@@ -21,10 +21,14 @@ def create_app(config_name):
         returns the instance
     '''
 
+    # Load configurations from instance folder
     app = FlaskAPI(__name__, instance_relative_config=True)
+    # Updates the values from the given object
     app.config.from_object(app_config[config_name])
+    # Updates the values in the config from a Python file
     app.config.from_pyfile('config.py')
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+    # set to False to avoid wasting resources
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     # connect to the DB
     db.init_app(app)
 
