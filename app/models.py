@@ -3,6 +3,7 @@
 
 # Third party import
 from flask_bcrypt import Bcrypt
+from datetime import datetime
 
 # Local import
 from app import db
@@ -16,21 +17,41 @@ class User(db.Model):
     # table columns
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), nullable=False, unique=True)
-    password = db.Column(db.String(256), nullable=False)
+    password_hash = db.Column(db.String(256), nullable=False)
     categories = db.relationship(
         'Category', order_by='category.id', cascade='all, delete-orphan',
         backref='users', lazy='dynamic')
 
-    def __init__(self, username, password):
-        ''' Initialise the user with a username and password '''
+    def __init__(self, username):
+        ''' Initialise the user with a username '''
         self.username = username
-        # hashing password value
-        self.password = Bcrypt().generate_password_hash(password).decode()
 
-    def password_authentication(self, password):
-        """ Compare passed password value against the stored hashed password
-        """
+    def password_hasher(self, password):
+        ''' hashes the password '''
+        self.password_hash = Bcrypt().generate_password_hash(password)
+
+    def password_authenticator(self, password):
+        ''' Compare password value against the stored hashed password '''
         return Bcrypt().check_password_hash(self.password, password)
+
+        def __init__(self, username):
+            """initialize with name."""
+        self.username = username
+
+    def save(self):
+        ''' Adds new Users to the DB '''
+        db.session.add(self)
+        db.session.commit()
+
+    @staticmethod
+    def get_all():
+        ''' Gets all the users in one query '''
+        return User.query.all()
+
+    def delete(self):
+        ''' Deletes a User from the DB '''
+        db.session.delete(self)
+        db.session.commit()
 
     def __repr__(self):
         return '<User: {}>'.format(self.username)
@@ -60,7 +81,23 @@ class Category(db.Model):
         self.name = name
         self.description = description
 
+    def save(self):
+        ''' Adds new Categories to the DB '''
+        db.session.add(self)
+        db.session.commit()
+
+    @staticmethod
+    def get_all():
+        ''' Gets all the Categories in one query '''
+        return Category.query.all()
+
+    def delete(self):
+        ''' Deletes a Category from the DB '''
+        db.session.delete(self)
+        db.session.commit()
+
     def __repr__(self):
+        ''' Tells python how to print the objects from the class '''
         return '<Category: {}>'.format(self.name)
 
 
@@ -84,6 +121,21 @@ class Recipe(db.Model):
         ''' Initialise the recipe with a name and ingredients '''
         self.name = name
         self.ingredients = ingredients
+
+    def save(self):
+        ''' Adds new Recipes to the DB '''
+        db.session.add(self)
+        db.session.commit()
+
+    @staticmethod
+    def get_all():
+        ''' Gets all the Recipes in one query '''
+        return Recipe.query.all()
+
+    def delete(self):
+        ''' Deletes a Recipe from the DB '''
+        db.session.delete(self)
+        db.session.commit()
 
     def __repr__(self):
         return '<Recipe: {}>'.format(self.name)
