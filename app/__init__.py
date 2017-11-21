@@ -4,7 +4,8 @@
 '''
 
 # third party imports
-from flask_api import FlaskAPI
+from flask import Flask
+from flask_restful import Resource, Api
 from flask_sqlalchemy import SQLAlchemy
 
 # local import
@@ -22,7 +23,8 @@ def create_app(config_name):
     '''
 
     # Load configurations from instance folder
-    app = FlaskAPI(__name__, instance_relative_config=True)
+    app = Flask(__name__, instance_relative_config=True)
+    api = Api(app)
     # Updates the values from the given object
     app.config.from_object(app_config[config_name])
     # Updates the values in the config from a Python file
