@@ -104,3 +104,4 @@ migrations/env.py
 migrations/README
 migrations/script.py.mako
 migrations/versions/72fc843de703_.py
+migrations/versions/4ebeaf6420cc_.py
