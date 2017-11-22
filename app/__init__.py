@@ -1,6 +1,6 @@
 # app/__init__.py
-''' This script initialises the app through the application factory, which
-    creates the new flask object,loads the configuration and connects to the DB
+''' This script initialises the app through the application factory, the new
+    flask object is created, loads the configuration and connects to the DB
 '''
 
 # third party imports
