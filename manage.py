@@ -8,7 +8,9 @@ from flask_migrate import Migrate, MigrateCommand
 
 # Local imports
 from app import db, create_app
-from app import models
+from app.models.user import User
+from app.models.category import Category
+from app.models.recipe import Recipe
 
 
 app = create_app(config_name=os.getenv('FLASK_CONFIG'))
