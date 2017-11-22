@@ -2,8 +2,8 @@
 ''' This scripts holds the DB table models '''
 
 # Third party import
-from flask_bcrypt import Bcrypt
 from datetime import datetime
+from flask_bcrypt import Bcrypt
 
 # Local import
 from app import db
@@ -33,10 +33,6 @@ class User(db.Model):
     def password_authenticator(self, password):
         ''' Compare password value against the stored hashed password '''
         return Bcrypt().check_password_hash(self.password, password)
-
-        def __init__(self, username):
-            """initialize with name."""
-        self.username = username
 
     def save(self):
         ''' Adds new Users to the DB '''
