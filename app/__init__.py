@@ -34,5 +34,8 @@ def create_app(config_name):
     # prep application to work with SQLAlchemy
     db.init_app(app)
 
+    # import and register auth blueprint
+    from .auth import auth
+    app.register_blueprint(auth)
     # the app instance used to start the app
     return app
