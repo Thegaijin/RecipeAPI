@@ -31,7 +31,7 @@ def create_app(config_name):
     app.config.from_pyfile('config.py')
     # set to False to avoid wasting resources
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    # connect to the DB
+    # prep application to work with SQLAlchemy
     db.init_app(app)
 
     # the app instance used to start the app
