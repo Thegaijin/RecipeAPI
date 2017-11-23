@@ -25,11 +25,17 @@ class Recipe(db.Model, CRUDMixin):
         db.DateTime, default=db.func.current_timestamp(),
         onupdate=db.func.current_timestamp())
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
+    category = db.relationship('Category', backref=db.backref('recipes',
+                                                              lazy='dynamic'))
+    created_by = db.Column(db.Integer, db.ForeignKey('User.id'))
+    user = db.relationship('User', backref=db.backref(' recipes',
+                                                      lazy='dynamic'))
 
-    def __init__(self, name, ingredients):
+    def __init__(self, name, ingredients, category):
         ''' Initialise the recipe with a name and ingredients '''
         self.name = name
         self.ingredients = ingredients
+        self.category = category
 
     def __repr__(self):
         return '<Recipe: {}>'.format(self.name)
