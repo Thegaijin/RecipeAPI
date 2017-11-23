@@ -27,7 +27,6 @@ class Recipe(db.Model, CRUDMixin):
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
     category = db.relationship('Category', backref=db.backref('recipes',
                                                               lazy='dynamic'))
-    created_by = db.Column(db.Integer, db.ForeignKey('User.id'))
     user = db.relationship('User', backref=db.backref(' recipes',
                                                       lazy='dynamic'))
 

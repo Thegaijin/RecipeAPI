@@ -17,7 +17,7 @@ class User(db.Model, CRUDMixin):
     # table columns
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), nullable=False, unique=True)
-    password_hash = db.Column(db.String(256), nullable=False)
+    password = db.Column(db.String(256), nullable=False)
     categories = db.relationship(
         'Category', order_by='category.id', cascade='all, delete-orphan',
         backref='users', lazy='dynamic')
@@ -28,7 +28,7 @@ class User(db.Model, CRUDMixin):
 
     def password_hasher(self, password):
         ''' hashes the password '''
-        self.password_hash = Bcrypt().generate_password_hash(password)
+        self.password = Bcrypt().generate_password_hash(password)
 
     def password_authenticator(self, password):
         ''' Compare password value against the stored hashed password '''
