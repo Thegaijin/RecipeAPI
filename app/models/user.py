@@ -30,7 +30,7 @@ class User(db.Model, CRUDMixin):
         ''' hashes the password '''
         self.password = Bcrypt().generate_password_hash(password)
 
-    def password_authenticator(self, password):
+    def password_checker(self, password):
         ''' Compare password value against the stored hashed password '''
         return Bcrypt().check_password_hash(self.password, password)
 
