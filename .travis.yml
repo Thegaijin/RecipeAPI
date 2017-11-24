@@ -9,8 +9,6 @@ install:
 # Setting environment variables
 env:
   - ENV_VAR=testing
-  - ENV_VAR2=development
-  - ENV_VAR3=production
 
 # create a db named test
 before_script:
@@ -18,7 +16,7 @@ before_script:
 
 # command to run tests
 script:
-  - pytest --cov-report term --cov=app
+  - python -m unittest
 
 after_success:
   - coveralls
