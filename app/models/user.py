@@ -56,13 +56,28 @@ class User(db.Model, CRUDMixin):
                 'sub': user_id
             }
             # create the byte string token using the payload and the SECRET key
-            jwt_string = jwt.encode(
+            token_string = jwt.encode(
                 header, payload, current_app.config.get('SECRET_KEY'))
-            return jwt_string
+            return token_string
 
         except Exception as e:
             # return an error in string format if an exception occurs
             return str(e)
+
+    @staticmethod
+    def decode_token(token):
+        """Decodes the access token from the Authorization header."""
+        try:
+            # try to decode the token using our SECRET_KEY
+            payload = jwt.decode(token, current_app.config.get('SECRET_KEY'))
+            # returns the user's ID
+            return payload['sub']
+        except jwt.ExpiredSignatureError:
+            # In case the token has expired
+            return "Expired token. Please login to get a new token"
+        except jwt.InvalidTokenError:
+            # Incase the token cannot be decoded/authenticated
+            return "Invalid token. Please register or login"
 
     def __repr__(self):
         return '<User: {}>'.format(self.username)
