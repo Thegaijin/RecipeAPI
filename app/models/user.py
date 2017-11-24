@@ -2,7 +2,10 @@
 ''' This scripts holds the DB table models '''
 
 # Third party import
+from datetime import datetime, timedelta
+from flask import current_app
 from flask_bcrypt import Bcrypt
+import jwt
 
 # Local import
 from app import db
@@ -33,6 +36,33 @@ class User(db.Model, CRUDMixin):
     def password_checker(self, password):
         ''' Compare password value against the stored hashed password '''
         return Bcrypt().check_password_hash(self.password, password)
+
+    def generate_token(self, user_id):
+        """ Generates the access token"""
+
+        try:
+            # header
+            header = {
+                'typ': 'JWT',
+                'alg': 'HS256'
+            }
+            # payload with the claims,expiration time,subject,token issue time
+            payload = {
+                # expiration time, 10 minutes after current/issued time
+                'exp': datetime.utcnow() + timedelta(minutes=10),
+                # issued time
+                'iat': datetime.utcnow(),
+                # subject, user's id
+                'sub': user_id
+            }
+            # create the byte string token using the payload and the SECRET key
+            jwt_string = jwt.encode(
+                header, payload, current_app.config.get('SECRET_KEY'))
+            return jwt_string
+
+        except Exception as e:
+            # return an error in string format if an exception occurs
+            return str(e)
 
     def __repr__(self):
         return '<User: {}>'.format(self.username)
