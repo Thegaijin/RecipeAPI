@@ -5,7 +5,7 @@
 
 # third party imports
 from flask import Flask
-from flask_restful import Resource, Api
+from flask_restplus import Resource, Api
 from flask_sqlalchemy import SQLAlchemy
 
 # local import
@@ -24,7 +24,8 @@ def create_app(config_name):
 
     # Load configurations from instance folder
     app = Flask(__name__, instance_relative_config=True)
-    api = Api(app)
+    api = Api(appversion='1.0', title='Recipes API',
+              description='A simple Recipes creation and categorisation API')
     # Updates the values from the given object
     app.config.from_object(app_config[config_name])
     # Updates the values in the config from a Python file
@@ -34,8 +35,4 @@ def create_app(config_name):
     # prep application to work with SQLAlchemy
     db.init_app(app)
 
-    # import and register auth blueprint
-    from .auth import auth
-    app.register_blueprint(auth)
-    # the app instance used to start the app
     return app
