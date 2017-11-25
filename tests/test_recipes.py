@@ -10,7 +10,7 @@ from app import create_app, db
 
 
 class UserTestCase(TestCase):
-    ''' Tests for the auth blueprint views '''
+    ''' Tests for the user registration and login '''
 
     def setUp(self):
 
