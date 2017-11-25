@@ -6,17 +6,16 @@ from datetime import datetime
 
 # Local import
 from app import db
-from app.models.crudmixin import CRUDMixin
 from app.models.user import User
 
 
-class Category(db.Model, CRUDMixin):
+class Category(db.Model):
     ''' Class representing the categories table '''
 
     __tablename__ = 'categories'
 
     # table columns
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False, unique=True)
     description = db.Column(db.String(256), nullable=False)
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())

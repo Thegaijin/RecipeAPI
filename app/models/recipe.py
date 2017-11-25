@@ -6,17 +6,16 @@ from datetime import datetime
 
 # Local imports
 from app import db
-from app.models.crudmixin import CRUDMixin
 from app.models.user import User
 
 
-class Recipe(db.Model, CRUDMixin):
+class Recipe(db.Model):
     ''' Class representing the recipes table '''
 
     __tablename__ = 'recipes'
 
     # table columns
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False, unique=True)
     ingredients = db.Column(db.String(256), nullable=False)
     created_by = db.Column(db.Integer, db.ForeignKey(User.id))
