@@ -2,7 +2,7 @@
 ''' This script holds the resource functionality for user creation and login '''
 
 # Local imports
-# from app import db
+from app import db
 from app.models.user import User
 
 
