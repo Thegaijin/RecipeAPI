@@ -15,45 +15,84 @@ api = Namespace(
     'auth', description='Creating and authenticating user credentials')
 
 user = api.model('User', {
-    'username': fields.String(required=True, description='user\'s name'),
-    'password': fields.String(required=True, description='user\'s  password'),
+    'username': fields.String(required=True,
+                              pattern="[^a-zA-Z0-9]",
+                              description='user\'s name'),
+    'password': fields.String(required=True, description='user\'s password'),
 })
+
+# validate input
+parser = reqparse.RequestParser(bundle_errors=True)
+# specify parameter names and accepted values
+parser.add_argument('username', required=True, help='Try again: {error_msg}')
+parser.add_argument('password', required=True)
 
 
 @api.route('/auth/register')
 class UserRegistration(Resource):
     ''' This class registers a new user. '''
 
-    def get(self, id):
-        pass
+    # specifies the expected input fields
+    @api.expect(parser)
+    def post(self):
+        ''' This method adds a new user to the DB
 
-    def put(self, id):
-        pass
+        :param username:A string: The user\'s chosen name
+        :param password: string: The user\'s password
+        '''
 
-    def delete(self, id):
-        pass
+        args = parser.parse_args()
+        username = args.username
+        password = args.password
+
+        try:
+            # check if the already username exists in the db
+            if User.query.filter_by(username=username).first() is None:
+                new_user = User(username)
+                # hash the password
+                new_user.password_hasher(password)
+                # add to the db
+                db.session.add(new_user)
+                db.session.commit()
+                return {'message': '{}, Your account was successfully\
+                        created'.format(new_user.username)}, 200
+            return {'message': 'The username already exists'}, 400
+        except:
+            return {'message': 'An error occured during the user registration'}
 
 
+@api.route('/auth/login')
 class UserLogin(Resource):
     ''' This class logs in an existing user. '''
 
-    def get(self, id):
-        pass
-
-    def put(self, id):
-        pass
-
-    def delete(self, id):
-        pass
-
-
-''' class UserAPI(Resource):
-    
-
-    # POST methods map to this function
+    @api.expect(parser)
     def post(self):
-        Responds to POST requests at the / auth / register view
-        # check if a username already exists
-        #user = User.query.filter_by(username=request.data['username']).first()
-        pass
- '''
+        ''' This method adds a new user to the DB
+
+        :param username:A string: The user\'s chosen name
+        :param password: string: The user\'s password
+        '''
+        args = parser.parse_args()
+        username = args.username
+        password = args.password
+
+        try:
+            # check if the user exists
+            if User.query.filter_by(username=username).first() is not None:
+                # save user object
+                the_user = User.query.filter_by(username=username).first()
+                # check if the password matches, returns True if they match
+                password_match = the_user.password_checker(password)
+                if password_match:
+                    user_token = the_user.generate_token(the_user.id)
+                    the_response = {
+                        'status': 'success',
+                        'message': 'Welcome, {}'.format(the_user.username),
+                        'token': user_token
+                    }
+                    return the_response, 200
+                return {'message': 'Credentials do not match, please try again'}
+            return {'message': 'Username does not exist, please signup'}
+        except:
+            return {'message': 'An error occured while attempting to login the\
+                    user'}
