@@ -2,18 +2,25 @@
 ''' This script holds the resource functionality for user creation and login '''
 
 # Local imports
-from . import auth
-from app import db, api
+from app import db
 from app.models.user import User
-from app.models.category import Category
-from app.models.recipe import Recipe
 
 
 # Third party imports
-from flask import make_response, request, jsonify
-from flask_restplus import Resource, reqparse
+from flask import jsonify, make_response, request
+from flask_restplus import fields, Namespace, Resource, reqparse
 
 
+api = Namespace(
+    'auth', description='Creating and authenticating user credentials')
+
+user = api.model('User', {
+    'username': fields.String(required=True, description='user\'s name'),
+    'password': fields.String(required=True, description='user\'s  password'),
+})
+
+
+@api.route('/auth/register')
 class UserRegistration(Resource):
     def get(self, id):
         pass
