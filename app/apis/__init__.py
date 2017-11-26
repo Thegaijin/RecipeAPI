@@ -2,9 +2,13 @@
 ''' This script aggregates the namespaces '''
 
 # Third party import
+from flask import Blueprint
 from flask_restplus import Api
 
-api = Api(title='Recipes API',
+apiv1_blueprint = Blueprint('api_v1', __name__)
+
+api = Api(apiv1_blueprint,
+          title='Recipes API',
           version='1.0',
           description='An API to create, read, update and delete recipes')
 # namespace for user registration and login
