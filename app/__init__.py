@@ -35,15 +35,5 @@ def create_app(config_name):
     db.init_app(app)
 
     apiv1_blueprint = Blueprint('api_v1', __name__, url_prefix='/api/v1')
-    api = Api(apiv1_blueprint, appversion='1.0', title='Recipes API',
-              description='An API to create, read, update and delete recipes')
-
-    # namespace for user registration and login
-    from app.apis.auth import api as ns_auth
-    api.add_namespace(ns_auth)
-
-    # namespace for the recipes CRUD
-    from app.apis.recipes import api as ns_recipes
-    api.add_namespace(ns_recipes)
     app.register_blueprint(apiv1_blueprint)
     return app
