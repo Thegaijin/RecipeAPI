@@ -22,32 +22,38 @@ user = api.model('User', {
 
 @api.route('/auth/register')
 class UserRegistration(Resource):
-    def get(self, id):
-        pass
-
-    def put(self, id):
-        pass
-
-    def delete(self, id):
-        pass
-
-
-class Login(Resource):
-    def get(self, id):
-        pass
-
-    def put(self, id):
-        pass
-
-    def delete(self, id):
-        pass
-
-
-class UserAPI(MethodView):
     ''' This class registers a new user. '''
+
+    def get(self, id):
+        pass
+
+    def put(self, id):
+        pass
+
+    def delete(self, id):
+        pass
+
+
+class UserLogin(Resource):
+    ''' This class logs in an existing user. '''
+
+    def get(self, id):
+        pass
+
+    def put(self, id):
+        pass
+
+    def delete(self, id):
+        pass
+
+
+''' class UserAPI(Resource):
+    
 
     # POST methods map to this function
     def post(self):
-        ''' Responds to POST requests at the /auth/register view '''
+        Responds to POST requests at the / auth / register view
         # check if a username already exists
-        user = User.query.filter_by(username=request.data['username']).first()
+        #user = User.query.filter_by(username=request.data['username']).first()
+        pass
+ '''
