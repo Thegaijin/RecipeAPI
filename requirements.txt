@@ -9,10 +9,12 @@ Flask-Bcrypt==0.7.1
 Flask-JWT==0.3.2
 Flask-Migrate==2.1.1
 Flask-RESTful==0.3.6
+flask-restplus==0.10.1
 Flask-Script==2.0.6
 Flask-SQLAlchemy==2.3.2
 itsdangerous==0.24
 Jinja2==2.9.6
+jsonschema==2.6.0
 Mako==1.0.7
 MarkupSafe==1.0
 psycopg2==2.7.3.2
