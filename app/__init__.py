@@ -32,8 +32,8 @@ def create_app(config_name):
     app.config.from_pyfile('config.py')
     # set to False to avoid wasting resources
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    app.register_blueprint(api_v1, url_prefix='/api/v1')
     # prep application to work with SQLAlchemy
     db.init_app(app)
 
-    app.register_blueprint(api_v1, url_prefix='/api/v1')
     return app
