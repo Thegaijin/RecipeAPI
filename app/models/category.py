@@ -26,7 +26,7 @@ class Category(db.Model):
     user = db.relationship('User', backref=db.backref(' categories',
                                                       lazy='dynamic'))
     recipes = db.relationship(
-        'Recipe', order_by='recipe.id', cascade='all, delete-orphan',
+        'Recipe', cascade='all, delete-orphan',
         backref='categories')
 
     def __init__(self, name, description):

@@ -21,7 +21,7 @@ class User(db.Model):
     username = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(256), nullable=False)
     categories = db.relationship(
-        'Category', order_by='category.id', cascade='all, delete-orphan',
+        'Category', cascade='all, delete-orphan',
         backref='users', lazy='dynamic')
 
     def __init__(self, username):
