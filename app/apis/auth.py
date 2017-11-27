@@ -9,6 +9,7 @@ from app.models.user import User
 # Third party imports
 from flask import jsonify, make_response, request
 from flask_restplus import fields, Namespace, Resource, reqparse
+import traceback
 
 
 api = Namespace(
@@ -55,11 +56,14 @@ class UserRegistration(Resource):
                 db.session.add(new_user)
                 db.session.commit()
 
-                the_response = {'message': '{}, Your account was successfully\
-                        created'.format(new_user.username)}
-                return make_response(jsonify(the_response)), 201
+                return {'message': '{}, Your account was successfully created\
+                        '.format(new_user.username)}, 201
+                # the_response = {'message': '{}, Your account was successfully\
+                #        created'.format(new_user.username)}
+                # return make_response(jsonify(the_response)), 201
             return {'message': 'The username already exists'}, 400
         except:
+            traceback.print_exc()
             return {'message': 'An error occured during the user registration'}
 
 
