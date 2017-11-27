@@ -9,7 +9,7 @@ from flask_restplus import Api
 from .auth import api as ns_auth
 from .recipes import api as ns_recipes
 
-apiv1_blueprint = Blueprint('api_v1', __name__, url_prefix='/api/v1')
+apiv1_blueprint = Blueprint('api_v1', __name__)
 
 api = Api(apiv1_blueprint,
           title='Recipes API',

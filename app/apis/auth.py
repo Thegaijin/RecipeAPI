@@ -28,7 +28,7 @@ parser.add_argument('username', required=True, help='Try again: {error_msg}')
 parser.add_argument('password', required=True)
 
 
-@api.route('/auth/register')
+@api.route('/register/')
 class UserRegistration(Resource):
     ''' This class registers a new user. '''
 
@@ -54,23 +54,25 @@ class UserRegistration(Resource):
                 # add to the db
                 db.session.add(new_user)
                 db.session.commit()
-                return {'message': '{}, Your account was successfully\
-                        created'.format(new_user.username)}, 200
+
+                the_response = {'message': '{}, Your account was successfully\
+                        created'.format(new_user.username)}
+                return make_response(jsonify(the_response)), 201
             return {'message': 'The username already exists'}, 400
         except:
             return {'message': 'An error occured during the user registration'}
 
 
-@api.route('/auth/login')
+@api.route('/login/')
 class UserLogin(Resource):
     ''' This class logs in an existing user. '''
 
     @api.expect(parser)
     def post(self):
-        ''' This method adds a new user to the DB
+        ''' This method signs in an existing user
 
-        :param username:A string: The user\'s chosen name
-        :param password: string: The user\'s password
+        :param username: A string: The user\'s chosen name
+        :param password: A string: The user\'s password
         '''
         args = parser.parse_args()
         username = args.username
