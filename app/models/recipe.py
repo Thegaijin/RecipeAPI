@@ -25,8 +25,7 @@ class Recipe(db.Model):
         db.DateTime, default=db.func.current_timestamp(),
         onupdate=db.func.current_timestamp())
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
-    # category = db.relationship('Category', backref=db.backref('recipes',
-    # lazy='dynamic'))
+    category = db.relationship('Category')
     # user = db.relationship('User', backref=db.backref(' recipes',
     # lazy='dynamic'))
 

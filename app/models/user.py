@@ -20,9 +20,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(256), nullable=False)
-    categories = db.relationship(
-        'Category', cascade='all, delete-orphan',
-        backref='users', lazy='dynamic')
+    # categories = db.relationship('Category', cascade='all, delete-orphan',
+    # backref='users', lazy='dynamic')
 
     def __init__(self, username):
         ''' Initialise the user with a username '''
