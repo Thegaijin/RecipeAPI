@@ -7,6 +7,7 @@ from datetime import datetime
 # Local imports
 from app import db
 from app.models.user import User
+from app.models.category import Category
 
 
 class Recipe(db.Model):
@@ -24,10 +25,10 @@ class Recipe(db.Model):
         db.DateTime, default=db.func.current_timestamp(),
         onupdate=db.func.current_timestamp())
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
-    category = db.relationship('Category', backref=db.backref('recipes',
-                                                              lazy='dynamic'))
-    user = db.relationship('User', backref=db.backref(' recipes',
-                                                      lazy='dynamic'))
+    # category = db.relationship('Category', backref=db.backref('recipes',
+    # lazy='dynamic'))
+    # user = db.relationship('User', backref=db.backref(' recipes',
+    # lazy='dynamic'))
 
     def __init__(self, name, ingredients, category):
         ''' Initialise the recipe with a name and ingredients '''

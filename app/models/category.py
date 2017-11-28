@@ -23,11 +23,10 @@ class Category(db.Model):
         db.DateTime, default=db.func.current_timestamp(),
         onupdate=db.func.current_timestamp())
     created_by = db.Column(db.Integer, db.ForeignKey(User.id))
-    user = db.relationship('User', backref=db.backref(' categories',
-                                                      lazy='dynamic'))
-    recipes = db.relationship(
-        'Recipe', cascade='all, delete-orphan',
-        backref='categories')
+    # user = db.relationship('User', backref=db.backref(' categories',
+    # lazy = 'dynamic'))
+    recipes = db.relationship('Recipe', cascade='all, delete-orphan',
+                              backref='categories')
 
     def __init__(self, name, description):
         ''' Initialise the category with a name and description '''
