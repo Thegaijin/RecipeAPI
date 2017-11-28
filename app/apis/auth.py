@@ -55,12 +55,11 @@ class UserRegistration(Resource):
                 db.session.add(new_user)
                 db.session.commit()
 
-                return {'message': '{}, Your account was successfully created\
-                        '.format(new_user.username)}, 201
-            return {'message': 'The username already exists'}, 400
+                return {'message': 'Account was successfully created'}, 201
+            return {'message': 'The username already exists'}, 202
         except:
 
-            return {'message': 'An error occured during the user registration'}
+            return {'message': 'Error occured during user registration'}, 400
 
 
 @api.route('/login/')
@@ -89,12 +88,12 @@ class UserLogin(Resource):
                     user_token = the_user.generate_token(the_user.id)
                     the_response = {
                         'status': 'successful Login',
-                        'message': 'Welcome, {}'.format(the_user.username),
+                        'message': 'You have been signed in',
                         'token': user_token
                     }
                     return the_response, 200
-                return {'message': 'Credentials do not match, please try again'}
-            return {'message': 'Username does not exist, please signup'}
+                return {'message': 'Credentials do not match, try again'}, 401
+            return {'message': 'Username does not exist, signup'}, 401
         except:
             traceback.print_exc()
             return {'message': 'An error occured while attempting to login'}
