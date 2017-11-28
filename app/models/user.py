@@ -30,7 +30,7 @@ class User(db.Model):
 
     def password_hasher(self, password):
         ''' hashes the password '''
-        self.password = Bcrypt().generate_password_hash(password)
+        self.password = Bcrypt().generate_password_hash(password).decode('utf-8')
 
     def password_checker(self, password):
         ''' Compare password value against the stored hashed password '''

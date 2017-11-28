@@ -63,7 +63,7 @@ class UserRegistration(Resource):
                 # return make_response(jsonify(the_response)), 201
             return {'message': 'The username already exists'}, 400
         except:
-            traceback.print_exc()
+
             return {'message': 'An error occured during the user registration'}
 
 
@@ -92,7 +92,7 @@ class UserLogin(Resource):
                 if password_match:
                     user_token = the_user.generate_token(the_user.id)
                     the_response = {
-                        'status': 'success',
+                        'status': 'successful Login',
                         'message': 'Welcome, {}'.format(the_user.username),
                         'token': user_token
                     }
@@ -100,5 +100,5 @@ class UserLogin(Resource):
                 return {'message': 'Credentials do not match, please try again'}
             return {'message': 'Username does not exist, please signup'}
         except:
-            return {'message': 'An error occured while attempting to login the\
-                    user'}
+            traceback.print_exc()
+            return {'message': 'An error occured while attempting to login'}
