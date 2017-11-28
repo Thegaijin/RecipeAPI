@@ -7,7 +7,6 @@ from app.models.user import User
 
 
 # Third party imports
-from flask import jsonify, make_response, request
 from flask_restplus import fields, Namespace, Resource, reqparse
 import traceback
 
@@ -58,9 +57,6 @@ class UserRegistration(Resource):
 
                 return {'message': '{}, Your account was successfully created\
                         '.format(new_user.username)}, 201
-                # the_response = {'message': '{}, Your account was successfully\
-                #        created'.format(new_user.username)}
-                # return make_response(jsonify(the_response)), 201
             return {'message': 'The username already exists'}, 400
         except:
 

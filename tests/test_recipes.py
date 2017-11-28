@@ -40,8 +40,8 @@ class UserTestCase(TestCase):
         output = json.loads(res.data.decode())
         # check response
         self.assertEqual(res.status_code, 201)
-        self.assertEqual(result['message'], 'username, Your account was \
-                        successfully created')
+        self.assertEqual(result['message'], '{}, Your account was \
+                        successfully created').format(username)
         # test redirect to login page
 
     def test_user_already_exists(self):
@@ -70,7 +70,7 @@ class UserTestCase(TestCase):
         # check response
         self.assertEqual(res.status_code, 200)
         result = json.loads(res_2.data.decode())
-        self.assertEqual(result['message'], 'Welcome, username')
+        self.assertEqual(result['message'], 'Welcome, {}').format(username)
         # test redirect to next page
 
     def test_unregistered_user_login_fails(self):
