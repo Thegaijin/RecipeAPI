@@ -5,7 +5,7 @@
 from datetime import datetime
 
 # Local imports
-from app import db
+from ..db import db
 from app.models.user import User
 from app.models.category import Category
 
