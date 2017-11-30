@@ -20,10 +20,12 @@ class BaseTestCase(TestCase):
         # Client object to send virtual requests to the application
         self.client = self.app.test_client
 
-        # The user details json data to be used for testing
+        # The user details data to be used for testing
         self.user = {'username': 'username',
                      'password': 'password'}
-
+        # The Category details data to be used for testing
+        self.category = {'name': 'category',
+                         'description': 'description'}
         # explicitly create application context
         # cache DB connections to be created on a per-request or usage case
         with self.app.app_context():
