@@ -7,6 +7,7 @@ from app.models.user import User
 
 
 # Third party imports
+from flask import jsonify, make_response, request
 from flask_restplus import fields, Namespace, Resource, reqparse
 import traceback
 
@@ -37,8 +38,9 @@ class UserRegistration(Resource):
     def post(self):
         ''' This method adds a new user to the DB
 
-        :param username:A string: The user\'s chosen name
-        :param password: string: The user\'s password
+        :param str username: The user\'s chosen name
+        :param str password: The user\'s password
+        :return: A dictionary with a message
         '''
 
         args = parser.parse_args()
@@ -70,8 +72,9 @@ class UserLogin(Resource):
     def post(self):
         ''' This method signs in an existing user
 
-        :param username: A string: The user\'s chosen name
-        :param password: A string: The user\'s password
+        :param str username: The user\'s chosen name
+        :param str password: The user\'s password
+        :return: A dictionary with a message
         '''
         args = parser.parse_args()
         username = args.username
@@ -89,11 +92,10 @@ class UserLogin(Resource):
                     the_response = {
                         'status': 'successful Login',
                         'message': 'You have been signed in',
-                        'token': user_token
+                        'token': user_token.decode()
                     }
                     return the_response, 200
                 return {'message': 'Credentials do not match, try again'}, 401
             return {'message': 'Username does not exist, signup'}, 401
         except:
-            traceback.print_exc()
             return {'message': 'An error occured while attempting to login'}
