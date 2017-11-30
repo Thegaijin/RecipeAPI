@@ -39,11 +39,11 @@ class User(db.Model):
         """ Generates the access token"""
 
         try:
-            # header
-            header = {
-                'typ': 'JWT',
-                'alg': 'HS256'
-            }
+            '''  # header
+             header = {
+                 'typ': 'JWT',
+                 'alg': 'HS256'
+             } '''
             # payload with the claims,expiration time,subject,token issue time
             payload = {
                 # expiration time, 10 minutes after current/issued time
@@ -53,13 +53,15 @@ class User(db.Model):
                 # subject, user's id
                 'sub': user_id
             }
-            # create the byte string token using the payload and the SECRET key
+            # create the byte string token using the payload and the SECRET
+            # key
             token_string = jwt.encode(
-                header, payload, current_app.config.get('SECRET_KEY'))
+                payload, current_app.config.get('SECRET_KEY'),
+                algorithm='HS256')
             return token_string
 
         except Exception as e:
-            # return an error in string format if an exception occurs
+                # return an error in string format if an exception occurs
             return str(e)
 
     @staticmethod
@@ -71,10 +73,10 @@ class User(db.Model):
             # returns the user's ID
             return payload['sub']
         except jwt.ExpiredSignatureError:
-            # In case the token has expired
+            # If the token has expired
             return "Expired token. Please login to get a new token"
         except jwt.InvalidTokenError:
-            # Incase the token cannot be decoded/authenticated
+            # If the token cannot be authenticated
             return "Invalid token. Please register or login"
 
     def __repr__(self):
