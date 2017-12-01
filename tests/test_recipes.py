@@ -37,9 +37,28 @@ class RecipeTestCase(BaseTestCase):
                                             Authorization="Bearer" + token),
                                         data=self.category)
         self.assertEqual(create_res.status_code, 201)
-        self.assertEqual(create_res['message'], 'Category created')
+        self.assertEqual(create_res['message'], 'Category was created')
         self.assertIn(create_res.data, 'category')
         self.assertIsNotNone(Category.query.filter_by(name='newname').first())
+
+    def test_category_already_exists(self):
+        ''' Test that the API can create a Category '''
+        # register user
+        self.user_registration()
+        # login user
+        loggedin_user = self.user_login()
+        # get token from login response object
+        token = json.loads(loggedin_user.data)['token']
+        # add token to the header as part of the post request
+        create_res = self.client().post('/api/v1/categories/',
+                                        headers=dict(
+                                            Authorization="Bearer" + token),
+                                        data=self.category)
+        create2_res = self.client().post('/api/v1/categories/',
+                                         headers=dict(
+                                             Authorization="Bearer" + token),
+                                         data=self.category)
+        self.assertEqual(create2_res['message'], 'Category already exists')
 
     def test_view_category(self):
         ''' Test that the API can view a category '''
@@ -59,7 +78,7 @@ class RecipeTestCase(BaseTestCase):
         view_res = self.client().get('/api/v1/categories/{}/'.format(
             create_res['id']), headers=dict(Authorization="Bearer" + token))
         self.assertEqual(view_res.status_code, 200)
-        self.assertEqual(view_res['message'], 'The category exists')
+        self.assertEqual(view_res['name'], 'category')
         self.assertIn(view_res.data, 'category')
         self.assertIsNotNone(Category.query.filter_by(name='newname').first())
 
