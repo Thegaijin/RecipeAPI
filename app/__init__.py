@@ -5,7 +5,7 @@
 
 # third party imports
 from flask import Flask
-from flask_jwt import JWT, jwt_required, current_identity
+# from flask_jwt import JWT
 from flask_restplus import Api
 # from flask_sqlalchemy import SQLAlchemy
 
@@ -13,10 +13,9 @@ from flask_restplus import Api
 # local import
 # importing protected configurations from /instance
 from instance.config import app_config
-from app.user_auth import authenticate, identity
-from .db import db
+from .db import db, jwt
 
-
+# jwt = JWT()
 # object to interact with the Database
 # db = SQLAlchemy()
 
@@ -39,7 +38,8 @@ def create_app(config_name):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     # prep application to work with SQLAlchemy
     db.init_app(app)
-    jwt = JWT(app, authenticate, identity)
+    from .auth_handlers import authenticate, identify
+    jwt.init_app(app)
     from app.apis import apiv1_blueprint as api_v1
     app.register_blueprint(api_v1, url_prefix='/api/v1')
 

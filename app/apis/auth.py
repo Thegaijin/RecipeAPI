@@ -4,7 +4,7 @@
 # Local imports
 from ..db import db
 from app.models.user import User
-from ..user_auth import authenticate, identity
+from ..auth_handlers import authenticate, identify
 
 
 # Third party imports
@@ -51,7 +51,10 @@ class UserRegistration(Resource):
         try:
             # check if the already username exists in the db
             if User.query.filter_by(username=username).first() is None:
-                new_user = User(username, password)
+                new_user = User(username)
+                # hash the password
+                new_user.password_hasher(password)
+                # add to the db
                 db.session.add(new_user)
                 db.session.commit()
 

@@ -20,7 +20,6 @@ def authenticate(username, password):
     '''
 
     user = User.query.filter_by(username=username).first()
-    print(user)
     if Bcrypt().check_password_hash(user.password, password):
         return user
 
