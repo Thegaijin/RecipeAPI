@@ -28,5 +28,9 @@ class User(db.Model):
         ''' hashes the password '''
         self.password = Bcrypt().generate_password_hash(password).decode('utf-8')
 
+    def password_checker(self, password):
+        ''' Check if hashed password and password match '''
+        return Bcrypt().check_password_hash(self.password, password)
+
     def __repr__(self):
         return '<User: {}>'.format(self.username)
