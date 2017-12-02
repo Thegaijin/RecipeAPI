@@ -106,3 +106,4 @@ migrations/script.py.mako
 migrations/versions/72fc843de703_.py
 migrations/versions/4ebeaf6420cc_.py
 migrations/versions/8250e4628af8_.py
+migrations/versions/91c8d8b3d28e_.py
