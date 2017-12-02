@@ -10,7 +10,7 @@ import traceback
 # Third party imports
 from flask import request
 from flask_restplus import fields, Namespace, Resource, reqparse
-from flask_jwt import jwt_required, current_identity
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 
 api = Namespace(
@@ -42,6 +42,7 @@ class Categories(Resource):
     ''' The class handles the Category CRUD functionality '''
 
     @api.response(200, 'Category found successfully')
+    @jwt_required
     def get(self, name):
         ''' This method returns a category '''
         try:
@@ -67,6 +68,7 @@ class Categories(Resource):
     # specifies the expected input fields
     @api.expect(parser)
     @api.response(201, 'Category created successfully')
+    @jwt_required
     def post(self):
         ''' This method adds a new category to the DB
 
@@ -74,15 +76,19 @@ class Categories(Resource):
         :param description: string: The category description
         :return: A dictionary with a message
         '''
+        # get current user id
+        user_id = get_jwt_identity()
+
         args = parser.parse_args()
         name = args.name
         description = args.description
-        # created_by = user_id
+        created_by = user_id
 
         try:
             # check if the category exists
             if Category.query.filter_by(name=name).first() is None:
-                category = Category(name, description)  # add created_by
+                category = Category(name, description,
+                                    created_by)  # add created_by
                 db.session.add(category)
                 db.session.commit()
                 the_response = {
@@ -102,6 +108,7 @@ class Categories(Resource):
 
     @api.expect(parser)
     @api.response(204, 'Successfully edited')
+    @jwt_required
     def put(self, name=None, description=None):
         ''' This method edits a category '''
         try:
@@ -154,6 +161,7 @@ class Categories(Resource):
             return post_response
 
     @api.response(204, 'Success')
+    @jwt_required
     def delete(self, name):
         ''' This method deletes a Category '''
         try:
@@ -181,6 +189,7 @@ class Recipes(Resource):
     ''' The class handles the Category CRUD functionality '''
 
     @api.response(200, 'Success')
+    @jwt_required
     def get(self, name):
         ''' This method returns a category '''
         try:
@@ -203,6 +212,7 @@ class Recipes(Resource):
     # specifies the expected input fields
     @api.expect(parser)
     @api.response(201, 'Success')
+    @jwt_required
     def post(self):
         ''' This method adds a new recipe to the DB
 
@@ -210,10 +220,14 @@ class Recipes(Resource):
         :param description: string: The recipe description
         :return: A dictionary with a message
         '''
+
+        # get current user id
+        user_id = get_jwt_identity()
+
         args = parser.parse_args()
         name = args.name
         description = args.description
-        # created_by = user_id
+        created_by = user_id
 
         try:
             # check if the category exists
@@ -238,6 +252,7 @@ class Recipes(Resource):
 
     @api.expect(parser)
     @api.response(204, 'Success')
+    @jwt_required
     def put(self, name=None, description=None):
         ''' This method edits a recipe '''
         try:
@@ -290,6 +305,7 @@ class Recipes(Resource):
             return post_response
 
     @api.response(204, 'Success')
+    @jwt_required
     def delete(self, name):
         ''' This method deletes a Recipe '''
         try:

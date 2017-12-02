@@ -4,11 +4,14 @@
 # Local imports
 from ..db import db
 from app.models.user import User
-from ..auth_handlers import authenticate, identify
+from app import jwt
 
 
 # Third party imports
 from flask import jsonify, make_response, request
+from flask_jwt_extended import (jwt_required, create_access_token,
+                                get_jwt_identity)
+
 from flask_restplus import fields, Namespace, Resource, reqparse
 import traceback
 
@@ -87,11 +90,14 @@ class UserLogin(Resource):
                 # save user object
                 the_user = User.query.filter_by(username=username).first()
                 # check if the password matches, returns True if they match
-                user = authenticate(username, password)
-                if user is not None:
+                user = the_user.password_checker(password)
+
+                if user:
+                    access_token = create_access_token(identity=username)
                     the_response = {
                         'status': 'successful Login',
                         'message': 'You have been signed in',
+                        'access_token': access_token
                     }
                     return the_response, 200
                 return {'message': 'Credentials do not match, try again'}, 401
