@@ -56,6 +56,7 @@ class Categories(Resource):
                 get_response['id'] = the_category.id
                 get_response['name'] = the_category.name
                 get_response['description'] = the_category.description
+                get_response['created_by'] = the_category.created_by
                 return get_response, 200
 
         except Exception as e:
@@ -77,18 +78,17 @@ class Categories(Resource):
         :return: A dictionary with a message
         '''
         # get current user id
-        user_id = get_jwt_identity()
+        username = get_jwt_identity()
 
         args = parser.parse_args()
         name = args.name
         description = args.description
-        created_by = user_id
+        created_by = username
 
         try:
             # check if the category exists
             if Category.query.filter_by(name=name).first() is None:
-                category = Category(name, description,
-                                    created_by)  # add created_by
+                category = Category(name, description, created_by)
                 db.session.add(category)
                 db.session.commit()
                 the_response = {

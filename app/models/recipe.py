@@ -19,7 +19,7 @@ class Recipe(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100), nullable=False, unique=True)
     ingredients = db.Column(db.String(256), nullable=False)
-    created_by = db.Column(db.Integer, db.ForeignKey(User.id))
+    created_by = db.Column(db.String(100), db.ForeignKey(User.username))
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
     date_modified = db.Column(
         db.DateTime, default=db.func.current_timestamp(),
