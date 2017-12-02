@@ -29,11 +29,12 @@ class Recipe(db.Model):
     # user = db.relationship('User', backref=db.backref(' recipes',
     # lazy='dynamic'))
 
-    def __init__(self, name, ingredients, category):
-        ''' Initialise the recipe with a name and ingredients '''
+    def __init__(self, name, ingredients, category, created_by):
+        ''' Initialise the recipe with a name, ingredients and created by '''
         self.name = name
         self.ingredients = ingredients
         self.category = category
+        self.created_by = created_by
 
     def __repr__(self):
         return '<Recipe: {}>'.format(self.name)

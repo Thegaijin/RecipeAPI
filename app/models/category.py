@@ -28,12 +28,12 @@ class Category(db.Model):
     recipes = db.relationship('Recipe', cascade='all, delete-orphan',
                               backref='categories')
 
-    def __init__(self, name, description):  # created_by
-        ''' Initialise the category with a name and description '''
+    def __init__(self, name, description, created_by):
+        ''' Initialise the category with a name, description and created by '''
 
         self.name = name
         self.description = description
-        # self.created_by = created_by
+        self.created_by = created_by
 
     def __repr__(self):
         ''' Tells python how to print the objects from the class '''
