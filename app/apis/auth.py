@@ -39,6 +39,7 @@ class UserRegistration(Resource):
 
     # specifies the expected input fields
     @api.expect(parser)
+    @api.response(201, 'Account was successfully created')
     def post(self):
         ''' This method adds a new user to the DB
 
@@ -73,6 +74,7 @@ class UserLogin(Resource):
     ''' This class logs in an existing user. '''
 
     @api.expect(parser)
+    @api.response(201, 'You have been signed in')
     def post(self):
         ''' This method signs in an existing user
 
