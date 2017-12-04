@@ -24,16 +24,16 @@ class Recipe(db.Model):
     date_modified = db.Column(
         db.DateTime, default=db.func.current_timestamp(),
         onupdate=db.func.current_timestamp())
-    category_id = db.Column(db.Integer, db.ForeignKey('categories.id'))
+    category_name = db.Column(db.String, db.ForeignKey('categories.name'))
     category = db.relationship('Category')
     # user = db.relationship('User', backref=db.backref(' recipes',
     # lazy='dynamic'))
 
-    def __init__(self, name, ingredients, category, created_by):
+    def __init__(self, name, ingredients, category_name, created_by):
         ''' Initialise the recipe with a name, ingredients and created by '''
         self.name = name
         self.ingredients = ingredients
-        self.category = category
+        self.category_name = category_name
         self.created_by = created_by
 
     def __repr__(self):
