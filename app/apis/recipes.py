@@ -85,8 +85,8 @@ class Categories(Resource):
     def post(self):
         ''' This method adds a new category to the DB
 
-        :param name:A string: The category name
-        :param description: string: The category description
+        :param str name: The category name
+        :param str description: The category description
         :return: A dictionary with a message
         '''
         # get current user id
@@ -124,8 +124,8 @@ class Categories(Resource):
     def put(self, name=None, description=None):
         ''' This method edits a category. 
 
-        :param name:A string: The new category name
-        :param description: string: The new category description
+        :param str name: The new category name
+        :param str description: The new category description
         :return: A dictionary with a message
         '''
         try:
@@ -187,7 +187,7 @@ class Categories(Resource):
 
 
 @api.route('/recipe/<name>/')
-@api.route('/recipe/<name>/<recipe_name>')
+@api.route('/recipe/<name>/<recipe_name>/')
 class Recipes(Resource):
     ''' The class handles the Recipes CRUD functionality '''
 
@@ -203,7 +203,7 @@ class Recipes(Resource):
                 get_response = {}
                 get_response['id'] = the_recipe.id
                 get_response['name'] = the_recipe.recipe_name
-                get_response['description'] = the_recipe.description
+                get_response['description'] = the_recipe.ingredients
                 get_response['category'] = the_recipe.category_name
                 get_response['created by'] = the_recipe.created_by
                 return get_response, 200
@@ -222,8 +222,8 @@ class Recipes(Resource):
     def post(self, name):
         ''' This method adds a new recipe to the DB
 
-        :param name:A string: The recipe name
-        :param description: string: The recipe description
+        :param str name: The recipe name
+        :param str description: The recipe description
         :return: A dictionary with a message
         '''
 
@@ -258,47 +258,32 @@ class Recipes(Resource):
             traceback.print_exc()
             return post_response
 
-    @api.expect(parser)
+    @api.expect(recipe_parser)
     @api.response(204, 'Success')
     @jwt_required
-    def put(self, recipe_name=None, description=None):
-        ''' This method edits a recipe '''
+    def put(self, name, recipe_name):
+        ''' This method edits a recipe
+
+        :param str recipe_name: The new recipe name
+        :param str description: The new recipe description
+        :return: A dictionary with a message
+        '''
         try:
             the_recipe = Recipe.query.filter_by(
                 recipe_name=recipe_name).first()
             if the_recipe is not None:
-                args = parser.parse_args()
+                args = recipe_parser.parse_args()
                 recipe_name = args.recipe_name
                 description = args.description
 
                 if recipe_name is not None and description is not None:
                     the_recipe.recipe_name = recipe_name
-                    the_recipe.description = description
+                    the_recipe.ingredients = description
                     db.session.add(the_recipe)
                     db.session.commit()
                     edit_response = {
                         'status': 'Success',
                         'message': 'Recipe details successfully edited'
-                    }
-
-                    return edit_response, 204
-                elif name is not None and description is None:
-                    the_recipe.name = name
-                    db.session.add(the_recipe)
-                    db.session.commit()
-                    edit_response = {
-                        'status': 'Success',
-                        'message': 'Recipe name successfully edited'
-                    }
-
-                    return edit_response, 204
-                elif name is None and description is not None:
-                    the_recipe.description = description
-                    db.session.add(the_recipe)
-                    db.session.commit()
-                    edit_response = {
-                        'status': 'Success',
-                        'message': 'Recipe description successfully edited'
                     }
 
                     return edit_response, 204
@@ -315,7 +300,7 @@ class Recipes(Resource):
 
     @api.response(204, 'Success')
     @jwt_required
-    def delete(self, recipe_name):
+    def delete(self, name, recipe_name):
         ''' This method deletes a Recipe '''
         try:
             the_recipe = Recipe.query.filter_by(
