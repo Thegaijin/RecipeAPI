@@ -17,7 +17,7 @@ class Recipe(db.Model):
 
     # table columns
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(100), nullable=False, unique=True)
+    recipe_name = db.Column(db.String(100), nullable=False, unique=True)
     ingredients = db.Column(db.String(256), nullable=False)
     created_by = db.Column(db.String(100), db.ForeignKey(User.username))
     date_created = db.Column(db.DateTime, default=db.func.current_timestamp())
@@ -29,12 +29,12 @@ class Recipe(db.Model):
     # user = db.relationship('User', backref=db.backref(' recipes',
     # lazy='dynamic'))
 
-    def __init__(self, name, ingredients, category_name, created_by):
+    def __init__(self, recipe_name, ingredients, category_name, created_by):
         ''' Initialise the recipe with a name, ingredients and created by '''
-        self.name = name
+        self.recipe_name = recipe_name
         self.ingredients = ingredients
         self.category_name = category_name
         self.created_by = created_by
 
     def __repr__(self):
-        return '<Recipe: {}>'.format(self.name)
+        return '<Recipe: {}>'.format(self.recipe_name)
