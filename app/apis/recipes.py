@@ -43,33 +43,52 @@ recipe_parser.add_argument(
 recipe_parser.add_argument('description', required=True)
 
 
-@api.route('/categories/')
+@api.route('/categories')
 @api.route('/categories/<name>/')
 class Categories(Resource):
     ''' The class handles the Category CRUD functionality '''
 
     @api.response(200, 'Category found successfully')
     @jwt_required
-    def get(self, name):
+    def get(self, name=None):
         ''' This method returns a category. The method is passed the category
             name in the url and it returns the details of that category
 
             :param str name: The name of the category you want to view.
             :return: A dictionary of the category\'s properties
         '''
-        try:
-            the_category = Category.query.filter_by(name=name).first()
-            if the_category is not None:
 
-                ''' return jsonify(id=the_category.id,
-                               name=the_category.name,
-                               description=the_category.description), 200 '''
-                get_response = {}
-                get_response['id'] = the_category.id
-                get_response['name'] = the_category.name
-                get_response['description'] = the_category.description
-                get_response['created_by'] = the_category.created_by
-                return get_response, 200
+        try:
+            if name is not None:
+                the_category = Category.query.filter_by(
+                    name=name).one()
+                if the_category is not None:
+
+                    get_response = {}
+                    get_response['id'] = the_category.id
+                    get_response['name'] = the_category.name
+                    get_response['description'] = the_category.description
+                    get_response['created_by'] = the_category.created_by
+                    return get_response, 200
+            else:
+                # get current user id
+                username = get_jwt_identity()
+                created_by = username
+                the_categories = Category.query.filter_by(
+                    created_by=created_by).all()
+
+                user_categories = []
+                if the_categories:
+                    for category in the_categories:
+                        get_response = {}
+                        get_response['id'] = category.id
+                        get_response['name'] = category.name
+                        get_response['description'] = category.description
+                        get_response['created_by'] = category.created_by
+
+                        user_categories.append(get_response)
+                    print(user_categories)
+                    return user_categories, 200
 
         except Exception as e:
             get_response = {
