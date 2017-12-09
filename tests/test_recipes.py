@@ -112,7 +112,7 @@ class RecipeTestCase(BaseTestCase):
         # get token from login response object
         token = json.loads(loggedin_user.data)['token']
         # create category
-        create_res = self.client().post('/api/v1/recipes/categories/',
+        create_res = self.client().post('/api/v1/recipes/categories',
                                         headers=dict(
                                             Authorization="Bearer" + token),
                                         data=self.category)
