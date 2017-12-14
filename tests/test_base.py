@@ -25,7 +25,8 @@ class BaseTestCase(TestCase):
                      'password': 'password'}
         # The Category details data to be used for testing
         self.category = {'name': 'category',
-                         'description': 'description'}
+                         'description': 'description',
+                         'created_by': 'created_by'}
         # explicitly create application context
         # cache DB connections to be created on a per-request or usage case
         with self.app.app_context():
