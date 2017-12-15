@@ -33,6 +33,16 @@ class BaseTestCase(TestCase):
             # current_app points to app
             db.create_all()
 
+    def user_registration(self):
+        ''' This method registers a user '''
+
+        return self.client().post('/api/v1/auth/register/', data=self.user)
+
+    def user_login(self):
+        ''' This helper method helps log in a test user '''
+
+        return self.client().post('/api/v1/auth/login/', data=self.user)
+
     def tearDown(self):
         with self.app.app_context():
 
