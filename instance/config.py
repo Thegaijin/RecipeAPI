@@ -24,7 +24,7 @@ class TestingConfig(Config):
     # path to test database
     SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/test_db'
     DEBUG = True
-    SQLALCHEMY_ECHO = True  # allow SQLAlchemy to log error
+    SQLALCHEMY_ECHO = False
     PRESERVE_CONTEXT_ON_EXCEPTION = False
 
 
