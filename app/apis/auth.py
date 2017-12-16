@@ -1,5 +1,5 @@
 # app/auth/user.py
-''' This script holds the resource functionality for user creation and login '''
+''' This script holds resource functionality for user creation and login '''
 
 # Local imports
 from ..db import db
@@ -58,6 +58,7 @@ class UserRegistration(Resource):
                 new_user = User(username)
                 # hash the password
                 new_user.password_hasher(password)
+                print(new_user.password_hasher(password))
                 # add to the db
                 db.session.add(new_user)
                 db.session.commit()
