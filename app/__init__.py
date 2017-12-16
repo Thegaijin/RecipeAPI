@@ -22,6 +22,8 @@ def create_app(config_name):
         Loads configuration settings and connects to the required DB
         Registers the blueprint with the namespaces
         returns the instance
+
+        :param str config_name: The key to activate the related configuration
     '''
 
     # Load configurations from instance folder
@@ -36,7 +38,13 @@ def create_app(config_name):
     # prep application to work with SQLAlchemy
     db.init_app(app)
     jwt.init_app(app)
+
+    # Import blueprints
     from app.apis import apiv1_blueprint as api_v1
+    from app.apis import apiv2_blueprint as api_v2
+
+    # Register blueprints
     app.register_blueprint(api_v1, url_prefix='/api/v1')
+    app.register_blueprint(api_v2, url_prefix='/api/v2')
 
     return app
