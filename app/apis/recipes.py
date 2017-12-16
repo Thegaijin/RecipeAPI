@@ -73,7 +73,7 @@ class Categories(Resource):
     @api.response(200, 'Category found successfully')
     @api.expect(q_parser)
     @jwt_required
-    def get(self, id):
+    def get(self, id=None):
         ''' This method returns a category or several categories depending on
             the query. In case the method is passed the category name in the
             url, it returns the details of that category.
@@ -156,9 +156,9 @@ class Categories(Resource):
                 db.session.commit()
                 the_response = {
                     'status': 'Success',
-                    'message': 'Category was successfully created'
+                    'message': 'Category was created',
+                    'id': category.id
                 }
-
                 return the_response, 201
             return {'message': 'Category already exists'}
         except Exception as e:
