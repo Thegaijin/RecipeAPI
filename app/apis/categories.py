@@ -197,7 +197,7 @@ class Categories(Resource):
             traceback.print_exc()
             return edit_response
 
-    @api.response(204, 'The category was successfully deleted')
+    @api.response(204, 'Category was deleted')
     @jwt_required
     def delete(self, id):
         ''' This method deletes a Category. The method is passed the category
@@ -211,7 +211,7 @@ class Categories(Resource):
             if the_category is not None:
                 db.session.delete(the_category)
                 db.session.commit()
-                return {'message': 'The category was successfully deleted'}
+                return {'message': 'Category was deleted'}
             else:
                 return {'message': 'The category does not exist'}
         except Exception as e:
