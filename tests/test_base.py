@@ -23,9 +23,10 @@ class BaseTestCase(TestCase):
         # The user details data to be used for testing
         self.user = {'username': 'username', 'password': 'password'}
         # The Category details data to be used for testing
-        self.category = {'name': 'category', 'description': 'description',
+        self.category = {'category_name': 'category',
+                         'description': 'description',
                          'created_by': 'created_by'}
-        self.category1 = {'name': 'category1',
+        self.category1 = {'category_name': 'category1',
                           'description': 'description1',
                           'created_by': 'created_by1'}
 
