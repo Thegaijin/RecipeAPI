@@ -37,14 +37,14 @@ q_parser.add_argument('page', type=int, help='Try again: {error_msg}')
 q_parser.add_argument('per_page', type=int, help='Try again: {error_msg}')
 
 
-@api.route('/<int:id>/')
-@api.route('/<int:id>/<recipe_name>/')
+@api.route('/<int:category_id>/')
+@api.route('/<int:category_id>/<recipe_name>/')
 class Recipes(Resource):
     ''' The class handles the Recipes CRUD functionality '''
 
     @api.response(200, 'Success')
     @jwt_required
-    def get(self, id, recipe_name):
+    def get(self, category_id, recipe_name):
         ''' This method returns a recipe '''
         try:
             the_recipe = Recipe.query.filter_by(
@@ -52,10 +52,10 @@ class Recipes(Resource):
             if the_recipe is not None:
 
                 get_response = {}
-                get_response['id'] = the_recipe.id
-                get_response['name'] = the_recipe.recipe_name
+                get_response['recipe_id'] = the_recipe.recipe_id
+                get_response['recipe_name'] = the_recipe.recipe_name
                 get_response['description'] = the_recipe.ingredients
-                get_response['category'] = the_recipe.category_name
+                get_response['category_name'] = the_recipe.category_name
                 get_response['created by'] = the_recipe.created_by
                 return get_response, 200
 
@@ -70,7 +70,7 @@ class Recipes(Resource):
     @api.expect(recipe_parser)
     @api.response(201, 'Success')
     @jwt_required
-    def post(self, id):
+    def post(self, category_id):
         ''' This method adds a new recipe to the DB
 
         :param str name: The recipe name
@@ -86,12 +86,14 @@ class Recipes(Resource):
         print('recipe name: {}'.format(recipe_name))
         description = args.description
         print('description: {}'.format(description))
-        category_id = id
+        category_id = category_id
         created_by = user_id
 
         try:
             # check if the category exists
-            if Recipe.query.filter_by(recipe_name=recipe_name).first() is None:
+            if Recipe.query.filter_by(created_by=created_by,
+                                      category_id=category_id,
+                                      recipe_name=recipe_name).first() is None:
                 recipe = Recipe(recipe_name, description,
                                 category_id, created_by)
                 print(recipe)
@@ -115,7 +117,7 @@ class Recipes(Resource):
     @api.expect(recipe_parser)
     @api.response(204, 'Success')
     @jwt_required
-    def put(self, name, recipe_name):
+    def put(self, category_id, recipe_name):
         ''' This method edits a recipe
 
         :param str recipe_name: The new recipe name
@@ -154,7 +156,7 @@ class Recipes(Resource):
 
     @api.response(204, 'Success')
     @jwt_required
-    def delete(self, id, recipe_name):
+    def delete(self, category_id, recipe_name):
         ''' This method deletes a Recipe '''
         try:
             the_recipe = Recipe.query.filter_by(
