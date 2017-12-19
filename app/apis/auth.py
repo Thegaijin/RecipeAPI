@@ -96,7 +96,8 @@ class UserLogin(Resource):
                 user = the_user.password_checker(password)
 
                 if user:
-                    access_token = create_access_token(identity=the_user.id)
+                    access_token = create_access_token(
+                        identity=the_user.user_id)
                     the_response = {
                         'status': 'successful Login',
                         'message': 'You have been signed in',
