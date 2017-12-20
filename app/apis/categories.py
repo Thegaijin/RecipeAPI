@@ -89,9 +89,9 @@ class Categories(Resource):
                     print("the category: {}".format(jsonify(the_category)))
                     the_categories = jsonify({'categories': the_category})
                     print('paginated categories: {}'.format(the_categories))
-                    return the_categories, 200
+            return the_categories, 200
 
-                # return categories(the_categories)
+            # return categories(the_categories)
 
         except Exception as e:
             get_response = {

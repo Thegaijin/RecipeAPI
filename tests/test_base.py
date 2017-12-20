@@ -28,7 +28,7 @@ class BaseTestCase(TestCase):
                          'created_by': 'created_by'}
         self.category1 = {'category_name': 'category1',
                           'description': 'description1',
-                          'created_by': 'created_by1'}
+                          'created_by': 'created_by'}
 
         # explicitly create application context
         # cache DB connections to be created on a per-request or usage case
