@@ -75,8 +75,7 @@ class RecipeTestCase(BaseTestCase):
         # check for category
         view_res = self.client().get('/api/v1/categories/{}/'.format(
             create_res['category_id']), headers=dict(
-            Authorization="Bearer " + token))
-            create_res['id']), headers=dict(Authorization="Bearer " + token))
+            Authorization="Bearer " + token))s
 
         self.assertEqual(view_res.status_code, 200)
         view_res = json.loads(view_res.data)
@@ -94,7 +93,6 @@ class RecipeTestCase(BaseTestCase):
         # get token from login response object
         token = json.loads(loggedin_user.data)['access_token']
         print('****************************alllllll**************************')
-        # print('************************************************************')
         # create category
         create_res = self.client().post('/api/v1/categories',
                                         headers=dict(
@@ -111,12 +109,6 @@ class RecipeTestCase(BaseTestCase):
         create2_res = json.loads(create2_res.data)
         print("loads create all: {}".format(create_res))
         print("loads create all 2: {}".format(create2_res))
-        print("loads: {}".format(create_res))
-        print(create_res)
-        # check for category
-        view_res = self.client().get('/api/v1/categories',
-                                     headers=dict(
-                                         Authorization="Bearer " + token))
 
         # check for category
         view_res = self.client().get('/api/v1/categories',
@@ -128,8 +120,6 @@ class RecipeTestCase(BaseTestCase):
         view_res = json.loads(view_res)
         print("loads: {}".format(view_res))
         print('the type' + type(view_res))
-        view_res = json.loads(view_res.data)
-        print("loads: {}".format(view_res))
         length = len(view_res)
         self.assertEqual(length, 2)
 
@@ -153,12 +143,6 @@ class RecipeTestCase(BaseTestCase):
         edit_res = self.client().put('/api/v1/categories/{}/'.format(
             create_res['category_id']), headers=dict(
                 Authorization="Bearer " + token),
-        print("loads: {}".format(create_res))
-        print(create_res['id'])
-        new_details = {'name': 'new_name',
-                       'description': 'new_description'}
-        edit_res = self.client().put('/api/v1/categories/{}/'.format(
-            create_res['id']), headers=dict(Authorization="Bearer " + token),
             data=new_details)
         self.assertEqual(edit_res.status_code, 204)
         # self.assertEqual(edit_res['message'], 'Category edit was successful')
@@ -183,8 +167,6 @@ class RecipeTestCase(BaseTestCase):
             '/api/v1/categories/{}/'.format(
                 create_res['category_id']), headers=dict(
                     Authorization="Bearer " + token))
-                create_res['id']), headers=dict(
-                                            Authorization="Bearer " + token))
         self.assertEqual(delete_res.status_code, 200)
         delete_res = json.loads(delete_res.data)
         self.assertEqual(delete_res['message'], 'Category was deleted')
