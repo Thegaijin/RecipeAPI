@@ -13,6 +13,7 @@ Flask-Script==2.0.6
 Flask-SQLAlchemy==2.3.2
 itsdangerous==0.24
 Jinja2==2.9.6
+jsonify==0.5
 jsonschema==2.6.0
 Mako==1.0.7
 MarkupSafe==1.0
