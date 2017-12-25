@@ -9,8 +9,7 @@ from app import jwt
 
 # Third party imports
 from flask import jsonify, make_response, request
-from flask_jwt_extended import (jwt_required, create_access_token,
-                                get_jwt_identity)
+from flask_jwt_extended import create_access_token
 
 from flask_restplus import fields, Namespace, Resource, reqparse
 import traceback
@@ -38,7 +37,7 @@ class UserRegistration(Resource):
     ''' This class registers a new user. '''
 
     # specifies the expected input fields
-    @api.expect(parser)
+    @api.expect(user)
     @api.response(201, 'Account was successfully created')
     def post(self):
         ''' This method adds a new user to the DB
@@ -74,7 +73,7 @@ class UserRegistration(Resource):
 class UserLogin(Resource):
     ''' This class logs in an existing user. '''
 
-    @api.expect(parser)
+    @api.expect(user)
     @api.response(201, 'You have been signed in')
     def post(self):
         ''' This method signs in an existing user
