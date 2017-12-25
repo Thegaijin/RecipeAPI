@@ -5,12 +5,14 @@
 from app import db
 from app.models.category import Category
 from app.models.user import User
+from ..serializers import CategorySchema
 import traceback
 
 # Third party imports
 from flask import request, jsonify
 from flask_restplus import fields, Namespace, Resource, reqparse
 from flask_jwt_extended import jwt_required, get_jwt_identity
+from pprint import pprint
 
 
 api = Namespace(
@@ -59,7 +61,7 @@ class Categories(Resource):
     ''' The class handles the Category CRUD functionality '''
 
     @api.response(200, 'Category found successfully')
-    @api.expect(q_parser)
+    # @api.expect(q_parser)
     @jwt_required
     def get(self):
         ''' This method returns all categories
@@ -68,30 +70,52 @@ class Categories(Resource):
         '''
         args = q_parser.parse_args()
         q = args.q
-        page = args.get('page', 1)
-        per_page = args.get('per_page', 3)
+        page = int(args.get('page', 1))
+        per_page = int(args.get('per_page', 5))
+        print(per_page)
 
         try:
             user_id = get_jwt_identity()
+            # .paginate(page=page, per_page=per_page)
             the_categories = Category.query.filter_by(
                 created_by=user_id).paginate(page=page, per_page=per_page)
-            the_categories = categories(the_categories.items)
-            print(the_categories)
-            print(type(the_categories))
-            if the_categories:
-                if q:
-                    # for category in the_categories.items:
-                    #     if q in category.category_name:
-                    #         print("the category: {}".format(category))
-                    #         return categories(category)
-                    the_category = [
-                        category for category in the_categories if q in category.category_name]
-                    print("the category: {}".format(jsonify(the_category)))
-                    the_categories = jsonify({'categories': the_category})
-                    print('paginated categories: {}'.format(the_categories))
-            return the_categories, 200
+            the_categories = the_categories.items
+            print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
+            print('items: {}'.format(the_categories))
 
-            # return categories(the_categories)
+            for category in the_categories:
+                print('category mine: {}'.format(category.category_name))
+
+            categoriesschema = CategorySchema(many=True)
+            # dump converts python object to json object
+            get_categories = categoriesschema.dump(the_categories).data
+            print("get categoriesj:{}".format(get_categories))
+            # print('my type: {}'.format(type(categorysch.data)))
+
+            # get_categories = categorysch.data
+            # print("{}".format(get_categories))
+            # print('my data: {}'.format(type(get_categories)))
+            if get_categories:
+                print('qqqqq', q)
+                if q:
+                    for category in get_categories:
+                        q = q.lower()
+                        if q == category['category_name']:
+                            print("sdfff", category)
+                            print("the category: {}".format(category))
+                            return jsonify(category.data)
+
+                    # the_category = [
+                    #     category for category in get_categories if q in category]
+                    # print("the category: {}".format(the_category))
+                    # the_categories = jsonify({'categories': the_category})
+
+                    # print('****:', category)
+                    # print('paginated categories: {}'.format(th_categories))
+                    # return category, 200
+
+                    return {'message': 'No search result found'}
+            return jsonify(get_categories.data), 200
 
         except Exception as e:
             get_response = {
@@ -120,7 +144,7 @@ class Categories(Resource):
         #     return get_response, 404
 
     # specifies the expected input fields
-    @api.expect(parser)
+    @api.expect(category)
     @api.response(201, 'Category created successfully')
     @jwt_required
     def post(self):
@@ -143,7 +167,8 @@ class Categories(Resource):
             if Category.query.filter_by(
                     created_by=created_by,
                     category_name=category_name).first() is None:
-                category = Category(category_name, description, created_by)
+                category = Category(category_name.lower(),
+                                    description.lower(), created_by)
                 db.session.add(category)
                 db.session.commit()
                 the_response = {
@@ -198,7 +223,7 @@ class Categoryy(Resource):
 
             return get_response, 404
 
-    @api.expect(parser)
+    @api.expect(category)
     @api.response(204, 'Successfully edited')
     @jwt_required
     def put(self, category_id):

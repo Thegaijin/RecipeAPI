@@ -6,6 +6,7 @@
 # third party imports
 from flask import Flask
 from flask_jwt_extended import JWTManager
+from flask_marshmallow import Marshmallow
 from flask_restplus import Api
 
 
@@ -15,6 +16,7 @@ from instance.config import app_config
 from .db import db
 
 jwt = JWTManager()
+marsw = Marshmallow()
 
 
 def create_app(config_name):
@@ -38,6 +40,7 @@ def create_app(config_name):
     # prep application to work with SQLAlchemy
     db.init_app(app)
     jwt.init_app(app)
+    marsw.init_app(app)
 
     # Import blueprints
     from app.apis import apiv1_blueprint as api_v1
