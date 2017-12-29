@@ -8,19 +8,22 @@ from app import jwt
 
 
 # Third party imports
+from datetime import timedelta
 from flask import jsonify, make_response, request
 from flask_jwt_extended import create_access_token
-
 from flask_restplus import fields, Namespace, Resource, reqparse
+import re
 import traceback
 
 
 api = Namespace(
     'auth', description='Creating and authenticating user credentials')
+username_regex = re.compile(r"^[a-zA-Z_][0-9a-zA-Z_]*$", re.IGNORECASE)
 
 user = api.model('User', {
     'username': fields.String(required=True,
-                              pattern="[^a-zA-Z0-9]",
+                              pattern='^[a-zA-Z_][0-9a-zA-Z_]*$',
+                              min_length=2, max_length=4,
                               description='user\'s name'),
     'password': fields.String(required=True, description='user\'s password'),
 })
@@ -28,7 +31,8 @@ user = api.model('User', {
 # validate input
 parser = reqparse.RequestParser(bundle_errors=True)
 # specify parameter names and accepted values
-parser.add_argument('username', required=True, help='Try again: {error_msg}')
+parser.add_argument('username',
+                    required=True, help='Try again: {error_msg}')
 parser.add_argument('password', required=True)
 
 
@@ -37,7 +41,7 @@ class UserRegistration(Resource):
     ''' This class registers a new user. '''
 
     # specifies the expected input fields
-    @api.expect(user)
+    @api.expect(user)  # , validate=True
     @api.response(201, 'Account was successfully created')
     def post(self):
         ''' This method adds a new user to the DB
@@ -95,8 +99,10 @@ class UserLogin(Resource):
                 user = the_user.password_checker(password)
 
                 if user:
+                    expires = timedelta(days=365)
                     access_token = create_access_token(
-                        identity=the_user.user_id)
+                        identity=the_user.user_id, expires_delta=expires)
+                    print('token', access_token)
                     the_response = {
                         'status': 'successful Login',
                         'message': 'You have been signed in',
