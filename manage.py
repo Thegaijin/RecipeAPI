@@ -9,9 +9,6 @@ from flask_migrate import Migrate, MigrateCommand
 
 # Local imports
 from app import create_app
-from app.models.user import User
-from app.models.category import Category
-from app.models.recipe import Recipe
 from app.db import db
 
 
