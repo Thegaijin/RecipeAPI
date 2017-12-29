@@ -1,18 +1,16 @@
 # app/auth/categories.py
 ''' This script holds the resource functionality for category CRUD '''
 
+# Third party imports
+from flask import request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_restplus import fields, Namespace, Resource, reqparse
+
+
 # Local imports
 from app import db
 from app.models.category import Category
-from app.models.user import User
 from ..serializers import CategorySchema
-import traceback
-
-# Third party imports
-from flask import request, jsonify
-from flask_restplus import fields, Namespace, Resource, reqparse
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from pprint import pprint
 
 
 api = Namespace(
@@ -27,33 +25,21 @@ category = api.model('Category', {
 
 # validate input
 parser = reqparse.RequestParser(bundle_errors=True)
-# specify parameter names and accepted values
 parser.add_argument('category_name', required=True,
                     help='Try again: {error_msg}')
 parser.add_argument('description', required=True,
                     help='Try again: {error_msg}')
 
+per_page_min = 5
+per_page_max = 10
 # validate input
 q_parser = reqparse.RequestParser(bundle_errors=True)
-# specify parameter names and accepted values
-q_parser.add_argument('q', help='search')
-q_parser.add_argument('page', type=int, help='Try again: {error_msg}')
-q_parser.add_argument('per_page', type=int, help='Try again: {error_msg}',
-                      choices=[5, 10, 20, 30, 40, 50], default=10)
-
-
-def categories(the_categories):
-    user_categories = []
-    if the_categories:
-        for category in the_categories:
-            get_response = {}
-            get_response['category_id'] = category.category_id
-            get_response['category_name'] = category.category_name
-            get_response['description'] = category.description
-            get_response['created_by'] = category.created_by
-
-            user_categories.append(get_response)
-        return user_categories
+q_parser.add_argument('q', required=False,
+                      help='search for word', location='args')
+q_parser.add_argument('page', required=False, type=int,
+                      help='Number of pages', location='args')
+q_parser.add_argument('per_page', required=False, type=int,
+                      help='categories per page', default=10, location='args')
 
 
 @api.route('')
@@ -61,61 +47,63 @@ class Categories(Resource):
     ''' The class handles the Category CRUD functionality '''
 
     @api.response(200, 'Category found successfully')
-    # @api.expect(q_parser)
+    @api.expect(q_parser)
     @jwt_required
     def get(self):
-        ''' This method returns all categories
+        ''' This method returns all the categories
 
             :return: A dictionary of the category\'s properties
         '''
-        args = q_parser.parse_args()
-        q = args.q
-        page = int(args.get('page', 1))
-        per_page = int(args.get('per_page', 5))
-        print(per_page)
 
         try:
             user_id = get_jwt_identity()
-            # .paginate(page=page, per_page=per_page)
-            the_categories = Category.query.filter_by(
-                created_by=user_id).paginate(page=page, per_page=per_page)
-            the_categories = the_categories.items
-            print('^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^')
-            print('items: {}'.format(the_categories))
 
-            for category in the_categories:
-                print('category mine: {}'.format(category.category_name))
+            # get BaseQuery object to allow for pagination
+            the_categories = Category.query.filter_by(created_by=user_id)
 
+            args = q_parser.parse_args(request)
+            q = args.get('q', '')
+            page = args.get('page', 5)
+            per_page = args.get('per_page', 10)
+            if per_page < per_page_min:
+                per_page = per_page_min
+
+            if per_page > per_page_max:
+                per_page = per_page_max
+
+            if q:
+                q = q.lower()
+                for a_category in the_categories.all():
+                    if q in a_category.category_name.lower():
+
+                        categoryschema = CategorySchema()
+                        # dump converts python object to json object
+                        the_category = categoryschema.dump(a_category)
+
+                        # jsonify Single argument: Passed through to dumps()
+                        return jsonify(the_category.data)
+
+            pag_categories = the_categories.paginate(
+                page, per_page, error_out=False)
+
+            paginated = []
+            for a_category in pag_categories.items:
+                paginated.append(a_category)
             categoriesschema = CategorySchema(many=True)
-            # dump converts python object to json object
-            get_categories = categoriesschema.dump(the_categories).data
-            print("get categoriesj:{}".format(get_categories))
-            # print('my type: {}'.format(type(categorysch.data)))
 
-            # get_categories = categorysch.data
-            # print("{}".format(get_categories))
-            # print('my data: {}'.format(type(get_categories)))
-            if get_categories:
-                print('qqqqq', q)
-                if q:
-                    for category in get_categories:
-                        q = q.lower()
-                        if q == category['category_name']:
-                            print("sdfff", category)
-                            print("the category: {}".format(category))
-                            return jsonify(category.data)
+            all_categories = categoriesschema.dump(paginated)
+            # base_url = 'http://127.0.0.1:5000/api/v1/categories'
+            # num_of_categories = len(pag_categories)
 
-                    # the_category = [
-                    #     category for category in get_categories if q in category]
-                    # print("the category: {}".format(the_category))
-                    # the_categories = jsonify({'categories': the_category})
-
-                    # print('****:', category)
-                    # print('paginated categories: {}'.format(th_categories))
-                    # return category, 200
-
-                    return {'message': 'No search result found'}
-            return jsonify(get_categories.data), 200
+            # jsonify turns the JSON output into a Response object
+            # with the application/json mimetype
+            #  jsonify converts multiple arguments into an array or
+            # multiple keyword arguments into a dict
+            # Multiple arguments: Converted to an array before being passed to
+            # dumps()
+            # Multiple keyword arguments: Converted to a dict before being p
+            # assed to dumps().
+            return jsonify(all_categories)
 
         except Exception as e:
             get_response = {
@@ -123,36 +111,13 @@ class Categories(Resource):
             }
             return get_response
 
-        # try:
-        #     if q:
-        #         the_categories = Category.query.filter(
-        #             Category.category_name.like(
-        #                 '%' + q + '%')).paginate(page, per_page)
-        #         category_list = categories(the_categories)
-        #         print(category_list)
-
-        #         for category in category_list:
-        #             if q == category['category_name']:
-        #                 print(category)
-        #                 return category
-
-        # except Exception as e:
-        #     get_response = {
-        #         'message': str(e)
-        #     }
-
-        #     return get_response, 404
-
-    # specifies the expected input fields
     @api.expect(category)
     @api.response(201, 'Category created successfully')
     @jwt_required
     def post(self):
         ''' This method adds a new category to the DB
 
-        :param str name: The category name
-        :param str description: The category description
-        :return: A dictionary with a message
+        :return: A dictionary with a message and status code
         '''
         # get current user id
         user_id = get_jwt_identity()
@@ -167,9 +132,9 @@ class Categories(Resource):
             if Category.query.filter_by(
                     created_by=created_by,
                     category_name=category_name).first() is None:
-                category = Category(category_name.lower(),
-                                    description.lower(), created_by)
-                db.session.add(category)
+                a_category = Category(category_name.lower(),
+                                      description.lower(), created_by)
+                db.session.add(a_category)
                 db.session.commit()
                 the_response = {
                     'status': 'Success',
@@ -178,17 +143,20 @@ class Categories(Resource):
                 }
                 return the_response, 201
             return {'message': 'Category already exists'}
+
         except Exception as e:
 
             post_response = {
                 'message': str(e)
             }
-            traceback.print_exc()
+
             return post_response
 
 
 @api.route('/<int:category_id>/')
 class Categoryy(Resource):
+    """This class handles a single category GET, PUT AND DELETE functionality
+    """
 
     @api.response(200, 'Category found successfully')
     @jwt_required
@@ -201,21 +169,9 @@ class Categoryy(Resource):
 
             if the_category is not None:
 
-                get_response = {}
-                get_response['category_id'] = the_category.category_id
-                get_response['category_name'] = the_category.category_name
-                get_response['description'] = the_category.description
-                get_response['created_by'] = the_category.created_by
-                print(get_response)
-                return get_response, 200
-            # else:
-            #     # get current user id
-            #     username = get_jwt_identity()
-            #     created_by = username
-            #     the_categories = Category.query.all()
-
-            #     return categories(the_categories)
-
+                categoryschema = CategorySchema()
+                get_response = categoryschema.dump(the_category)
+                return jsonify(get_response.data)
         except Exception as e:
             get_response = {
                 'message': str(e)
@@ -248,8 +204,8 @@ class Categoryy(Resource):
                 if category_name is not None and description is not None:
                     if Category.query.filter_by(category_name=category_name,
                                                 created_by=created_by).first() is None:
-                        the_category.category_name = category_name
-                        the_category.description = description
+                        the_category.category_name = category_name.lower()
+                        the_category.description = description.lower()
                         db.session.add(the_category)
                         db.session.commit()
                         edit_response = {
@@ -267,7 +223,7 @@ class Categoryy(Resource):
             edit_response = {
                 'message': str(e)
             }
-            traceback.print_exc()
+
             return edit_response
 
     @api.response(204, 'Category was deleted')
@@ -285,9 +241,8 @@ class Categoryy(Resource):
             if the_category is not None:
                 db.session.delete(the_category)
                 db.session.commit()
-                return {'message': 'Category was deleted'}
-            else:
-                return {'message': 'The category does not exist'}
+                return {'message': 'Category was deleted'}, 200
+            return {'message': 'The category does not exist'}
         except Exception as e:
 
             post_response = {
