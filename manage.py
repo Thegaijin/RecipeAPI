@@ -1,5 +1,5 @@
 # manage.py
-''' This script handles updating the DB with changes made to the models '''
+''' This script creates and starts the app and manages DB migrations '''
 
 # Third party imports
 import os
