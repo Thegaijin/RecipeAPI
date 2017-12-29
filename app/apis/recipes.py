@@ -1,16 +1,17 @@
 # app/auth/categories.py
 ''' This script holds the resource functionality for recipe CRUD '''
 
+
+# Third party imports
+from flask import request, jsonify
+from flask_jwt_extended import jwt_required, get_jwt_identity
+from flask_restplus import fields, Namespace, Resource, reqparse
+
 # Local imports
 from app import db
-# from app.models.category import Category
 from app.models.recipe import Recipe
-# from app.models.user import User
-import traceback
-# Third party imports
-from flask import request
-from flask_restplus import fields, Namespace, Resource, reqparse
-from flask_jwt_extended import jwt_required, get_jwt_identity
+from ..serializers import RecipeSchema
+from .categories import per_page_max, per_page_min
 
 
 api = Namespace(
@@ -32,32 +33,70 @@ recipe_parser.add_argument('description', required=True)
 
 q_parser = reqparse.RequestParser(bundle_errors=True)
 # specify parameter names and accepted values
-q_parser.add_argument('q', help='search')
-q_parser.add_argument('page', type=int, help='Try again: {error_msg}')
-q_parser.add_argument('per_page', type=int, help='Try again: {error_msg}')
+q_parser.add_argument('q', help='search', location='args')
+q_parser.add_argument(
+    'page', type=int, help='Try again: {error_msg}', location='args')
+q_parser.add_argument('per_page', type=int,
+                      help='Try again: {error_msg}', location='args')
 
 
 @api.route('/<int:category_id>/')
-@api.route('/<int:category_id>/<recipe_name>/')
 class Recipes(Resource):
     ''' The class handles the Recipes CRUD functionality '''
 
     @api.response(200, 'Success')
+    @api.expect(q_parser)
     @jwt_required
-    def get(self, category_id, recipe_name):
-        ''' This method returns a recipe '''
-        try:
-            the_recipe = Recipe.query.filter_by(
-                recipe_name=recipe_name).first()
-            if the_recipe is not None:
+    def get(self, category_id=None):
+        ''' This method returns all the recipes created by a user or a
+            category that mateches a search keyword
 
-                get_response = {}
-                get_response['recipe_id'] = the_recipe.recipe_id
-                get_response['recipe_name'] = the_recipe.recipe_name
-                get_response['description'] = the_recipe.ingredients
-                get_response['category_name'] = the_recipe.category_name
-                get_response['created by'] = the_recipe.created_by
-                return get_response, 200
+            :return: A recipe that matches the search or a list of recipe\'s
+        '''
+        try:
+            user_id = get_jwt_identity()
+
+            print('user id', user_id)
+            if category_id is None:
+                the_recipes = Recipe.query.filter_by(
+                    created_by=user_id)
+                print('if none', the_recipes)
+            the_recipes = Recipe.query.filter_by(
+                created_by=user_id, category_id=category_id)
+            print('if not none', the_recipes)
+
+            args = q_parser.parse_args(request)
+            q = args.get('q', '')
+            page = args.get('page', 5)
+            per_page = args.get('per_page', 10)
+            if per_page < per_page_min:
+                per_page = per_page_min
+
+            if per_page > per_page_max:
+                per_page = per_page_max
+
+            if q:
+                q = q.lower()
+                for a_recipe in the_recipes.all():
+                    if q in a_recipe.recipe_name.lower():
+
+                        recipeschema = RecipeSchema()
+                        the_recipe = recipeschema.dump(a_recipe)
+
+                        return jsonify(the_recipe.data)
+
+            pag_recipes = the_recipes.paginate(
+                page, per_page, error_out=False)
+
+            paginated = []
+            for a_recipe in pag_recipes.items:
+                paginated.append(a_recipe)
+            recipesschema = RecipeSchema(many=True)
+
+            all_recipes = recipesschema.dump(paginated)
+            print('all recipes', all_recipes)
+
+            return jsonify(all_recipes)
 
         except Exception as e:
             get_response = {
@@ -67,15 +106,14 @@ class Recipes(Resource):
             return get_response, 404
 
     # specifies the expected input fields
-    @api.expect(recipe_parser)
+    @api.expect(recipe)
     @api.response(201, 'Success')
     @jwt_required
     def post(self, category_id):
         ''' This method adds a new recipe to the DB
 
-        :param str name: The recipe name
-        :param str description: The recipe description
-        :return: A dictionary with a message
+        :param str category_id: The category name to which the recipe belongs
+        :return: A dictionary with a message and status code
         '''
 
         # get current username
@@ -94,10 +132,10 @@ class Recipes(Resource):
             if Recipe.query.filter_by(created_by=created_by,
                                       category_id=category_id,
                                       recipe_name=recipe_name).first() is None:
-                recipe = Recipe(recipe_name, description,
-                                category_id, created_by)
+                a_recipe = Recipe(recipe_name.lower(), description.lower(),
+                                  category_id, created_by)
                 print(recipe)
-                db.session.add(recipe)
+                db.session.add(a_recipe)
                 db.session.commit()
                 the_response = {
                     'status': 'Success',
@@ -111,10 +149,37 @@ class Recipes(Resource):
             post_response = {
                 'message': str(e)
             }
-            traceback.print_exc()
+
             return post_response
 
-    @api.expect(recipe_parser)
+
+@api.route('/<int:category_id>/<recipe_name>/')
+class Recipee(Resource):
+    """This class handles a single recipe GET, PUT AND DELETE functionality
+    """
+
+    @api.response(200, 'Category found successfully')
+    @jwt_required
+    def get(self, category_id, recipe_name):
+        ''' This method returns a recipe in a paerticular category
+        '''
+        try:
+            the_recipe = Recipe.query.filter_by(
+                category_id=category_id, recipe_name=recipe_name).first()
+
+            if the_recipe is not None:
+
+                recipeschema = RecipeSchema()
+                get_response = recipeschema.dump(the_recipe)
+                return jsonify(get_response.data)
+        except Exception as e:
+            get_response = {
+                'message': str(e)
+            }
+
+            return get_response, 404
+
+    @api.expect(recipe)
     @api.response(204, 'Success')
     @jwt_required
     def put(self, category_id, recipe_name):
@@ -125,16 +190,16 @@ class Recipes(Resource):
         :return: A dictionary with a message
         '''
         try:
-            the_recipe = Recipe.query.filter_by(
-                recipe_name=recipe_name).first()
+            the_recipe = Recipe.query.filter_by(category_id=category_id,
+                                                recipe_name=recipe_name).first()
             if the_recipe is not None:
                 args = recipe_parser.parse_args()
                 recipe_name = args.recipe_name
                 description = args.description
 
                 if recipe_name is not None and description is not None:
-                    the_recipe.recipe_name = recipe_name
-                    the_recipe.ingredients = description
+                    the_recipe.recipe_name = recipe_name.lower()
+                    the_recipe.ingredients = description.lower()
                     db.session.add(the_recipe)
                     db.session.commit()
                     edit_response = {
@@ -143,34 +208,32 @@ class Recipes(Resource):
                     }
 
                     return edit_response, 204
-                else:
-                    return {'message': 'No changes to be made'}
-                return {'message': 'The recipe does not exist'}
+                return {'message': 'No changes to be made'}
+            return {'message': 'The recipe does not exist'}
         except Exception as e:
 
             edit_response = {
                 'message': str(e)
             }
-            traceback.print_exc()
-            return post_response
+
+            return edit_response
 
     @api.response(204, 'Success')
     @jwt_required
     def delete(self, category_id, recipe_name):
         ''' This method deletes a Recipe '''
         try:
-            the_recipe = Recipe.query.filter_by(
-                recipe_name=recipe_name).first()
+            the_recipe = Recipe.query.filter_by(category_id=category_id,
+                                                recipe_name=recipe_name).first()
             if the_recipe is not None:
                 db.session.delete(the_recipe)
                 db.session.commit()
                 return {'message': 'The recipe was successfully deleted'}
-            else:
-                return {'message': 'The recipe does not exist'}
+            return {'message': 'The recipe does not exist'}
         except Exception as e:
 
-            post_response = {
+            delete_response = {
                 'message': str(e)
             }
-            traceback.print_exc()
-            return post_response
+
+            return delete_response
