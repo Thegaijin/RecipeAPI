@@ -139,7 +139,7 @@ class Categories(Resource):
                 the_response = {
                     'status': 'Success',
                     'message': 'Category was created',
-                    'category_id': category.category_id
+                    'category_id': a_category.category_id
                 }
                 return the_response, 201
             return {'message': 'Category already exists'}
