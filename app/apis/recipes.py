@@ -134,18 +134,14 @@ class Recipes(Resource):
         '''
         try:
             user_id = get_jwt_identity()
-
             the_recipes = Recipe.query.filter_by(
                 created_by=user_id, category_id=category_id)
-
             args = q_parser.parse_args(request)
             return manage_get(the_recipes, args)
-
         except Exception as e:
             get_response = {
                 'message': str(e)
             }
-
             return get_response, 404
 
     # specifies the expected input fields
@@ -163,7 +159,6 @@ class Recipes(Resource):
 
         # get current username
         user_id = get_jwt_identity()
-
         args = recipe_parser.parse_args()
         recipe_name = args.recipe_name
         description = args.description
@@ -177,7 +172,6 @@ class Recipes(Resource):
                                       recipe_name=recipe_name).first() is None:
                 a_recipe = Recipe(recipe_name.lower(), description.lower(),
                                   category_id, created_by)
-
                 db.session.add(a_recipe)
                 db.session.commit()
                 the_response = {
@@ -185,15 +179,12 @@ class Recipes(Resource):
                     'message': 'Recipe has been created',
                     'recipe_name': a_recipe.recipe_name
                 }
-
                 return the_response, 201
             return {'message': 'Recipe already exists'}
         except Exception as e:
-
             post_response = {
                 'message': str(e)
             }
-
             return post_response
 
 
@@ -216,9 +207,7 @@ class Recipee(Resource):
         try:
             the_recipe = Recipe.query.filter_by(
                 category_id=category_id, recipe_name=recipe_name).first()
-
             if the_recipe is not None:
-
                 recipeschema = RecipeSchema()
                 get_response = recipeschema.dump(the_recipe)
                 return jsonify(get_response.data)
@@ -227,7 +216,6 @@ class Recipee(Resource):
             get_response = {
                 'message': str(e)
             }
-
             return get_response, 404
 
     @api.expect(recipe)
@@ -249,7 +237,6 @@ class Recipee(Resource):
                 args = recipe_parser.parse_args()
                 recipe_name = args.recipe_name
                 description = args.description
-
                 if recipe_name is not None and description is not None:
                     the_recipe.recipe_name = recipe_name.lower()
                     the_recipe.ingredients = description.lower()
@@ -259,16 +246,13 @@ class Recipee(Resource):
                         'status': 'Success',
                         'message': 'Recipe details successfully edited'
                     }
-
                     return edit_response, 204
                 return {'message': 'No changes to be made'}
             return {'message': 'The recipe does not exist'}
         except Exception as e:
-
             edit_response = {
                 'message': str(e)
             }
-
             return edit_response
 
     @api.response(204, 'Success')

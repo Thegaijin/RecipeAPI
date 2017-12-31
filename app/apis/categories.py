@@ -60,14 +60,12 @@ class Categories(Resource):
 
             # get BaseQuery object to allow for pagination
             the_categories = Category.query.filter_by(created_by=user_id)
-
             args = q_parser.parse_args(request)
             q = args.get('q', '')
             page = args.get('page', 1)
             per_page = args.get('per_page', 10)
             if per_page < per_page_min:
                 per_page = per_page_min
-
             if per_page > per_page_max:
                 per_page = per_page_max
 
@@ -75,36 +73,19 @@ class Categories(Resource):
                 q = q.lower()
                 for a_category in the_categories.all():
                     if q in a_category.category_name.lower():
-
                         categoryschema = CategorySchema()
                         # dump converts python object to json object
                         the_category = categoryschema.dump(a_category)
-
                         # jsonify Single argument: Passed through to dumps()
                         return jsonify(the_category.data)
-
             pag_categories = the_categories.paginate(
                 page, per_page, error_out=False)
-
             paginated = []
             for a_category in pag_categories.items:
                 paginated.append(a_category)
             categoriesschema = CategorySchema(many=True)
-
             all_categories = categoriesschema.dump(paginated)
-            # base_url = 'http://127.0.0.1:5000/api/v1/categories'
-            # num_of_categories = len(pag_categories)
-
-            # jsonify turns the JSON output into a Response object
-            # with the application/json mimetype
-            #  jsonify converts multiple arguments into an array or
-            # multiple keyword arguments into a dict
-            # Multiple arguments: Converted to an array before being passed to
-            # dumps()
-            # Multiple keyword arguments: Converted to a dict before being p
-            # assed to dumps().
             return jsonify(all_categories)
-
         except Exception as e:
             get_response = {
                 'message': str(e)
@@ -143,13 +124,10 @@ class Categories(Resource):
                 }
                 return the_response, 201
             return {'message': 'Category already exists'}
-
         except Exception as e:
-
             post_response = {
                 'message': str(e)
             }
-
             return post_response
 
 
@@ -190,9 +168,7 @@ class Categoryy(Resource):
         :param str description: The new category description
         :return: A dictionary with a message
         '''
-        # get current user id
         user_id = get_jwt_identity()
-
         try:
             the_category = Category.query.filter_by(
                 category_id=category_id).first()
@@ -201,7 +177,6 @@ class Categoryy(Resource):
                 category_name = args.category_name
                 description = args.description
                 created_by = user_id
-
                 if category_name is not None and description is not None:
                     if Category.query.filter_by(category_name=category_name,
                                                 created_by=created_by).first() is None:
@@ -213,7 +188,6 @@ class Categoryy(Resource):
                             'status': 'Success',
                             'message': 'Category details successfully edited'
                         }
-
                         return edit_response, 204
                     return {'message': 'One or more inputs missing'}
                 else:
@@ -223,7 +197,6 @@ class Categoryy(Resource):
             edit_response = {
                 'message': str(e)
             }
-
             return edit_response
 
     @api.response(204, 'Category was deleted')
