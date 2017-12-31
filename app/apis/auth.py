@@ -1,19 +1,17 @@
 # app/auth/user.py
 ''' This script holds resource functionality for user creation and login '''
 
+# Third party imports
+from datetime import timedelta
+from flask_jwt_extended import create_access_token
+from flask_restplus import fields, Namespace, Resource, reqparse
+import re
+
+
 # Local imports
 from ..db import db
 from app.models.user import User
 from app import jwt
-
-
-# Third party imports
-from datetime import timedelta
-from flask import jsonify, make_response, request
-from flask_jwt_extended import create_access_token
-from flask_restplus import fields, Namespace, Resource, reqparse
-import re
-import traceback
 
 
 api = Namespace(
