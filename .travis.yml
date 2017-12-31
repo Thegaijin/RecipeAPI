@@ -16,7 +16,8 @@ before_script:
 
 # command to run tests
 script:
-  - python -m unittest
+  - pytest --cov-report term --cov=app
+  # - python -m unittest
 
 after_success:
   - coveralls
