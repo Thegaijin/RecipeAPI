@@ -63,7 +63,7 @@ class Categories(Resource):
 
             args = q_parser.parse_args(request)
             q = args.get('q', '')
-            page = args.get('page', 5)
+            page = args.get('page', 1)
             per_page = args.get('per_page', 10)
             if per_page < per_page_min:
                 per_page = per_page_min

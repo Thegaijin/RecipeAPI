@@ -40,6 +40,46 @@ q_parser.add_argument('per_page', type=int,
                       help='Try again: {error_msg}', location='args')
 
 
+def manage_get(the_recipes, args):
+    if the_recipes:
+        q = args.get('q', '')
+        page = args.get('page', 1)
+        per_page = args.get('per_page', 10)
+        print('args after', args)
+        print('After args')
+        if per_page is None or per_page < per_page_min:
+            per_page = per_page_min
+
+        if per_page > per_page_max:
+            per_page = per_page_max
+
+        print('were here')
+        if q:
+            print('were here in q')
+            q = q.lower()
+            for a_recipe in the_recipes.all():
+                if q in a_recipe.recipe_name.lower():
+
+                    recipeschema = RecipeSchema()
+                    the_recipe = recipeschema.dump(a_recipe)
+
+                    return jsonify(the_recipe.data)
+
+        pag_recipes = the_recipes.paginate(
+            page, per_page, error_out=False)
+        print('page: {}, per_page: {}'.format(page, per_page))
+
+        paginated = []
+        for a_recipe in pag_recipes.items:
+            paginated.append(a_recipe)
+        recipesschema = RecipeSchema(many=True)
+
+        all_recipes = recipesschema.dump(paginated)
+        print('all recipes', all_recipes)
+
+        return jsonify(all_recipes)
+
+
 @api.route('/<int:category_id>/')
 class Recipes(Resource):
     ''' The class handles the Recipes CRUD functionality '''
@@ -47,56 +87,25 @@ class Recipes(Resource):
     @api.response(200, 'Success')
     @api.expect(q_parser)
     @jwt_required
-    def get(self, category_id=None):
-        ''' This method returns all the recipes created by a user or a
-            category that mateches a search keyword
+    def get(self, category_id):
+        ''' A method to get recipes in a category.
+            Checks if a category ID exists and returns all the recipes in the
+            category or one with a recipe_name that matches a search keyword
 
-            :return: A recipe that matches the search or a list of recipe\'s
+            :param int category_id: The category id to which the recipe belongs
+            :return: A recipe that matches the search keyword or all the
+            recipes in a category
         '''
         try:
             user_id = get_jwt_identity()
 
             print('user id', user_id)
-            if category_id is None:
-                the_recipes = Recipe.query.filter_by(
-                    created_by=user_id)
-                print('if none', the_recipes)
             the_recipes = Recipe.query.filter_by(
                 created_by=user_id, category_id=category_id)
-            print('if not none', the_recipes)
+            print('if not none:', the_recipes)
 
             args = q_parser.parse_args(request)
-            q = args.get('q', '')
-            page = args.get('page', 5)
-            per_page = args.get('per_page', 10)
-            if per_page < per_page_min:
-                per_page = per_page_min
-
-            if per_page > per_page_max:
-                per_page = per_page_max
-
-            if q:
-                q = q.lower()
-                for a_recipe in the_recipes.all():
-                    if q in a_recipe.recipe_name.lower():
-
-                        recipeschema = RecipeSchema()
-                        the_recipe = recipeschema.dump(a_recipe)
-
-                        return jsonify(the_recipe.data)
-
-            pag_recipes = the_recipes.paginate(
-                page, per_page, error_out=False)
-
-            paginated = []
-            for a_recipe in pag_recipes.items:
-                paginated.append(a_recipe)
-            recipesschema = RecipeSchema(many=True)
-
-            all_recipes = recipesschema.dump(paginated)
-            print('all recipes', all_recipes)
-
-            return jsonify(all_recipes)
+            return manage_get(the_recipes, args)
 
         except Exception as e:
             get_response = {
@@ -110,10 +119,12 @@ class Recipes(Resource):
     @api.response(201, 'Success')
     @jwt_required
     def post(self, category_id):
-        ''' This method adds a new recipe to the DB
+        ''' A method to create a recipe.
+            Checks if a recipe name exists in the given category, if it doesn\'t
+            it creates the new recipe, if it does, it returns a message
 
-        :param str category_id: The category name to which the recipe belongs
-        :return: A dictionary with a message and status code
+            :param int category_id: The category id to which the recipe belongs
+            :return: A dictionary with a message and status code
         '''
 
         # get current username
@@ -121,9 +132,7 @@ class Recipes(Resource):
 
         args = recipe_parser.parse_args()
         recipe_name = args.recipe_name
-        print('recipe name: {}'.format(recipe_name))
         description = args.description
-        print('description: {}'.format(description))
         category_id = category_id
         created_by = user_id
 
@@ -134,12 +143,13 @@ class Recipes(Resource):
                                       recipe_name=recipe_name).first() is None:
                 a_recipe = Recipe(recipe_name.lower(), description.lower(),
                                   category_id, created_by)
-                print(recipe)
+
                 db.session.add(a_recipe)
                 db.session.commit()
                 the_response = {
                     'status': 'Success',
-                    'message': 'Recipe was successfully created'
+                    'message': 'Recipe has been created',
+                    'recipe_name': a_recipe.recipe_name
                 }
 
                 return the_response, 201
@@ -161,7 +171,13 @@ class Recipee(Resource):
     @api.response(200, 'Category found successfully')
     @jwt_required
     def get(self, category_id, recipe_name):
-        ''' This method returns a recipe in a paerticular category
+        ''' A method to get a recipe in a category by name.
+            Checks if the given recipe name exists in the given category and
+            returns the recipe details.
+
+            :param int category_id: The category id to which the recipe belongs
+            :param str recipe_name: The name of the recipe to search for
+            :return: The details of the recipe
         '''
         try:
             the_recipe = Recipe.query.filter_by(
@@ -183,11 +199,13 @@ class Recipee(Resource):
     @api.response(204, 'Success')
     @jwt_required
     def put(self, category_id, recipe_name):
-        ''' This method edits a recipe
+        ''' A method for editing a recipe.
+            Checks if the given recipe name exists in the given category and
+            edits it with the new details.
 
-        :param str recipe_name: The new recipe name
-        :param str description: The new recipe description
-        :return: A dictionary with a message
+            :param str recipe_name: The new recipe name
+            :param str description: The new recipe description
+            :return: A dictionary with a message
         '''
         try:
             the_recipe = Recipe.query.filter_by(category_id=category_id,
@@ -221,14 +239,21 @@ class Recipee(Resource):
     @api.response(204, 'Success')
     @jwt_required
     def delete(self, category_id, recipe_name):
-        ''' This method deletes a Recipe '''
+        ''' A method to delete a recipe
+            Checks if the given recipe name exists in the given category and
+            deletes it.
+
+            :param str recipe_name: The new recipe name
+            :param str description: The new recipe description
+            :return: A dictionary with a message
+        '''
         try:
             the_recipe = Recipe.query.filter_by(category_id=category_id,
                                                 recipe_name=recipe_name).first()
             if the_recipe is not None:
                 db.session.delete(the_recipe)
                 db.session.commit()
-                return {'message': 'The recipe was successfully deleted'}
+                return {'message': 'Recipe was deleted'}
             return {'message': 'The recipe does not exist'}
         except Exception as e:
 
@@ -237,3 +262,35 @@ class Recipee(Resource):
             }
 
             return delete_response
+
+
+@api.route('')
+class Recipess(Resource):
+    ''' The class handles the view functionality for all recipes '''
+
+    @api.response(200, 'Success')
+    @api.expect(q_parser)
+    @jwt_required
+    def get(self):
+        ''' A method to get all the recipes
+            Returns all the recipes created by a user or a recipe that matches
+            a search keyword
+
+            :return: A recipe that matches the search or a list of recipe\'s
+        '''
+        try:
+            user_id = get_jwt_identity()
+
+            print('user id', user_id)
+            the_recipes = Recipe.query.filter_by(created_by=user_id)
+            print('if none', the_recipes)
+
+            args = q_parser.parse_args(request)
+            return manage_get(the_recipes, args)
+
+        except Exception as e:
+            get_response = {
+                'message': str(e)
+            }
+
+            return get_response
