@@ -44,11 +44,13 @@ class UserRegistration(Resource):
     @api.expect(user)  # , validate=True
     @api.response(201, 'Account was successfully created')
     def post(self):
-        ''' This method adds a new user to the DB
+        ''' This method adds a new user.
+            Takes the user credentials added, hashes the password and saves
+            them to the DB
 
-        :param str username: The user\'s chosen name
-        :param str password: The user\'s password
-        :return: A dictionary with a message
+            :param str username: The user\'s chosen name
+            :param str password: The user\'s password
+            :return: A dictionary with a message
         '''
 
         args = parser.parse_args()
@@ -81,10 +83,12 @@ class UserLogin(Resource):
     @api.response(201, 'You have been signed in')
     def post(self):
         ''' This method signs in an existing user
+            Checks if the entered credentials match the existing ones in the DB
+            and if they do, gives the user access.
 
-        :param str username: The user\'s chosen name
-        :param str password: The user\'s password
-        :return: A dictionary with a message
+            :param str username: The user\'s chosen name
+            :param str password: The user\'s password
+            :return: A dictionary with a message
         '''
         args = parser.parse_args()
         username = args.username
@@ -102,7 +106,7 @@ class UserLogin(Resource):
                     expires = timedelta(days=365)
                     access_token = create_access_token(
                         identity=the_user.user_id, expires_delta=expires)
-                    print('token', access_token)
+
                     the_response = {
                         'status': 'successful Login',
                         'message': 'You have been signed in',
