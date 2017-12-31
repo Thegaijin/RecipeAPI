@@ -3,12 +3,10 @@
 
 # Third party imports
 import json
-import jsonify
-from unittest import TestCase
+
 
 # Local import
 from tests.test_base import BaseTestCase
-from app.models.category import Category
 
 
 class CategoryTestCase(BaseTestCase):
@@ -63,7 +61,6 @@ class CategoryTestCase(BaseTestCase):
         loggedin_user = self.user_login()
         # get token from login response object
         token = json.loads(loggedin_user.data)['access_token']
-        print('**********************view one********************************')
         # create category
         create_res = self.client().post('/api/v1/categories',
                                         headers=dict(
@@ -72,15 +69,13 @@ class CategoryTestCase(BaseTestCase):
 
         self.assertEqual(create_res.status_code, 201)
         create_res = json.loads(create_res.data)
-        print('loaded: {}'.format(create_res))
         # check for category
         view_res = self.client().get('/api/v1/categories/{}/'.format(
             create_res['category_id']), headers=dict(
-            Authorization="Bearer " + token))
+                Authorization="Bearer " + token))
 
         self.assertEqual(view_res.status_code, 200)
         view_res = json.loads(view_res.data)
-        print("loads view: {}".format(view_res))
         self.assertEqual(view_res['category_name'], 'category')
         # self.assertIn(view_res, 'category')
         # self.assertIsNotNone(Category.query.filter_by(name='newname').first())
@@ -93,7 +88,6 @@ class CategoryTestCase(BaseTestCase):
         loggedin_user = self.user_login()
         # get token from login response object
         token = json.loads(loggedin_user.data)['access_token']
-        print('****************************alllllll**************************')
         # create category
         create_res = self.client().post('/api/v1/categories',
                                         headers=dict(
@@ -108,14 +102,11 @@ class CategoryTestCase(BaseTestCase):
         self.assertEqual(create2_res.status_code, 201)
         create_res = json.loads(create_res.data)
         create2_res = json.loads(create2_res.data)
-        print("loads create all: {}".format(create_res))
-        print("loads create all 2: {}".format(create2_res))
 
         # check for category
         view_res = self.client().get('/api/v1/categories',
                                      headers=dict(
                                          Authorization="Bearer " + token))
-        print('the result: {}'.format(view_res))
         self.assertEqual(view_res.status_code, 200)
         self.assertIn(b'category', view_res.data)
 

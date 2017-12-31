@@ -220,7 +220,6 @@ class Categoryy(Resource):
                     return {'message': 'No changes to be made'}
                 return {'message': 'The category does not exist'}
         except Exception as e:
-            print('wtf')
             edit_response = {
                 'message': str(e)
             }

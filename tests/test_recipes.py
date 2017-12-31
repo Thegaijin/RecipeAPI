@@ -3,15 +3,13 @@
 
 # Third party imports
 import json
-import jsonify
-from unittest import TestCase
 
 # Local import
 from tests.test_base import BaseTestCase
-from app.models.recipe import Recipe
 
 
 class RecipeTestCase(BaseTestCase):
+    ''' This class handles all the tests for the Recipe functionality '''
 
     def test_create_category(self):
         ''' Test that the API can create a Recipe in a category '''
@@ -76,13 +74,11 @@ class RecipeTestCase(BaseTestCase):
                 Authorization="Bearer " + token), data=self.recipe)
         self.assertEqual(create_res.status_code, 201)
         create_res = json.loads(create_res.data)
-        print('the created recipe', create_res)
         view_res = self.client().get('/api/v1/recipes/{}/{}/'.format(
             category_res['category_id'], create_res['recipe_name']),
             headers=dict(Authorization="Bearer " + token))
         self.assertEqual(view_res.status_code, 200)
         view_res = json.loads(view_res.data)
-        print('in category', view_res)
         self.assertIn('recipe_name', view_res)
 
     def test_view_all_recipes(self):
@@ -113,7 +109,6 @@ class RecipeTestCase(BaseTestCase):
 
         view_res = self.client().get('/api/v1/recipes', headers=dict(
             Authorization="Bearer " + token))
-        print('view_res', view_res)
         self.assertEqual(view_res.status_code, 200)
         self.assertIn(b'recipe', view_res.data)
 

@@ -60,7 +60,6 @@ class UserRegistration(Resource):
                 new_user = User(username)
                 # hash the password
                 new_user.password_hasher(password)
-                print(new_user.password_hasher(password))
                 # add to the db
                 db.session.add(new_user)
                 db.session.commit()

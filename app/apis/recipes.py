@@ -55,17 +55,14 @@ def manage_get(the_recipes, args):
         q = args.get('q', '')
         page = args.get('page', 1)
         per_page = args.get('per_page', 10)
-        print('args after', args)
-        print('After args')
+
         if per_page is None or per_page < per_page_min:
             per_page = per_page_min
 
         if per_page > per_page_max:
             per_page = per_page_max
 
-        print('were here')
         if q:
-            print('were here in q')
             q = q.lower()
             for a_recipe in the_recipes.all():
                 if q in a_recipe.recipe_name.lower():
@@ -77,7 +74,6 @@ def manage_get(the_recipes, args):
 
         pag_recipes = the_recipes.paginate(
             page, per_page, error_out=False)
-        print('page: {}, per_page: {}'.format(page, per_page))
 
         paginated = []
         for a_recipe in pag_recipes.items:
@@ -85,7 +81,6 @@ def manage_get(the_recipes, args):
         recipesschema = RecipeSchema(many=True)
 
         all_recipes = recipesschema.dump(paginated)
-        print('all recipes', all_recipes)
 
         return jsonify(all_recipes)
     return {'message': 'There are no recipes'}
@@ -108,9 +103,7 @@ class Recipess(Resource):
         try:
             user_id = get_jwt_identity()
 
-            print('user id', user_id)
             the_recipes = Recipe.query.filter_by(created_by=user_id)
-            print('if none', the_recipes)
 
             args = q_parser.parse_args(request)
             return manage_get(the_recipes, args)
@@ -142,10 +135,8 @@ class Recipes(Resource):
         try:
             user_id = get_jwt_identity()
 
-            print('user id', user_id)
             the_recipes = Recipe.query.filter_by(
                 created_by=user_id, category_id=category_id)
-            print('if not none:', the_recipes)
 
             args = q_parser.parse_args(request)
             return manage_get(the_recipes, args)
