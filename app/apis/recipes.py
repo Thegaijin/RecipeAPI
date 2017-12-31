@@ -15,8 +15,7 @@ from .categories import per_page_max, per_page_min
 
 
 api = Namespace(
-    'recipes', description='Creating, viewing, editing and deleting recipes and\
-    recipe categories')
+    'recipes', description='Creating, viewing, editing and deleting recipes')
 
 recipe = api.model('Recipe', {
     'recipe_name': fields.String(required=True, description='Recipe name'),
@@ -41,6 +40,17 @@ q_parser.add_argument('per_page', type=int,
 
 
 def manage_get(the_recipes, args):
+    """ Function to handle search and pagination
+        It receives a BaseQuery object of recipes, checks if the search
+        parameter was passed a value and searches for that value.
+        If the pagination parameters were passed values, checks if they are
+        within the min/max range per page and paginates accordingly.
+
+        :param object the_recipes: -- [description]
+        :param list args: -- [description]
+        :return:
+    """
+
     if the_recipes:
         q = args.get('q', '')
         page = args.get('page', 1)
@@ -78,6 +88,39 @@ def manage_get(the_recipes, args):
         print('all recipes', all_recipes)
 
         return jsonify(all_recipes)
+    return {'message': 'There are no recipes'}
+
+
+@api.route('')
+class Recipess(Resource):
+    ''' The class handles the view functionality for all recipes '''
+
+    @api.response(200, 'Success')
+    @api.expect(q_parser)
+    @jwt_required
+    def get(self):
+        ''' A method to get all the recipes
+            Returns all the recipes created by a user or a recipe that matches
+            a search keyword
+
+            :return: A recipe that matches the search or a list of recipe\'s
+        '''
+        try:
+            user_id = get_jwt_identity()
+
+            print('user id', user_id)
+            the_recipes = Recipe.query.filter_by(created_by=user_id)
+            print('if none', the_recipes)
+
+            args = q_parser.parse_args(request)
+            return manage_get(the_recipes, args)
+
+        except Exception as e:
+            get_response = {
+                'message': str(e)
+            }
+
+            return get_response
 
 
 @api.route('/<int:category_id>/')
@@ -120,8 +163,8 @@ class Recipes(Resource):
     @jwt_required
     def post(self, category_id):
         ''' A method to create a recipe.
-            Checks if a recipe name exists in the given category, if it doesn\'t
-            it creates the new recipe, if it does, it returns a message
+            Checks if a recipe name exists in the given category, if it
+            doesn\'t it creates the new recipe,if it does,it returns a message
 
             :param int category_id: The category id to which the recipe belongs
             :return: A dictionary with a message and status code
@@ -188,6 +231,7 @@ class Recipee(Resource):
                 recipeschema = RecipeSchema()
                 get_response = recipeschema.dump(the_recipe)
                 return jsonify(get_response.data)
+            return {'message': 'The recipe does not exist'}
         except Exception as e:
             get_response = {
                 'message': str(e)
@@ -262,35 +306,3 @@ class Recipee(Resource):
             }
 
             return delete_response
-
-
-@api.route('')
-class Recipess(Resource):
-    ''' The class handles the view functionality for all recipes '''
-
-    @api.response(200, 'Success')
-    @api.expect(q_parser)
-    @jwt_required
-    def get(self):
-        ''' A method to get all the recipes
-            Returns all the recipes created by a user or a recipe that matches
-            a search keyword
-
-            :return: A recipe that matches the search or a list of recipe\'s
-        '''
-        try:
-            user_id = get_jwt_identity()
-
-            print('user id', user_id)
-            the_recipes = Recipe.query.filter_by(created_by=user_id)
-            print('if none', the_recipes)
-
-            args = q_parser.parse_args(request)
-            return manage_get(the_recipes, args)
-
-        except Exception as e:
-            get_response = {
-                'message': str(e)
-            }
-
-            return get_response

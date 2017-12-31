@@ -172,6 +172,7 @@ class Categoryy(Resource):
                 categoryschema = CategorySchema()
                 get_response = categoryschema.dump(the_category)
                 return jsonify(get_response.data)
+            return {'message': 'The category doesn\'t exist'}
         except Exception as e:
             get_response = {
                 'message': str(e)

@@ -3,15 +3,14 @@
 
 # Third party imports
 from datetime import timedelta
+import re
 from flask_jwt_extended import create_access_token
 from flask_restplus import fields, Namespace, Resource, reqparse
-import re
 
 
 # Local imports
-from ..db import db
 from app.models.user import User
-from app import jwt
+from ..db import db
 
 
 api = Namespace(
@@ -69,7 +68,7 @@ class UserRegistration(Resource):
                 return {'message': 'Account was successfully created'}, 201
             return {'message': 'The username already exists'}, 202
         except:
-            traceback.print_exc()
+
             return {'message': 'Error occured during user registration'}, 400
 
 
@@ -98,9 +97,9 @@ class UserLogin(Resource):
                 # save user object
                 the_user = User.query.filter_by(username=username).first()
                 # check if the password matches, returns True if they match
-                user = the_user.password_checker(password)
+                a_user = the_user.password_checker(password)
 
-                if user:
+                if a_user:
                     expires = timedelta(days=365)
                     access_token = create_access_token(
                         identity=the_user.user_id, expires_delta=expires)
@@ -114,5 +113,4 @@ class UserLogin(Resource):
                 return {'message': 'Credentials do not match, try again'}, 401
             return {'message': 'Username does not exist, signup'}, 401
         except:
-            traceback.print_exc()
             return {'message': 'An error occured while attempting to login'}

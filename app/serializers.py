@@ -14,16 +14,18 @@ ma = Marshmallow()
 
 
 class UserSchema(ma.ModelSchema):
+    """ User model schema """
     class Meta:
         model = User
 
 
 class CategorySchema(ma.ModelSchema):
+    """ Category model schema """
     class Meta:
-
         model = Category
 
 
 class RecipeSchema(ma.ModelSchema):
+    """ Recipe model schema """
     class Meta:
         model = Recipe
