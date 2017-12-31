@@ -29,6 +29,12 @@ class BaseTestCase(TestCase):
         self.category1 = {'category_name': 'category1',
                           'description': 'description1',
                           'created_by': 'created_by'}
+        self.recipe = {'recipe_name': 'recipe',
+                       'description': 'description',
+                       'created_by': 'created_by'}
+        self.recipe1 = {'recipe_name': 'recipe1',
+                        'description': 'description1',
+                        'created_by': 'created_by'}
 
         # explicitly create application context
         # cache DB connections to be created on a per-request or usage case
@@ -45,6 +51,15 @@ class BaseTestCase(TestCase):
         ''' This helper method helps log in a test user '''
 
         return self.client().post('/api/v1/auth/login/', data=self.user)
+
+    def create_category(self):
+        ''' This method creates a category to be used for recipe tests '''
+        login = self.user_login()
+        token = json.loads(login.data)['access_token']
+        return self.client().post('/api/v1/categories',
+                                  headers=dict(
+                                      Authorization="Bearer " + token),
+                                  data=self.category)
 
     def tearDown(self):
         with self.app.app_context():
