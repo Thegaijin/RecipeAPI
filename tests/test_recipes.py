@@ -1,5 +1,5 @@
 # test_recipes.py
-''' This Script has the tests for CRUD functionality '''
+''' This Script has the tests for Recipe CRUD functionality '''
 
 # Third party imports
 import json
@@ -8,14 +8,13 @@ from unittest import TestCase
 
 # Local import
 from tests.test_base import BaseTestCase
-from app.models.category import Category
+from app.models.recipe import Recipe
 
 
 class RecipeTestCase(BaseTestCase):
-    ''' Tests for Category and recipe CRUD '''
 
     def test_create_category(self):
-        ''' Test that the API can create a Category '''
+        ''' Test that the API can create a Recipe in a category '''
         # register user
         self.user_registration()
         # login user
@@ -23,19 +22,21 @@ class RecipeTestCase(BaseTestCase):
         # get token from login response object
         token = json.loads(loggedin_user.data)['access_token']
         # add token to the header as part of the post request
-        create_res = self.client().post('/api/v1/categories',
-                                        headers=dict(
-                                            Authorization="Bearer " + token),
-                                        data=self.category)
+        category_res = self.create_category()
+        self.assertEqual(category_res.status_code, 201)
+        category_res = json.loads(category_res.data)
 
+        create_res = self.client().post('/api/v1/recipes/{}/'.format(
+            category_res['category_id']), headers=dict(
+                Authorization="Bearer " + token), data=self.recipe)
         self.assertEqual(create_res.status_code, 201)
         create_res = json.loads(create_res.data)
+        self.assertEqual(create_res['message'], 'Recipe has been created')
 
-        self.assertEqual(create_res['message'], 'Category was created')
-        # self.assertIsNotNone(Category.query.filter_by(name='newname').first())
-
-    def test_category_already_exists(self):
-        ''' Test that the API can create a Category '''
+    def test_recipe_already_exits(self):
+        ''' Test that the API can not create a recipe in category if it
+             already exists
+        '''
         # register user
         self.user_registration()
         # login user
@@ -43,136 +44,127 @@ class RecipeTestCase(BaseTestCase):
         # get token from login response object
         token = json.loads(loggedin_user.data)['access_token']
         # add token to the header as part of the post request
-        create_res = self.client().post('/api/v1/categories',
-                                        headers=dict(
-                                            Authorization="Bearer " + token),
-                                        data=self.category)
-        create2_res = self.client().post('/api/v1/categories',
-                                         headers=dict(
-                                             Authorization="Bearer " + token),
-                                         data=self.category)
+        category_res = self.create_category()
+        self.assertEqual(category_res.status_code, 201)
+        category_res = json.loads(category_res.data)
 
+        create_res = self.client().post('/api/v1/recipes/{}/'.format(
+            category_res['category_id']), headers=dict(
+                Authorization="Bearer " + token), data=self.recipe)
+        create2_res = self.client().post('/api/v1/recipes/{}/'.format(
+            category_res['category_id']), headers=dict(
+                Authorization="Bearer " + token), data=self.recipe)
         create2_res = json.loads(create2_res.data)
-        self.assertEqual(create2_res['message'], 'Category already exists')
+        self.assertEqual(create2_res['message'], 'Recipe already exists')
 
-    def test_view_category(self):
-        ''' Test that the API can view a category '''
+    def test_view_recipe_in_category(self):
+        """ Test that the API can view a recipe """
+
         # register user
         self.user_registration()
         # login user
         loggedin_user = self.user_login()
         # get token from login response object
         token = json.loads(loggedin_user.data)['access_token']
-        print('**********************view one********************************')
-        # create category
-        create_res = self.client().post('/api/v1/categories',
-                                        headers=dict(
-                                            Authorization="Bearer " + token),
-                                        data=self.category)
+        # add token to the header as part of the post request
+        category_res = self.create_category()
+        self.assertEqual(category_res.status_code, 201)
+        category_res = json.loads(category_res.data)
 
+        create_res = self.client().post('/api/v1/recipes/{}/'.format(
+            category_res['category_id']), headers=dict(
+                Authorization="Bearer " + token), data=self.recipe)
         self.assertEqual(create_res.status_code, 201)
         create_res = json.loads(create_res.data)
-        print('loaded: {}'.format(create_res))
-        # check for category
-        view_res = self.client().get('/api/v1/categories/{}/'.format(
-            create_res['category_id']), headers=dict(
-            Authorization="Bearer " + token))
-
+        print('the created recipe', create_res)
+        view_res = self.client().get('/api/v1/recipes/{}/{}/'.format(
+            category_res['category_id'], create_res['recipe_name']),
+            headers=dict(Authorization="Bearer " + token))
         self.assertEqual(view_res.status_code, 200)
         view_res = json.loads(view_res.data)
-        print("loads view: {}".format(view_res))
-        self.assertEqual(view_res['category_name'], 'category')
-        # self.assertIn(view_res, 'category')
-        # self.assertIsNotNone(Category.query.filter_by(name='newname').first())
+        print('in category', view_res)
+        self.assertIn('recipe_name', view_res)
 
-    def test_view_all_categories(self):
-        ''' Test that the API can view all categories '''
+    def test_view_all_recipes(self):
+        """ Test that the API can view several recipes """
+
         # register user
         self.user_registration()
         # login user
         loggedin_user = self.user_login()
         # get token from login response object
         token = json.loads(loggedin_user.data)['access_token']
-        print('****************************alllllll**************************')
-        # create category
-        create_res = self.client().post('/api/v1/categories',
-                                        headers=dict(
-                                            Authorization="Bearer " + token),
-                                        data=self.category)
+        # add token to the header as part of the post request
+        category_res = self.create_category()
+        self.assertEqual(category_res.status_code, 201)
+        category_res = json.loads(category_res.data)
 
-        create2_res = self.client().post('/api/v1/categories',
-                                         headers=dict(
-                                             Authorization="Bearer " + token),
-                                         data=self.category1)
+        create_res = self.client().post('/api/v1/recipes/{}/'.format(
+            category_res['category_id']), headers=dict(
+                Authorization="Bearer " + token), data=self.recipe)
+        create2_res = self.client().post('/api/v1/recipes/{}/'.format(
+            category_res['category_id']), headers=dict(
+                Authorization="Bearer " + token), data=self.recipe1)
+
         self.assertEqual(create_res.status_code, 201)
         self.assertEqual(create2_res.status_code, 201)
         create_res = json.loads(create_res.data)
         create2_res = json.loads(create2_res.data)
-        print("loads create all: {}".format(create_res))
-        print("loads create all 2: {}".format(create2_res))
 
-        # check for category
-        view_res = self.client().get('/api/v1/categories',
-                                     headers=dict(
-                                         Authorization="Bearer " + token))
-        print('the result: {}'.format(view_res))
-        # view = jsonify(view_res.data)
-        # json.loads(view)
-        # print('the view: {}'.format(view))
+        view_res = self.client().get('/api/v1/recipes', headers=dict(
+            Authorization="Bearer " + token))
+        print('view_res', view_res)
         self.assertEqual(view_res.status_code, 200)
-        self.assertIn(b'category', view_res.data)
-        # print("Data {}".format(view_res.data))
-        # view_res = json.loads(view_res)
-        # print("loads: {}".format(view_res))
-        # print('the type' + type(view_res))
-        # length = len(view_res)
-        # self.assertEqual(length, 2)
+        self.assertIn(b'recipe', view_res.data)
 
-    def test_edit_category(self):
-        ''' Test that the API can view all categories '''
+    def test_edit_recipe(self):
+        """ Test that API can edit a recipe """
+
         # register user
         self.user_registration()
         # login user
         loggedin_user = self.user_login()
         # get token from login response object
         token = json.loads(loggedin_user.data)['access_token']
-        # create category
-        create_res = self.client().post('/api/v1/categories',
-                                        headers=dict(
-                                            Authorization="Bearer " + token),
-                                        data=self.category)
+        # add token to the header as part of the post request
+        category_res = self.create_category()
+        self.assertEqual(category_res.status_code, 201)
+        category_res = json.loads(category_res.data)
+
+        create_res = self.client().post('/api/v1/recipes/{}/'.format(
+            category_res['category_id']), headers=dict(
+                Authorization="Bearer " + token), data=self.recipe)
         self.assertEqual(create_res.status_code, 201)
         create_res = json.loads(create_res.data)
-        new_details = {'category_name': 'new_name',
+        new_details = {'recipe_name': 'new_name',
                        'description': 'new_description'}
-        edit_res = self.client().put('/api/v1/categories/{}/'.format(
-            create_res['category_id']), headers=dict(
-                Authorization="Bearer " + token),
-            data=new_details)
+        edit_res = self.client().put('/api/v1/recipes/{}/{}/'.format(
+            category_res['category_id'], create_res['recipe_name']),
+            headers=dict(Authorization="Bearer " + token), data=new_details)
         self.assertEqual(edit_res.status_code, 204)
-        # self.assertEqual(edit_res['message'], 'Category edit was successful')
-        # self.assertIn(edit_res, 'new_name')
-        # self.assertIsNotNone(Category.query.filter_by(name='newname').first())
 
-    def test_delete_category(self):
+    def test_delete_recipe(self):
+        """ Test that API can delete a recipe """
+
         # register user
         self.user_registration()
         # login user
         loggedin_user = self.user_login()
         # get token from login response object
         token = json.loads(loggedin_user.data)['access_token']
-        # create category
-        create_res = self.client().post('/api/v1/categories',
-                                        headers=dict(
-                                            Authorization="Bearer " + token),
-                                        data=self.category)
+        # add token to the header as part of the post request
+        category_res = self.create_category()
+        self.assertEqual(category_res.status_code, 201)
+        category_res = json.loads(category_res.data)
+
+        create_res = self.client().post('/api/v1/recipes/{}/'.format(
+            category_res['category_id']), headers=dict(
+                Authorization="Bearer " + token), data=self.recipe)
         self.assertEqual(create_res.status_code, 201)
         create_res = json.loads(create_res.data)
-        delete_res = self.client().delete(
-            '/api/v1/categories/{}/'.format(
-                create_res['category_id']), headers=dict(
-                    Authorization="Bearer " + token))
+        delete_res = self.client().delete('/api/v1/recipes/{}/{}/'.format(
+            category_res['category_id'], create_res['recipe_name']),
+            headers=dict(Authorization="Bearer " + token))
         self.assertEqual(delete_res.status_code, 200)
         delete_res = json.loads(delete_res.data)
-        self.assertEqual(delete_res['message'], 'Category was deleted')
-        # self.assertIsNone(Category.query.filter_by(name='category').first())
+        self.assertEqual(delete_res['message'], 'Recipe was deleted')
