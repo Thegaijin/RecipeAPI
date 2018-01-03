@@ -4,6 +4,7 @@
 # Third party imports
 from datetime import timedelta
 import re
+from flask import request, jsonify
 from flask_jwt_extended import create_access_token
 from flask_restplus import fields, Namespace, Resource, reqparse
 
@@ -15,11 +16,11 @@ from ..db import db
 
 api = Namespace(
     'auth', description='Creating and authenticating user credentials')
-username_regex = re.compile(r"^[a-zA-Z_][0-9a-zA-Z_]*$", re.IGNORECASE)
-
+# username_regex = re.compile(r"^[a-zA-Z_][0-9a-zA-Z_]*$", re.IGNORECASE)
+#  pattern='^[a-zA-Z_][0-9a-zA-Z_]*$'
 user = api.model('User', {
     'username': fields.String(required=True,
-                              pattern='^[a-zA-Z_][0-9a-zA-Z_]*$',
+                              pattern='^[a-zA-Z]+$',
                               min_length=2, max_length=4,
                               description='user\'s name'),
     'password': fields.String(required=True, description='user\'s password'),
@@ -45,8 +46,6 @@ class UserRegistration(Resource):
             Takes the user credentials added, hashes the password and saves
             them to the DB
 
-            :param str username: The user\'s chosen name
-            :param str password: The user\'s password
             :return: A dictionary with a message
         '''
 
@@ -82,8 +81,6 @@ class UserLogin(Resource):
             Checks if the entered credentials match the existing ones in the DB
             and if they do, gives the user access.
 
-            :param str username: The user\'s chosen name
-            :param str password: The user\'s password
             :return: A dictionary with a message
         '''
         args = parser.parse_args()
@@ -113,3 +110,22 @@ class UserLogin(Resource):
             return {'message': 'Username does not exist, signup'}, 401
         except:
             return {'message': 'An error occured while attempting to login'}
+
+
+@api.route('/logout/')
+class UserLogout(Resource):
+    ''' This class logs out a currently logged in user. '''
+
+    @api.expect(user)
+    @api.response(200, 'You have been logged out')
+    def post(self):
+        ''' This method logs out a logged in user
+            Checks if the logged users token is valid.
+
+            :return: A dictionary with a message
+        '''
+        auth_header = request.headers.get('Authorization')
+        if auth_header:
+            token = auth_header.split()[1]
+
+            return token
