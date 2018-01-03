@@ -61,7 +61,7 @@ class UserTestCase(BaseTestCase):
         result = json.loads(res.data)
         self.assertEqual(result['message'], 'Username does not exist, signup')
 
-    def test_user_wrong_credentials_login_fails(self):
+    def test_login_fails(self):
         ''' Test if a user can sign in with wrong credentials '''
         # attempt to register user
         res_1 = self.client().post('/api/v1/auth/register/', data=self.user)
@@ -75,3 +75,24 @@ class UserTestCase(BaseTestCase):
         result = json.loads(res_2.data)
         self.assertEqual(result['message'],
                          'Credentials do not match, try again')
+
+    def test_valid_logout(self):
+        ''' Test for logout '''
+        # register user
+        self.user_registration()
+        # login user
+        loggedin_user = self.user_login()
+        # get token from login response object
+        token = json.loads(loggedin_user.data)['access_token']
+        # valid token logout
+        res = self.client().post('/api/v1/auth/logout/', headers=dict(
+            Authorization='Bearer ' + token, data=token))
+        print('plain res', res)
+        print('data res', res.data)
+        print('token', token)
+        self.assertEqual(res.status_code, 201)
+        logout_res = json.loads(res.data)
+        print(logout_res)
+        # self.assertTrue(data['status'] == 'success')
+        # self.assertTrue(data['message'] == 'Successfully logged out.')
+        # self.assertEqual(response.status_code, 200)
