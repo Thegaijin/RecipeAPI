@@ -34,8 +34,3 @@ class Recipe(db.Model):
 
     def __repr__(self):
         return '<Recipe: {}>'.format(self.recipe_name)
-
-
-# class RecipeSchema(marsw.ModelSchema):
-#     class Meta:
-#         model = Recipe
