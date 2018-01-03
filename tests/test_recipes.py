@@ -110,7 +110,6 @@ class RecipeTestCase(BaseTestCase):
         view_res = self.client().get('/api/v1/recipes', headers=dict(
             Authorization="Bearer " + token))
         self.assertEqual(view_res.status_code, 200)
-        self.assertIn(b'recipe', view_res.data)
 
     def test_edit_recipe(self):
         """ Test that API can edit a recipe """
