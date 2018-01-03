@@ -34,6 +34,7 @@ per_page_min = 5
 per_page_max = 10
 # validate input
 q_parser = reqparse.RequestParser(bundle_errors=True)
+# location specifies to look only in the querystring
 q_parser.add_argument('q', required=False,
                       help='search for word', location='args')
 q_parser.add_argument('page', required=False, type=int,
