@@ -10,9 +10,9 @@ from flask_restplus import fields, Namespace, Resource, reqparse
 # Local imports
 from app import db
 from app.models.recipe import Recipe
-from ..serializers import RecipeSchema
-from .categories import per_page_max, per_page_min
-# from .helper import manage_get
+# from ..serializers import RecipeSchema
+# from .categories import per_page_max, per_page_min
+from .helper import manage_get
 
 
 api = Namespace(
@@ -101,7 +101,7 @@ class Recipess(Resource):
             return response
         except Exception as e:
             get_response = {
-                'message': str(e)
+                'View recipes exception': str(e)
             }
             return get_response
 
@@ -130,7 +130,7 @@ class Recipes(Resource):
             return manage_get(the_recipes, args)
         except Exception as e:
             get_response = {
-                'message': str(e)
+                'View recipes in category exception': str(e)
             }
             return get_response, 404
 
@@ -173,7 +173,7 @@ class Recipes(Resource):
             return {'message': 'Recipe already exists'}
         except Exception as e:
             post_response = {
-                'message': str(e)
+                'Add recipe exception': str(e)
             }
             return post_response
 
@@ -204,7 +204,7 @@ class Recipee(Resource):
             return {'message': 'The recipe does not exist'}
         except Exception as e:
             get_response = {
-                'message': str(e)
+                'View recipe by name exception': str(e)
             }
             return get_response, 404
 
@@ -241,7 +241,7 @@ class Recipee(Resource):
             return {'message': 'The recipe does not exist'}
         except Exception as e:
             edit_response = {
-                'message': str(e)
+                'Edit recipe exception': str(e)
             }
             return edit_response
 
@@ -267,7 +267,7 @@ class Recipee(Resource):
         except Exception as e:
 
             delete_response = {
-                'message': str(e)
+                'Delete recipe exception': str(e)
             }
 
             return delete_response
