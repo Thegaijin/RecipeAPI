@@ -89,7 +89,7 @@ class Categories(Resource):
             return jsonify(all_categories)
         except Exception as e:
             get_response = {
-                'message': str(e)
+                'View all categories exception': str(e)
             }
             return get_response
 
@@ -127,7 +127,7 @@ class Categories(Resource):
             return {'message': 'Category already exists'}
         except Exception as e:
             post_response = {
-                'message': str(e)
+                'Create Category Exception': str(e)
             }
             return post_response
 
@@ -154,7 +154,7 @@ class Categoryy(Resource):
             return {'message': 'The category doesn\'t exist'}
         except Exception as e:
             get_response = {
-                'message': str(e)
+                'Get a category exception': str(e)
             }
 
             return get_response, 404
@@ -196,7 +196,7 @@ class Categoryy(Resource):
                 return {'message': 'The category does not exist'}
         except Exception as e:
             edit_response = {
-                'message': str(e)
+                'Edit category exception': str(e)
             }
             return edit_response
 
@@ -219,8 +219,8 @@ class Categoryy(Resource):
             return {'message': 'The category does not exist'}
         except Exception as e:
 
-            post_response = {
-                'message': str(e)
+            delete_response = {
+                'Delete category exception': str(e)
             }
 
-            return post_response
+            return delete_response
