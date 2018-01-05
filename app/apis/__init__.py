@@ -23,7 +23,7 @@ api = Api(apiv1_blueprint,
 api_2 = Api(apiv2_blueprint,
             title='My app',
             version='2.0',
-            description='An API ...')
+            description='Another API version')
 
 # namespace for user registration and login
 api.add_namespace(ns_auth)
