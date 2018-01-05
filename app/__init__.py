@@ -13,6 +13,7 @@ from flask_restplus import Api
 # importing protected configurations from /instance
 from instance.config import app_config
 from .db import db
+from app.models.blacklist import Blacklist
 
 jwt = JWTManager()
 
@@ -35,6 +36,10 @@ def create_app(config_name):
     app.config.from_pyfile('config.py')
     # set to False to avoid wasting resources
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    # set token blacklisting to true
+    app.config['JWT_BLACKLIST_ENABLED'] = True
+    # set the type of token to blacklist
+    app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access']
     # prep application to work with SQLAlchemy
     db.init_app(app)
     jwt.init_app(app)
@@ -48,3 +53,21 @@ def create_app(config_name):
     app.register_blueprint(api_v2, url_prefix='/api/v2')
 
     return app
+
+
+@jwt.token_in_blacklist_loader
+def check_if_token_in_blacklist(decrypted_token):
+    """ Call back function that checks if a the token is valid on all the
+        endpoints that require a token
+
+        :Decorators:
+            jwt
+        :param decrypted_token: -- [description]
+        :Return: Boolean
+    """
+    jti = decrypted_token['jti']
+    print('jti', jti)
+
+    if Blacklist.query.filter_by(token=jti).first() is None:
+        return False
+    return True

@@ -5,12 +5,15 @@
 from datetime import timedelta
 import re
 from flask import request, jsonify
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import (
+    get_jwt_identity, create_access_token, jwt_required, get_raw_jwt)
 from flask_restplus import fields, Namespace, Resource, reqparse
+from flask_jwt_extended.exceptions import RevokedTokenError
 
 
 # Local imports
 from app.models.user import User
+from app.models.blacklist import Blacklist
 from ..db import db
 
 
@@ -106,26 +109,38 @@ class UserLogin(Resource):
                         'access_token': access_token
                     }
                     return the_response, 200
-                return {'message': 'Credentials do not match, try again'}, 401
-            return {'message': 'Username does not exist, signup'}, 401
+                return {'Login error': 'Credentials do not match, try again'}, 401
+            return {'Login error': 'Username does not exist, signup'}, 401
         except:
-            return {'message': 'An error occured while attempting to login'}
+            return {'Login exception': 'An error occured while attempting to login'}
 
 
 @api.route('/logout/')
 class UserLogout(Resource):
     ''' This class logs out a currently logged in user. '''
 
-    @api.expect(user)
     @api.response(200, 'You have been logged out')
-    def post(self):
+    @jwt_required
+    def delete(self):
         ''' This method logs out a logged in user
             Checks if the logged users token is valid.
 
             :return: A dictionary with a message
         '''
-        auth_header = request.headers.get('Authorization')
-        if auth_header:
-            token = auth_header.split()[1]
+        try:
+            jti = get_raw_jwt()['jti']
+            print('raw jti', jti)
+            blacklisted = Blacklist(jti)
+            print('blacklisted', blacklisted)
+            db.session.add(blacklisted)
+            db.session.commit()
+            the_response = {"message": "Successfully logged out"}
+            return the_response, 200
 
-            return token
+        except RevokedTokenError as e:
+            return {"Error": "logged out"}
+            # blacklist_response = {
+            #     'Logout Error': str(e)
+            # }
+
+            # return blacklist_response
