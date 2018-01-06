@@ -11,7 +11,7 @@ from tests.test_base import BaseTestCase
 class RecipeTestCase(BaseTestCase):
     ''' This class handles all the tests for the Recipe functionality '''
 
-    def test_create_category(self):
+    def test_create_recipe(self):
         ''' Test that the API can create a Recipe in a category '''
         # register user
         self.user_registration()
