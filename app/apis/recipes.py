@@ -10,7 +10,7 @@ from flask_restplus import fields, Namespace, Resource, reqparse
 # Local imports
 from app import db
 from app.models.recipe import Recipe
-# from ..serializers import RecipeSchema
+from ..serializers import RecipeSchema
 # from .categories import per_page_max, per_page_min
 from .helper import manage_get
 

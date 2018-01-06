@@ -66,7 +66,6 @@ def check_if_token_in_blacklist(decrypted_token):
         :Return: Boolean
     """
     jti = decrypted_token['jti']
-    print('jti', jti)
 
     if Blacklist.query.filter_by(token=jti).first() is None:
         return False
