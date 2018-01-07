@@ -11,6 +11,7 @@ from flask_restplus import fields, Namespace, Resource, reqparse
 from app import db
 from app.models.category import Category
 from ..serializers import CategorySchema
+from ..validation_helper import name_validator
 
 
 api = Namespace(
@@ -109,27 +110,36 @@ class Categories(Resource):
         description = args.description
         created_by = user_id
 
-        try:
-            # check if the category exists
-            if Category.query.filter_by(
-                    created_by=created_by,
-                    category_name=category_name).first() is None:
-                a_category = Category(category_name.lower(),
-                                      description.lower(), created_by)
-                db.session.add(a_category)
-                db.session.commit()
-                the_response = {
-                    'status': 'Success',
-                    'message': 'Category was created',
-                    'category_id': a_category.category_id
+        validated_name = name_validator(category_name)
+        if len(validated_name) is len(category_name):
+            try:
+                # change values to lowercase
+                category_name = category_name.lower()
+                description = description.lower()
+                # check if the category exists
+                if Category.query.filter_by(
+                        created_by=created_by,
+                        category_name=category_name).first() is None:
+                    a_category = Category(category_name,
+                                          description, created_by)
+                    db.session.add(a_category)
+                    db.session.commit()
+                    the_response = {
+                        'status': 'Success',
+                        'message': 'Category was created',
+                        'category_id': a_category.category_id
+                    }
+                    return the_response, 201
+                return {'message': 'Category already exists'}
+            except Exception as e:
+                post_response = {
+                    'Create Category Exception': str(e)
                 }
-                return the_response, 201
-            return {'message': 'Category already exists'}
-        except Exception as e:
-            post_response = {
-                'Create Category Exception': str(e)
-            }
-            return post_response
+                return post_response
+        else:
+            return {'Input validation Error': 'The category name should '
+                    'comprise of alphabetical characters and can be more than '
+                    'one word'}
 
 
 @api.route('/<int:category_id>/')
@@ -178,11 +188,18 @@ class Categoryy(Resource):
                 category_name = args.category_name
                 description = args.description
                 created_by = user_id
+
+                # change values to lowercase
+                category_name = category_name.lower()
+                description = description.lower()
+
                 if category_name is not None and description is not None:
                     if Category.query.filter_by(category_name=category_name,
                                                 created_by=created_by).first() is None:
-                        the_category.category_name = category_name.lower()
-                        the_category.description = description.lower()
+
+                        # Replace old values with the new values
+                        the_category.category_name = category_name
+                        the_category.description = description
                         db.session.add(the_category)
                         db.session.commit()
                         edit_response = {

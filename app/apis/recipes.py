@@ -13,6 +13,7 @@ from app.models.recipe import Recipe
 from ..serializers import RecipeSchema
 # from .categories import per_page_max, per_page_min
 from .helper import manage_get
+from ..validation_helper import name_validator
 
 
 api = Namespace(
@@ -63,7 +64,7 @@ def manage_get(the_recipes, args):
         if q:
             q = q.lower()
             for a_recipe in the_recipes.all():
-                if q in a_recipe.recipe_name.lower():
+                if q in a_recipe.recipe_name:
                     recipeschema = RecipeSchema()
                     the_recipe = recipeschema.dump(a_recipe)
                     return jsonify(the_recipe.data)
@@ -155,27 +156,37 @@ class Recipes(Resource):
         category_id = category_id
         created_by = user_id
 
-        try:
-            # check if the category exists
-            if Recipe.query.filter_by(created_by=created_by,
-                                      category_id=category_id,
-                                      recipe_name=recipe_name).first() is None:
-                a_recipe = Recipe(recipe_name.lower(), description.lower(),
-                                  category_id, created_by)
-                db.session.add(a_recipe)
-                db.session.commit()
-                the_response = {
-                    'status': 'Success',
-                    'message': 'Recipe has been created',
-                    'recipe_name': a_recipe.recipe_name
+        validated_name = name_validator(recipe_name)
+        if len(validated_name) is len(category_name):
+            try:
+                # change values to lowercase
+                recipe_name = recipe_name.lower()
+                description = description.lower()
+
+                # check if the category exists
+                if Recipe.query.filter_by(created_by=created_by,
+                                          category_id=category_id,
+                                          recipe_name=recipe_name).first() is None:
+                    a_recipe = Recipe(recipe_name, description,
+                                      category_id, created_by)
+                    db.session.add(a_recipe)
+                    db.session.commit()
+                    the_response = {
+                        'status': 'Success',
+                        'message': 'Recipe has been created',
+                        'recipe_name': a_recipe.recipe_name
+                    }
+                    return the_response, 201
+                return {'message': 'Recipe already exists'}
+            except Exception as e:
+                post_response = {
+                    'Add recipe exception': str(e)
                 }
-                return the_response, 201
-            return {'message': 'Recipe already exists'}
-        except Exception as e:
-            post_response = {
-                'Add recipe exception': str(e)
-            }
-            return post_response
+                return post_response
+        else:
+            return {'Input validation Error': 'The recipe name should '
+                    'comprise of alphabetical characters and can be more than '
+                    'one word'}
 
 
 @api.route('/<int:category_id>/<recipe_name>/')
@@ -227,9 +238,13 @@ class Recipee(Resource):
                 args = recipe_parser.parse_args()
                 recipe_name = args.recipe_name
                 description = args.description
+
+                # change the values to lowercase
+                recipe_name = recipe_name.lower()
+                description = description.lower()
                 if recipe_name is not None and description is not None:
-                    the_recipe.recipe_name = recipe_name.lower()
-                    the_recipe.ingredients = description.lower()
+                    the_recipe.recipe_name = recipe_name
+                    the_recipe.ingredients = description
                     db.session.add(the_recipe)
                     db.session.commit()
                     edit_response = {

@@ -15,16 +15,14 @@ from flask_jwt_extended.exceptions import RevokedTokenError
 from app.models.user import User
 from app.models.blacklist import Blacklist
 from ..db import db
+from ..validation_helper import username_validator, password_validator
 
 
 api = Namespace(
     'auth', description='Creating and authenticating user credentials')
-# username_regex = re.compile(r"^[a-zA-Z_][0-9a-zA-Z_]*$", re.IGNORECASE)
-#  pattern='^[a-zA-Z_][0-9a-zA-Z_]*$'
+
 user = api.model('User', {
     'username': fields.String(required=True,
-                              pattern='^[a-zA-Z]+$',
-                              min_length=2, max_length=4,
                               description='user\'s name'),
     'password': fields.String(required=True, description='user\'s password'),
 })
@@ -56,21 +54,29 @@ class UserRegistration(Resource):
         username = args.username
         password = args.password
 
-        try:
-            # check if the already username exists in the db
-            if User.query.filter_by(username=username).first() is None:
-                new_user = User(username)
-                # hash the password
-                new_user.password_hasher(password)
-                # add to the db
-                db.session.add(new_user)
-                db.session.commit()
+        validated_username = username_validator(username)
+        validated_password = password_validator(password)
+        if validated_username and validated_password:
+            try:
+                username = username.lower()
+                # check if the already username exists in the db
+                if User.query.filter_by(username=username).first() is None:
+                    new_user = User(username)
+                    # hash the password
+                    new_user.password_hasher(password)
+                    # add to the db
+                    db.session.add(new_user)
+                    db.session.commit()
 
-                return {'message': 'Account was successfully created'}, 201
-            return {'message': 'The username already exists'}, 202
-        except:
-
-            return {'message': 'Error occured during user registration'}, 400
+                    return {'message': 'Account was successfully created'}, 201
+                return {'message': 'The username already exists'}, 202
+            except:
+                return {'message': 'Error occured during user registration'}, 400
+        else:
+            return {'Input validation error': 'username can only comprise '
+                    'of alphanumeric values & an underscore. '
+                    'Password can only comprise of alphanumeric values '
+                    '& an underscore and between 6 to 25 characters long'}
 
 
 @api.route('/login/')
@@ -112,7 +118,8 @@ class UserLogin(Resource):
                 return {'Login error': 'Credentials do not match, try again'}, 401
             return {'Login error': 'Username does not exist, signup'}, 401
         except:
-            return {'Login exception': 'An error occured while attempting to login'}
+            return {'Login exception': 'An error occured while attempting'
+                    'to login'}
 
 
 @api.route('/logout/')
