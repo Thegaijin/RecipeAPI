@@ -38,8 +38,7 @@ parser.add_argument('password', required=True)
 class UserRegistration(Resource):
     ''' This class registers a new user. '''
 
-    # specifies the expected input fields
-    @api.expect(user)  # , validate=True
+    @api.expect(user)
     @api.response(201, 'Account was successfully created')
     def post(self):
         ''' This method adds a new user.
@@ -56,21 +55,16 @@ class UserRegistration(Resource):
         validated_username = username_validator(username)
         validated_password = password_validator(password)
         if validated_username and validated_password:
-            try:
-                username = username.lower()
-                # check if the already username exists in the db
-                if User.query.filter_by(username=username).first() is None:
-                    new_user = User(username)
-                    # hash the password
-                    new_user.password_hasher(password)
-                    # add to the db
-                    db.session.add(new_user)
-                    db.session.commit()
 
-                    return {'message': 'Account was successfully created'}, 201
-                return {'message': 'The username already exists'}, 202
-            except:
-                return {'message': 'Error occured during user registration'}, 400
+            username = username.lower()
+            if User.query.filter_by(username=username).first() is None:
+                new_user = User(username)
+                new_user.password_hasher(password)
+                db.session.add(new_user)
+                db.session.commit()
+
+                return {'message': 'Account was successfully created'}, 201
+            return {'message': 'The username already exists'}, 409
         else:
             return {'Input validation error': 'username can only comprise '
                     'of alphanumeric values & an underscore. '
@@ -95,30 +89,23 @@ class UserLogin(Resource):
         username = args.username
         password = args.password
 
-        try:
-            # check if the user exists
-            if User.query.filter_by(username=username).first() is not None:
-                # save user object
-                the_user = User.query.filter_by(username=username).first()
-                # check if the password matches, returns True if they match
-                a_user = the_user.password_checker(password)
+        if User.query.filter_by(username=username).first() is not None:
+            the_user = User.query.filter_by(username=username).first()
+            a_user = the_user.password_checker(password)
 
-                if a_user:
-                    expires = timedelta(days=365)
-                    access_token = create_access_token(
-                        identity=the_user.user_id, expires_delta=expires)
+            if a_user:
+                expires = timedelta(days=365)
+                access_token = create_access_token(
+                    identity=the_user.user_id, expires_delta=expires)
 
-                    the_response = {
-                        'status': 'successful Login',
-                        'message': 'You have been signed in',
-                        'access_token': access_token
-                    }
-                    return the_response, 200
-                return {'Login error': 'Credentials do not match, try again'}, 401
-            return {'Login error': 'Username does not exist, signup'}, 401
-        except:
-            return {'Login exception': 'An error occured while attempting'
-                    'to login'}
+                the_response = {
+                    'status': 'successful Login',
+                    'message': 'You have been signed in',
+                    'access_token': access_token
+                }
+                return the_response, 200
+            return {'Login error': 'Credentials do not match, try again'}, 401
+        return {'Login error': 'Username does not exist, signup'}, 401
 
 
 @api.route('/logout/')
@@ -133,15 +120,9 @@ class UserLogout(Resource):
 
             :return: A dictionary with a message
         '''
-        try:
-            jti = get_raw_jwt()['jti']
-            blacklisted = Blacklist(jti)
-            db.session.add(blacklisted)
-            db.session.commit()
-            the_response = {"message": "Successfully logged out"}
-            return the_response, 200
-        except Exception as e:
-            blacklist_response = {
-                'Logout Error': str(e)
-            }
-            return blacklist_response
+        jti = get_raw_jwt()['jti']
+        blacklisted = Blacklist(jti)
+        db.session.add(blacklisted)
+        db.session.commit()
+        the_response = {"message": "Successfully logged out"}
+        return the_response, 200

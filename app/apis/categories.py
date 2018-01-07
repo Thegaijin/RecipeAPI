@@ -111,63 +111,45 @@ class Categories(Resource):
         created_by = user_id
 
         validated_name = name_validator(category_name)
-        if len(validated_name) is len(category_name):
-            try:
-                # change values to lowercase
-                category_name = category_name.lower()
-                description = description.lower()
-                # check if the category exists
-                if Category.query.filter_by(
-                        created_by=created_by,
-                        category_name=category_name).first() is None:
-                    a_category = Category(category_name,
-                                          description, created_by)
-                    db.session.add(a_category)
-                    db.session.commit()
-                    the_response = {
-                        'status': 'Success',
-                        'message': 'Category was created',
-                        'category_id': a_category.category_id
-                    }
-                    return the_response, 201
-                return {'message': 'Category already exists'}
-            except Exception as e:
-                post_response = {
-                    'Create Category Exception': str(e)
-                }
-                return post_response
-        else:
-            return {'Input validation Error': 'The category name should '
-                    'comprise of alphabetical characters and can be more than '
-                    'one word'}
+        if validated_name:
+            category_name = category_name.lower()
+            description = description.lower()
+
+            if Category.query.filter_by(
+                    created_by=created_by,
+                    category_name=category_name).first() is not None:
+                return {'message': 'Category already exists'}, 409
+            a_category = Category(category_name,
+                                  description, created_by)
+            db.session.add(a_category)
+            db.session.commit()
+            the_response = {
+                'status': 'Success',
+                'message': 'Category was created',
+                'category_id': a_category.category_id
+            }
+            return the_response, 201
+        return {'message': 'The category name should comprise of alphabetical '
+                'characters and can be more than one word'}, 400
 
 
 @api.route('/<int:category_id>/')
 class Categoryy(Resource):
-    """This class handles a single category GET, PUT AND DELETE functionality
-    """
+    ''' This class handles a single category GET, PUT AND DELETE functionality
+    '''
 
     @api.response(200, 'Category found successfully')
     @jwt_required
     def get(self, category_id):
-        ''' This method returns a category
-        '''
-        try:
-            the_category = Category.query.filter_by(
-                category_id=category_id).first()
+        ''' This method returns a category '''
+        the_category = Category.query.filter_by(
+            category_id=category_id).first()
 
-            if the_category is not None:
-
-                categoryschema = CategorySchema()
-                get_response = categoryschema.dump(the_category)
-                return jsonify(get_response.data)
-            return {'message': 'The category doesn\'t exist'}
-        except Exception as e:
-            get_response = {
-                'Get a category exception': str(e)
-            }
-
-            return get_response, 404
+        if the_category is None:
+            return {'message': 'The category doesn\'t exist'}, 404
+        categoryschema = CategorySchema()
+        get_response = categoryschema.dump(the_category)
+        return jsonify(get_response.data)
 
     @api.expect(parser)
     @api.response(204, 'Successfully edited')
@@ -179,49 +161,35 @@ class Categoryy(Resource):
         :param str description: The new category description
         :return: A dictionary with a message
         '''
-        user_id = get_jwt_identity()
-        try:
-            the_category = Category.query.filter_by(
-                category_id=category_id).first()
-            if the_category is not None:
-                args = parser.parse_args()
-                category_name = args.category_name
-                description = args.description
-                created_by = user_id
+        args = parser.parse_args()
+        category_name = args.category_name
+        description = args.description
 
-                # change values to lowercase
-                category_name = category_name.lower()
-                description = description.lower()
-
-                # check if there's a new value is added otherwise keep previous
-                if not category_name:
-                    category_name = the_category.category_name
-                if not description:
-                    description = the_category.description
-
-                validated_name = name_validator(category_name)
-                if len(validated_name) is len(category_name):
-                    # Replace old values with the new values
-                    the_category.category_name = category_name
-                    the_category.description = description
-                    db.session.add(the_category)
-                    db.session.commit()
-                    edit_response = {
-                        'status': 'Success',
-                        'message': 'Category details successfully edited'
-                    }
-                    return edit_response, 200
-
-                else:
-                    return {'Input validation Error': 'The category name '
-                            'should comprise of alphabetical characters and '
-                            'can be more than one word'}
+        category_name = category_name.lower()
+        description = description.lower()
+        the_category = Category.query.filter_by(
+            category_id=category_id).first()
+        if the_category is None:
             return {'message': 'The category does not exist'}
-        except Exception as e:
-            edit_response = {
-                'Edit category exception': str(e)
+
+        if not category_name:
+            category_name = the_category.category_name
+        if not description:
+            description = the_category.description
+
+        validated_name = name_validator(category_name)
+        if validated_name:
+            the_category.category_name = category_name
+            the_category.description = description
+            db.session.add(the_category)
+            db.session.commit()
+            response = {
+                'status': 'Success',
+                'message': 'Category details successfully edited'
             }
-            return edit_response
+            return response, 200
+        return {'Input validation Error': 'The category name should comprise '
+                'of alphabetical characters and can be more than one word'}
 
     @api.response(204, 'Category was deleted')
     @jwt_required
@@ -229,21 +197,14 @@ class Categoryy(Resource):
         ''' This method deletes a Category. The method is passed the category
             name in the url and it deletes the category that matches that name.
 
-            :param str name: The name of the category you want to delete.
+            :param str category_id: The id of the category you want to delete.
             :return: A dictionary with a message confirming deletion.
         '''
-        try:
-            the_category = Category.query.filter_by(
-                category_id=category_id).first()
-            if the_category is not None:
-                db.session.delete(the_category)
-                db.session.commit()
-                return {'message': 'Category was deleted'}, 200
-            return {'message': 'The category does not exist'}
-        except Exception as e:
 
-            delete_response = {
-                'Delete category exception': str(e)
-            }
-
-            return delete_response
+        the_category = Category.query.filter_by(
+            category_id=category_id).first()
+        if the_category is not None:
+            db.session.delete(the_category)
+            db.session.commit()
+            return {'message': 'Category was deleted'}, 200
+        return {'message': 'The category does not exist'}

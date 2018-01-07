@@ -24,15 +24,12 @@ recipe = api.model('Recipe', {
                                  description='Recipe description'),
 })
 
-# validate input
 recipe_parser = reqparse.RequestParser(bundle_errors=True)
-# specify parameter names and accepted values
 recipe_parser.add_argument(
     'recipe_name', required=True, help='Try again: {error_msg}')
 recipe_parser.add_argument('description', required=True, default='')
 
 q_parser = reqparse.RequestParser(bundle_errors=True)
-# specify parameter names and accepted values
 q_parser.add_argument('q', help='search', location='args')
 q_parser.add_argument(
     'page', type=int, help='Try again: {error_msg}', location='args')
@@ -82,17 +79,14 @@ class Recipes(Resource):
             :return: A recipe that matches the search keyword or all the
             recipes in a category
         '''
-        try:
-            user_id = get_jwt_identity()
-            the_recipes = Recipe.query.filter_by(
-                created_by=user_id, category_id=category_id)
-            args = q_parser.parse_args(request)
-            return manage_get_recipes(the_recipes, args)
-        except Exception as e:
-            get_response = {
-                'View recipes in category exception': str(e)
-            }
-            return get_response, 404
+
+        user_id = get_jwt_identity()
+        the_recipes = Recipe.query.filter_by(
+            created_by=user_id, category_id=category_id)
+        args = q_parser.parse_args(request)
+        if the_recipes is None:
+            return {'message': 'There are no recipes in the category'}, 404
+        return manage_get_recipes(the_recipes, args)
 
     # specifies the expected input fields
     @api.expect(recipe)
@@ -116,36 +110,28 @@ class Recipes(Resource):
         created_by = user_id
 
         validated_name = name_validator(recipe_name)
-        if len(validated_name) is len(recipe_name):
-            try:
-                # change values to lowercase
-                recipe_name = recipe_name.lower()
-                description = description.lower()
+        if validated_name:
+            # change values to lowercase
+            recipe_name = recipe_name.lower()
+            description = description.lower()
 
-                # check if the category exists
-                if Recipe.query.filter_by(created_by=created_by,
-                                          category_id=category_id,
-                                          recipe_name=recipe_name).first() is None:
-                    a_recipe = Recipe(recipe_name, description,
-                                      category_id, created_by)
-                    db.session.add(a_recipe)
-                    db.session.commit()
-                    the_response = {
-                        'status': 'Success',
-                        'message': 'Recipe has been created',
-                        'recipe_name': a_recipe.recipe_name
-                    }
-                    return the_response, 201
+            # check if the category exists
+            if Recipe.query.filter_by(created_by=created_by,
+                                      category_id=category_id,
+                                      recipe_name=recipe_name).first() is not None:
                 return {'message': 'Recipe already exists'}
-            except Exception as e:
-                post_response = {
-                    'Add recipe exception': str(e)
-                }
-                return post_response
-        else:
-            return {'Input validation Error': 'The recipe name should '
-                    'comprise of alphabetical characters and can be more than '
-                    'one word'}
+            a_recipe = Recipe(recipe_name, description,
+                              category_id, created_by)
+            db.session.add(a_recipe)
+            db.session.commit()
+            response = {
+                'status': 'Success',
+                'message': 'Recipe has been created',
+                'recipe_name': a_recipe.recipe_name
+            }
+            return response, 201
+        return {'message': 'The recipe name should comprise of alphabetical'
+                ' characters and can be more than one word'}
 
 
 @api.route('/<int:category_id>/<recipe_name>/')
@@ -164,17 +150,12 @@ class Recipee(Resource):
             :param str recipe_name: The name of the recipe to search for
             :return: The details of the recipe
         '''
-        try:
-            the_recipe = Recipe.query.filter_by(
-                category_id=category_id, recipe_name=recipe_name).first()
-            if the_recipe is not None:
-                return manage_get_recipe(the_recipe)
-            return {'message': 'The recipe does not exist'}
-        except Exception as e:
-            get_response = {
-                'View recipe by name exception': str(e)
-            }
-            return get_response, 404
+
+        the_recipe = Recipe.query.filter_by(
+            category_id=category_id, recipe_name=recipe_name).first()
+        if the_recipe is not None:
+            return manage_get_recipe(the_recipe)
+        return {'message': 'The recipe does not exist'}, 404
 
     @api.expect(recipe_parser)
     @api.response(204, 'Success')
@@ -188,46 +169,36 @@ class Recipee(Resource):
             :param str description: The new recipe description
             :return: A dictionary with a message
         '''
-        try:
-            the_recipe = Recipe.query.filter_by(category_id=category_id,
-                                                recipe_name=recipe_name).first()
-            # check of recipe to be edited exists
-            if the_recipe is not None:
-                args = recipe_parser.parse_args()
-                recipe_name = args.recipe_name
-                description = args.description
 
-                # change the values to lowercase
-                recipe_name = recipe_name.lower()
-                description = description.lower()
+        the_recipe = Recipe.query.filter_by(category_id=category_id,
+                                            recipe_name=recipe_name).first()
+        if the_recipe is None:
+            return {'message': 'The recipe does not exist'}, 404
+        args = recipe_parser.parse_args()
+        recipe_name = args.recipe_name
+        description = args.description
 
-                # check if there's a new value is added otherwise keep previous
-                if not recipe_name:
-                    recipe_name = the_recipe.recipe_name
-                if not description:
-                    description = the_recipe.ingredients
+        recipe_name = recipe_name.lower()
+        description = description.lower()
 
-                validated_name = name_validator(recipe_name)
-                if len(validated_name) is len(recipe_name):
-                    the_recipe.recipe_name = recipe_name
-                    the_recipe.ingredients = description
-                    db.session.add(the_recipe)
-                    db.session.commit()
-                    edit_response = {
-                        'status': 'Success',
-                        'message': 'Recipe details successfully edited'
-                    }
-                    return edit_response, 200
-                else:
-                    return {'Input validation Error': 'The recipe name should '
-                            'comprise of alphabetical characters and can be '
-                            'more than one word'}
-            return {'message': 'The recipe does not exist'}
-        except Exception as e:
-            edit_response = {
-                'Edit recipe exception': str(e)
+        if not recipe_name:
+            recipe_name = the_recipe.recipe_name
+        if not description:
+            description = the_recipe.ingredients
+
+        validated_name = name_validator(recipe_name)
+        if validated_name:
+            the_recipe.recipe_name = recipe_name
+            the_recipe.ingredients = description
+            db.session.add(the_recipe)
+            db.session.commit()
+            response = {
+                'status': 'Success',
+                'message': 'Recipe details successfully edited'
             }
-            return edit_response
+            return response, 200
+        return {'message': 'The recipe name should comprise alphabetical'
+                ' characters and can be more than one word'}
 
     @api.response(204, 'Success')
     @jwt_required
@@ -240,16 +211,11 @@ class Recipee(Resource):
             :param str description: The new recipe description
             :return: A dictionary with a message
         '''
-        try:
-            the_recipe = Recipe.query.filter_by(category_id=category_id,
-                                                recipe_name=recipe_name).first()
-            if the_recipe is not None:
-                db.session.delete(the_recipe)
-                db.session.commit()
-                return {'message': 'Recipe was deleted'}
+
+        the_recipe = Recipe.query.filter_by(category_id=category_id,
+                                            recipe_name=recipe_name).first()
+        if the_recipe is None:
             return {'message': 'The recipe does not exist'}
-        except Exception as e:
-            delete_response = {
-                'Delete recipe exception': str(e)
-            }
-            return delete_response
+        db.session.delete(the_recipe)
+        db.session.commit()
+        return {'message': 'Recipe was deleted'}

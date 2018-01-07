@@ -33,7 +33,7 @@ class UserTestCase(BaseTestCase):
         # attempt to register user 2 with the same details as user 1
         res_2 = self.client().post('/api/v1/auth/register/', data=self.user)
         # check response
-        self.assertEqual(res_2.status_code, 202)
+        self.assertEqual(res_2.status_code, 409)
         # get the results returned in json format
         output = json.loads(res_2.data)
         self.assertDictEqual(
