@@ -12,6 +12,7 @@ from app import db
 from app.models.category import Category
 from ..serializers import CategorySchema
 from ..validation_helper import name_validator
+from ..get_helper import per_page_max, per_page_min
 
 
 api = Namespace(
@@ -29,10 +30,9 @@ parser = reqparse.RequestParser(bundle_errors=True)
 parser.add_argument('category_name', required=True,
                     help='Try again: {error_msg}')
 parser.add_argument('description', required=True,
-                    help='Try again: {error_msg}')
+                    help='Try again: {error_msg}', default='')
 
-per_page_min = 5
-per_page_max = 10
+
 # validate input
 q_parser = reqparse.RequestParser(bundle_errors=True)
 # location specifies to look only in the querystring
@@ -169,7 +169,7 @@ class Categoryy(Resource):
 
             return get_response, 404
 
-    @api.expect(category)
+    @api.expect(parser)
     @api.response(204, 'Successfully edited')
     @jwt_required
     def put(self, category_id):
@@ -193,24 +193,30 @@ class Categoryy(Resource):
                 category_name = category_name.lower()
                 description = description.lower()
 
-                if category_name is not None and description is not None:
-                    if Category.query.filter_by(category_name=category_name,
-                                                created_by=created_by).first() is None:
+                # check if there's a new value is added otherwise keep previous
+                if not category_name:
+                    category_name = the_category.category_name
+                if not description:
+                    description = the_category.description
 
-                        # Replace old values with the new values
-                        the_category.category_name = category_name
-                        the_category.description = description
-                        db.session.add(the_category)
-                        db.session.commit()
-                        edit_response = {
-                            'status': 'Success',
-                            'message': 'Category details successfully edited'
-                        }
-                        return edit_response, 204
-                    return {'message': 'One or more inputs missing'}
+                validated_name = name_validator(category_name)
+                if len(validated_name) is len(category_name):
+                    # Replace old values with the new values
+                    the_category.category_name = category_name
+                    the_category.description = description
+                    db.session.add(the_category)
+                    db.session.commit()
+                    edit_response = {
+                        'status': 'Success',
+                        'message': 'Category details successfully edited'
+                    }
+                    return edit_response, 200
+
                 else:
-                    return {'message': 'No changes to be made'}
-                return {'message': 'The category does not exist'}
+                    return {'Input validation Error': 'The category name '
+                            'should comprise of alphabetical characters and '
+                            'can be more than one word'}
+            return {'message': 'The category does not exist'}
         except Exception as e:
             edit_response = {
                 'Edit category exception': str(e)

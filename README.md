@@ -6,4 +6,6 @@
 
 # RecipeAPI
 
-This is an API for an Recipes service using Flask. Users can register an account and login to create, save and share recipes.
+This is an API for an Recipes service using Flask. Users can register an account and login to create, edit, view and delete recipes.
+
+Add link to Heroku here

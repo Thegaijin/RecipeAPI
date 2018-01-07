@@ -2,14 +2,16 @@
 ''' This script handles search and pagination functionality for recipes '''
 
 # THird party imports
-import jsonify
+from flask import jsonify
 
 # Local imports
-from ..serializers import RecipeSchema
-from .categories import per_page_max, per_page_min
+from .serializers import RecipeSchema
+
+per_page_min = 5
+per_page_max = 10
 
 
-def manage_get(the_recipes, args):
+def manage_get_recipes(the_recipes, args):
     """ Function to handle search and pagination
         It receives a BaseQuery object of recipes, checks if the search
         parameter was passed a value and searches for that value.
@@ -32,7 +34,7 @@ def manage_get(the_recipes, args):
         if q:
             q = q.lower()
             for a_recipe in the_recipes.all():
-                if q in a_recipe.recipe_name.lower():
+                if q in a_recipe.recipe_name:
                     recipeschema = RecipeSchema()
                     the_recipe = recipeschema.dump(a_recipe)
                     return jsonify(the_recipe.data)
@@ -45,3 +47,10 @@ def manage_get(the_recipes, args):
         all_recipes = recipesschema.dump(paginated)
         return jsonify(all_recipes)
     return {'message': 'There are no recipes'}
+
+
+def manage_get_recipe(the_recipe):
+    recipeschema = RecipeSchema()
+    get_response = recipeschema.dump(the_recipe)
+    return jsonify(get_response.data)
+    return False

@@ -8,7 +8,6 @@ from flask import request, jsonify
 from flask_jwt_extended import (
     get_jwt_identity, create_access_token, jwt_required, get_raw_jwt)
 from flask_restplus import fields, Namespace, Resource, reqparse
-from flask_jwt_extended.exceptions import RevokedTokenError
 
 
 # Local imports
@@ -136,18 +135,13 @@ class UserLogout(Resource):
         '''
         try:
             jti = get_raw_jwt()['jti']
-            print('raw jti', jti)
             blacklisted = Blacklist(jti)
-            print('blacklisted', blacklisted)
             db.session.add(blacklisted)
             db.session.commit()
             the_response = {"message": "Successfully logged out"}
             return the_response, 200
-
-        except RevokedTokenError as e:
-            return {"Error": "logged out"}
-            # blacklist_response = {
-            #     'Logout Error': str(e)
-            # }
-
-            # return blacklist_response
+        except Exception as e:
+            blacklist_response = {
+                'Logout Error': str(e)
+            }
+            return blacklist_response

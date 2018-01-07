@@ -99,19 +99,7 @@ ENV/
 
 # mypy
 .mypy_cache/
-migrations/alembic.ini
-migrations/env.py
-migrations/README
-migrations/script.py.mako
-migrations/versions/72fc843de703_.py
-migrations/versions/4ebeaf6420cc_.py
-migrations/versions/8250e4628af8_.py
-migrations/versions/91c8d8b3d28e_.py
-migrations/versions/72cb7a58bb75_.py
-migrations/versions/1b2ebed66645_.py
-migrations/versions/130710189bca_.py
-migrations/versions/b8604ee1d06d_.py
-migrations/versions/dc93fd09184e_.py
+migrations/
 .vscode/settings.json
 .DS_Store
 migrations/versions/8d2c453752ff_.py

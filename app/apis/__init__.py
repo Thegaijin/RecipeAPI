@@ -4,6 +4,7 @@
 # Third party import
 from flask import Blueprint
 from flask_restplus import Api
+from app import jwt
 
 # Local imports
 from .auth import api as ns_auth
@@ -34,6 +35,7 @@ api.add_namespace(ns_categories)
 # namespace for the recipes CRUD
 api.add_namespace(ns_recipes)
 
-
 # Version 2 namespaces
 api_2.add_namespace(ns_hello)
+
+jwt._set_error_handler_callbacks(api)

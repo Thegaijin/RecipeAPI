@@ -4,7 +4,7 @@
 '''
 
 # third party imports
-from flask import Flask
+from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 from flask_restplus import Api
 
@@ -70,3 +70,8 @@ def check_if_token_in_blacklist(decrypted_token):
     if Blacklist.query.filter_by(token=jti).first() is None:
         return False
     return True
+
+
+@jwt.revoked_token_loader
+def my_revoked_token_callback():
+    return jsonify({'message': 'You must be logged in to access this page'})

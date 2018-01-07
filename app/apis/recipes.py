@@ -3,17 +3,16 @@
 
 
 # Third party imports
-from flask import request, jsonify
+from flask import request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restplus import fields, Namespace, Resource, reqparse
 
 # Local imports
 from app import db
 from app.models.recipe import Recipe
-from ..serializers import RecipeSchema
-# from .categories import per_page_max, per_page_min
-from .helper import manage_get
 from ..validation_helper import name_validator
+from ..get_helper import (per_page_max, per_page_min,
+                          manage_get_recipes, manage_get_recipe)
 
 
 api = Namespace(
@@ -30,7 +29,7 @@ recipe_parser = reqparse.RequestParser(bundle_errors=True)
 # specify parameter names and accepted values
 recipe_parser.add_argument(
     'recipe_name', required=True, help='Try again: {error_msg}')
-recipe_parser.add_argument('description', required=True)
+recipe_parser.add_argument('description', required=True, default='')
 
 q_parser = reqparse.RequestParser(bundle_errors=True)
 # specify parameter names and accepted values
@@ -39,44 +38,6 @@ q_parser.add_argument(
     'page', type=int, help='Try again: {error_msg}', location='args')
 q_parser.add_argument('per_page', type=int,
                       help='Try again: {error_msg}', location='args')
-
-
-def manage_get(the_recipes, args):
-    """ Function to handle search and pagination
-        It receives a BaseQuery object of recipes, checks if the search
-        parameter was passed a value and searches for that value.
-        If the pagination parameters were passed values, checks if they are
-        within the min/max range per page and paginates accordingly.
-
-        :param object the_recipes: -- [description]
-        :param list args: -- [description]
-        :return:
-    """
-
-    if the_recipes:
-        q = args.get('q', '')
-        page = args.get('page', 1)
-        per_page = args.get('per_page', 10)
-        if per_page is None or per_page < per_page_min:
-            per_page = per_page_min
-        if per_page > per_page_max:
-            per_page = per_page_max
-        if q:
-            q = q.lower()
-            for a_recipe in the_recipes.all():
-                if q in a_recipe.recipe_name:
-                    recipeschema = RecipeSchema()
-                    the_recipe = recipeschema.dump(a_recipe)
-                    return jsonify(the_recipe.data)
-        pag_recipes = the_recipes.paginate(
-            page, per_page, error_out=False)
-        paginated = []
-        for a_recipe in pag_recipes.items:
-            paginated.append(a_recipe)
-        recipesschema = RecipeSchema(many=True)
-        all_recipes = recipesschema.dump(paginated)
-        return jsonify(all_recipes)
-    return {'message': 'There are no recipes'}
 
 
 @api.route('')
@@ -97,9 +58,7 @@ class Recipess(Resource):
             user_id = get_jwt_identity()
             the_recipes = Recipe.query.filter_by(created_by=user_id)
             args = q_parser.parse_args(request)
-            print('args no slash', args)
-            response = manage_get(the_recipes, args)
-            return response
+            return manage_get_recipes(the_recipes, args)
         except Exception as e:
             get_response = {
                 'View recipes exception': str(e)
@@ -128,7 +87,7 @@ class Recipes(Resource):
             the_recipes = Recipe.query.filter_by(
                 created_by=user_id, category_id=category_id)
             args = q_parser.parse_args(request)
-            return manage_get(the_recipes, args)
+            return manage_get_recipes(the_recipes, args)
         except Exception as e:
             get_response = {
                 'View recipes in category exception': str(e)
@@ -157,7 +116,7 @@ class Recipes(Resource):
         created_by = user_id
 
         validated_name = name_validator(recipe_name)
-        if len(validated_name) is len(category_name):
+        if len(validated_name) is len(recipe_name):
             try:
                 # change values to lowercase
                 recipe_name = recipe_name.lower()
@@ -209,9 +168,7 @@ class Recipee(Resource):
             the_recipe = Recipe.query.filter_by(
                 category_id=category_id, recipe_name=recipe_name).first()
             if the_recipe is not None:
-                recipeschema = RecipeSchema()
-                get_response = recipeschema.dump(the_recipe)
-                return jsonify(get_response.data)
+                return manage_get_recipe(the_recipe)
             return {'message': 'The recipe does not exist'}
         except Exception as e:
             get_response = {
@@ -219,7 +176,7 @@ class Recipee(Resource):
             }
             return get_response, 404
 
-    @api.expect(recipe)
+    @api.expect(recipe_parser)
     @api.response(204, 'Success')
     @jwt_required
     def put(self, category_id, recipe_name):
@@ -234,6 +191,7 @@ class Recipee(Resource):
         try:
             the_recipe = Recipe.query.filter_by(category_id=category_id,
                                                 recipe_name=recipe_name).first()
+            # check of recipe to be edited exists
             if the_recipe is not None:
                 args = recipe_parser.parse_args()
                 recipe_name = args.recipe_name
@@ -242,7 +200,15 @@ class Recipee(Resource):
                 # change the values to lowercase
                 recipe_name = recipe_name.lower()
                 description = description.lower()
-                if recipe_name is not None and description is not None:
+
+                # check if there's a new value is added otherwise keep previous
+                if not recipe_name:
+                    recipe_name = the_recipe.recipe_name
+                if not description:
+                    description = the_recipe.ingredients
+
+                validated_name = name_validator(recipe_name)
+                if len(validated_name) is len(recipe_name):
                     the_recipe.recipe_name = recipe_name
                     the_recipe.ingredients = description
                     db.session.add(the_recipe)
@@ -251,8 +217,11 @@ class Recipee(Resource):
                         'status': 'Success',
                         'message': 'Recipe details successfully edited'
                     }
-                    return edit_response, 204
-                return {'message': 'No changes to be made'}
+                    return edit_response, 200
+                else:
+                    return {'Input validation Error': 'The recipe name should '
+                            'comprise of alphabetical characters and can be '
+                            'more than one word'}
             return {'message': 'The recipe does not exist'}
         except Exception as e:
             edit_response = {
@@ -280,9 +249,7 @@ class Recipee(Resource):
                 return {'message': 'Recipe was deleted'}
             return {'message': 'The recipe does not exist'}
         except Exception as e:
-
             delete_response = {
                 'Delete recipe exception': str(e)
             }
-
             return delete_response
