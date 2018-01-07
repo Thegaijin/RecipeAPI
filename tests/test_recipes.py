@@ -135,7 +135,7 @@ class RecipeTestCase(BaseTestCase):
         edit_res = self.client().put('/api/v1/recipes/{}/{}/'.format(
             category_res['category_id'], create_res['recipe_name']),
             headers=dict(Authorization="Bearer " + token), data=new_details)
-        self.assertEqual(edit_res.status_code, 204)
+        self.assertEqual(edit_res.status_code, 200)
 
     def test_delete_recipe(self):
         """ Test that API can delete a recipe """

@@ -131,7 +131,7 @@ class CategoryTestCase(BaseTestCase):
             create_res['category_id']), headers=dict(
                 Authorization="Bearer " + token),
             data=new_details)
-        self.assertEqual(edit_res.status_code, 204)
+        self.assertEqual(edit_res.status_code, 200)
 
     def test_delete_category(self):
         # register user

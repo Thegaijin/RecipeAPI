@@ -26,14 +26,14 @@ class BaseTestCase(TestCase):
         self.category = {'category_name': 'category',
                          'description': 'description',
                          'created_by': 'created_by'}
-        self.category1 = {'category_name': 'category1',
-                          'description': 'description1',
+        self.category1 = {'category_name': 'category one',
+                          'description': 'description one',
                           'created_by': 'created_by'}
         self.recipe = {'recipe_name': 'recipe',
                        'description': 'description',
                        'created_by': 'created_by'}
-        self.recipe1 = {'recipe_name': 'recipe1',
-                        'description': 'description1',
+        self.recipe1 = {'recipe_name': 'recipe one',
+                        'description': 'description one',
                         'created_by': 'created_by'}
 
         # explicitly create application context
