@@ -21,7 +21,7 @@ class CategoryTestCase(BaseTestCase):
         # get token from login response object
         token = json.loads(loggedin_user.data)['access_token']
         # add token to the header as part of the post request
-        create_res = self.client().post('/api/v1/categories',
+        create_res = self.client().post('/api/v1/categories/',
                                         headers=dict(
                                             Authorization="Bearer " + token),
                                         data=self.category)
@@ -41,11 +41,11 @@ class CategoryTestCase(BaseTestCase):
         # get token from login response object
         token = json.loads(loggedin_user.data)['access_token']
         # add token to the header as part of the post request
-        create_res = self.client().post('/api/v1/categories',
+        create_res = self.client().post('/api/v1/categories/',
                                         headers=dict(
                                             Authorization="Bearer " + token),
                                         data=self.category)
-        create2_res = self.client().post('/api/v1/categories',
+        create2_res = self.client().post('/api/v1/categories/',
                                          headers=dict(
                                              Authorization="Bearer " + token),
                                          data=self.category)
@@ -62,7 +62,7 @@ class CategoryTestCase(BaseTestCase):
         # get token from login response object
         token = json.loads(loggedin_user.data)['access_token']
         # create category
-        create_res = self.client().post('/api/v1/categories',
+        create_res = self.client().post('/api/v1/categories/',
                                         headers=dict(
                                             Authorization="Bearer " + token),
                                         data=self.category)
@@ -89,12 +89,12 @@ class CategoryTestCase(BaseTestCase):
         # get token from login response object
         token = json.loads(loggedin_user.data)['access_token']
         # create category
-        create_res = self.client().post('/api/v1/categories',
+        create_res = self.client().post('/api/v1/categories/',
                                         headers=dict(
                                             Authorization="Bearer " + token),
                                         data=self.category)
 
-        create2_res = self.client().post('/api/v1/categories',
+        create2_res = self.client().post('/api/v1/categories/',
                                          headers=dict(
                                              Authorization="Bearer " + token),
                                          data=self.category1)
@@ -104,7 +104,7 @@ class CategoryTestCase(BaseTestCase):
         create2_res = json.loads(create2_res.data)
 
         # check for category
-        view_res = self.client().get('/api/v1/categories',
+        view_res = self.client().get('/api/v1/categories/',
                                      headers=dict(
                                          Authorization="Bearer " + token))
         self.assertEqual(view_res.status_code, 200)
@@ -119,7 +119,7 @@ class CategoryTestCase(BaseTestCase):
         # get token from login response object
         token = json.loads(loggedin_user.data)['access_token']
         # create category
-        create_res = self.client().post('/api/v1/categories',
+        create_res = self.client().post('/api/v1/categories/',
                                         headers=dict(
                                             Authorization="Bearer " + token),
                                         data=self.category)
@@ -141,7 +141,7 @@ class CategoryTestCase(BaseTestCase):
         # get token from login response object
         token = json.loads(loggedin_user.data)['access_token']
         # create category
-        create_res = self.client().post('/api/v1/categories',
+        create_res = self.client().post('/api/v1/categories/',
                                         headers=dict(
                                             Authorization="Bearer " + token),
                                         data=self.category)
@@ -154,4 +154,3 @@ class CategoryTestCase(BaseTestCase):
         self.assertEqual(delete_res.status_code, 200)
         delete_res = json.loads(delete_res.data)
         self.assertEqual(delete_res['message'], 'Category was deleted')
-        # self.assertIsNone(Category.query.filter_by(name='category').first())

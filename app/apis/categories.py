@@ -44,7 +44,7 @@ q_parser.add_argument('per_page', required=False, type=int,
                       help='categories per page', default=10, location='args')
 
 
-@api.route('')
+@api.route('/')
 class Categories(Resource):
     ''' The class handles the Category CRUD functionality '''
 
@@ -102,7 +102,7 @@ class Categories(Resource):
 
         :return: A dictionary with a message and status code
         '''
-        # get current user id
+        # try:
         user_id = get_jwt_identity()
 
         args = parser.parse_args()
@@ -131,6 +131,8 @@ class Categories(Resource):
             return the_response, 201
         return {'message': 'The category name should comprise of alphabetical '
                 'characters and can be more than one word'}, 400
+        # except raise_routing_exception as e:
+        #     raise FormDataRoutingRedirect(request)
 
 
 @api.route('/<int:category_id>/')

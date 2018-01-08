@@ -37,7 +37,7 @@ q_parser.add_argument('per_page', type=int,
                       help='Try again: {error_msg}', location='args')
 
 
-@api.route('')
+@api.route('/')
 class Recipess(Resource):
     ''' The class handles the view functionality for all recipes '''
 

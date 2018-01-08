@@ -107,7 +107,7 @@ class RecipeTestCase(BaseTestCase):
         create_res = json.loads(create_res.data)
         create2_res = json.loads(create2_res.data)
 
-        view_res = self.client().get('/api/v1/recipes', headers=dict(
+        view_res = self.client().get('/api/v1/recipes/', headers=dict(
             Authorization="Bearer " + token))
         self.assertEqual(view_res.status_code, 200)
 

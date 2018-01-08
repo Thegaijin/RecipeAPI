@@ -56,7 +56,7 @@ class BaseTestCase(TestCase):
         ''' This method creates a category to be used for recipe tests '''
         login = self.user_login()
         token = json.loads(login.data)['access_token']
-        return self.client().post('/api/v1/categories',
+        return self.client().post('/api/v1/categories/',
                                   headers=dict(
                                       Authorization="Bearer " + token),
                                   data=self.category)
