@@ -56,43 +56,36 @@ class Categories(Resource):
 
             :return: A dictionary of the category\'s properties
         '''
+        user_id = get_jwt_identity()
 
-        try:
-            user_id = get_jwt_identity()
+        # get BaseQuery object to allow for pagination
+        the_categories = Category.query.filter_by(created_by=user_id)
+        args = q_parser.parse_args(request)
+        q = args.get('q', '')
+        page = args.get('page', 1)
+        per_page = args.get('per_page', 10)
+        if per_page < per_page_min:
+            per_page = per_page_min
+        if per_page > per_page_max:
+            per_page = per_page_max
 
-            # get BaseQuery object to allow for pagination
-            the_categories = Category.query.filter_by(created_by=user_id)
-            args = q_parser.parse_args(request)
-            q = args.get('q', '')
-            page = args.get('page', 1)
-            per_page = args.get('per_page', 10)
-            if per_page < per_page_min:
-                per_page = per_page_min
-            if per_page > per_page_max:
-                per_page = per_page_max
-
-            if q:
-                q = q.lower()
-                for a_category in the_categories.all():
-                    if q in a_category.category_name.lower():
-                        categoryschema = CategorySchema()
-                        # dump converts python object to json object
-                        the_category = categoryschema.dump(a_category)
-                        # jsonify Single argument: Passed through to dumps()
-                        return jsonify(the_category.data)
-            pag_categories = the_categories.paginate(
-                page, per_page, error_out=False)
-            paginated = []
-            for a_category in pag_categories.items:
-                paginated.append(a_category)
-            categoriesschema = CategorySchema(many=True)
-            all_categories = categoriesschema.dump(paginated)
-            return jsonify(all_categories)
-        except Exception as e:
-            get_response = {
-                'View all categories exception': str(e)
-            }
-            return get_response
+        if q:
+            q = q.lower()
+            for a_category in the_categories.all():
+                if q in a_category.category_name.lower():
+                    categoryschema = CategorySchema()
+                    # dump converts python object to json object
+                    the_category = categoryschema.dump(a_category)
+                    # jsonify Single argument: Passed through to dumps()
+                    return jsonify(the_category.data)
+        pag_categories = the_categories.paginate(
+            page, per_page, error_out=False)
+        paginated = []
+        for a_category in pag_categories.items:
+            paginated.append(a_category)
+        categoriesschema = CategorySchema(many=True)
+        all_categories = categoriesschema.dump(paginated)
+        return jsonify(all_categories)
 
     @api.expect(category)
     @api.response(201, 'Category created successfully')
@@ -102,7 +95,6 @@ class Categories(Resource):
 
         :return: A dictionary with a message and status code
         '''
-        # try:
         user_id = get_jwt_identity()
 
         args = parser.parse_args()
@@ -131,8 +123,6 @@ class Categories(Resource):
             return the_response, 201
         return {'message': 'The category name should comprise of alphabetical '
                 'characters and can be more than one word'}, 400
-        # except raise_routing_exception as e:
-        #     raise FormDataRoutingRedirect(request)
 
 
 @api.route('/<int:category_id>/')

@@ -2,11 +2,12 @@
 ''' This script aggregates the namespaces '''
 
 # Third party import
-from flask import Blueprint
+from flask import Blueprint, jsonify, make_response
 from flask_restplus import Api
-from app import jwt
+
 
 # Local imports
+from app import jwt
 from .auth import api as ns_auth
 from .categories import api as ns_categories
 from .recipes import api as ns_recipes
@@ -39,3 +40,9 @@ api.add_namespace(ns_recipes)
 api_2.add_namespace(ns_hello)
 
 jwt._set_error_handler_callbacks(api)
+
+
+@apiv1_blueprint.app_errorhandler(404)
+def handle_custom_exception(e):
+    '''Return a custom message and 400 status code'''
+    return make_response(jsonify({'message': 'The URL does not exist'}), 404)

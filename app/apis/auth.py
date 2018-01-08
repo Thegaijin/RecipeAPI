@@ -1,4 +1,4 @@
-# app/auth/user.py
+# app/auth/auth.py
 ''' This script holds resource functionality for user creation and login '''
 
 # Third party imports
