@@ -1,5 +1,4 @@
 # app/auth/auth.py
-''' This script holds resource functionality for user creation and login '''
 
 from datetime import timedelta
 import re

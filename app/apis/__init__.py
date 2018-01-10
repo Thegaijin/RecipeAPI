@@ -1,12 +1,8 @@
 # app/appis/__init__.py
-''' This script aggregates the namespaces '''
 
-# Third party import
 from flask import Blueprint, jsonify, make_response
 from flask_restplus import Api
 
-
-# Local imports
 from app import jwt
 from .auth import api as ns_auth
 from .categories import api as ns_categories
@@ -27,16 +23,10 @@ api_2 = Api(apiv2_blueprint,
             version='2.0',
             description='Another API version')
 
-# namespace for user registration and login
 api.add_namespace(ns_auth)
-
-# namespace for the categories CRUD
 api.add_namespace(ns_categories)
-
-# namespace for the recipes CRUD
 api.add_namespace(ns_recipes)
 
-# Version 2 namespaces
 api_2.add_namespace(ns_hello)
 
 jwt._set_error_handler_callbacks(api)

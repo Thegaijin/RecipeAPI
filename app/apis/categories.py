@@ -1,5 +1,4 @@
 # app/auth/categories.py
-''' This script holds the resource functionality for category CRUD '''
 
 # Third party imports
 from flask import request, jsonify
