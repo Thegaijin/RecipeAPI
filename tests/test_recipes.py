@@ -1,5 +1,4 @@
 # test_recipes.py
-''' This Script has the tests for Recipe CRUD functionality '''
 
 import json
 

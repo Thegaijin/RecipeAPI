@@ -1,5 +1,4 @@
 # app/auth/categories.py
-''' This script holds the resource functionality for recipe CRUD '''
 
 
 # Third party imports

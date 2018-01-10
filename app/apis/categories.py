@@ -1,5 +1,4 @@
 # app/auth/categories.py
-''' This script holds the resource functionality for category CRUD '''
 
 # Third party imports
 from flask import request, jsonify
@@ -22,7 +21,7 @@ api = Namespace(
 category = api.model('Category', {
     'category_name': fields.String(required=True, description='category name'),
     'description': fields.String(required=True,
-                                 description='category description'),
+                                 description='category description')
 })
 
 # validate input
@@ -71,12 +70,12 @@ class Categories(Resource):
 
         if q:
             q = q.lower()
+            the_categories = Category.query.filter(
+                Category.category_name.like("%" + q + "%"))
             for a_category in the_categories.all():
                 if q in a_category.category_name.lower():
                     categoryschema = CategorySchema()
-                    # dump converts python object to json object
                     the_category = categoryschema.dump(a_category)
-                    # jsonify Single argument: Passed through to dumps()
                     return jsonify(the_category.data)
         pag_categories = the_categories.paginate(
             page, per_page, error_out=False)

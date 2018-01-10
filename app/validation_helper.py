@@ -1,5 +1,5 @@
 # validation_helper.py
-''' This scripts handles the data input validations '''
+
 import re
 
 

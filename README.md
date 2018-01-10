@@ -7,7 +7,7 @@
 
 # RecipeAPI
 
-This is an API for an Recipes service using Flask. Users can register an account and login to create, edit, view and delete recipes.
+This is an API for a Recipes service using Flask. Users can register an account and login to create, edit, view and delete recipe categories and recipes in those categories.
 
 Add link to Heroku here
 
@@ -34,50 +34,59 @@ To use the application, ensure that you have python 3.6+, clone the repository t
 
 1. Clone the repository
 
+   ```
    git clone https://github.com/Thegaijin/recipeAPI.git
+   ```
 
 2. Enter the project directory
-
+   ```
    cd recipeAPI
-
+   ```
 3. Create a virtual environment
-
+   ```
    virtualenv venv
-
+   ```
 4. Activate the virtual environment
-
+   ```
    source venv/bin/activate
-
+   ```
 5. Then install all the required dependencies:
-
+   ```
    pip install -r requirements.txt
-
-6. Setup your postgres database using the config file provided.
+   ```
+6. Install postgres if you don't already have it. Preferably Postgres 10.1.
 
 7. Create the Databases
 
-```
-###Test Database
-createdb test_db;
+   #### For the test Database
 
-###Development Database
-createdb recipe_db;
-```
+   ```
+   createdb test_db
+   ```
+
+   #### For the development Database
+
+   ```
+   createdb recipe_db
+   ```
 
 8. Run Migrations using these commands, in that order:
 
-```
-python manage.py db init
-python manage.py db migrate
-python manage.py db upgrade
-```
+   ```
+   python manage.py db init
+   python manage.py db migrate
+   python manage.py db upgrade
+   ```
 
-9. To test the application, run the command :
+9. To test the application, run the command:
 
-```
-pytest --cov-report term --cov=app
-```
+   ```
+   pytest --cov-report term --cov=app
+   ```
 
 10. To start the server, run the command:
 
-    python manage.py runserver
+```
+export FLASK_CONFIG=development
+python manage.py runserver
+```
