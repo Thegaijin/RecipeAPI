@@ -54,7 +54,7 @@ To use the application, ensure that you have python 3.6+, clone the repository t
    ```
    pip install -r requirements.txt
    ```
-6. Setup your postgres database using the config file provided.
+6. Install postgres if you don't already have it. Preferably Postgres 10.1.
 
 7. Create the Databases
 
