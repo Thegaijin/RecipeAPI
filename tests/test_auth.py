@@ -22,7 +22,7 @@ class UserTestCase(BaseTestCase):
         # check response
         self.assertEqual(res.status_code, 201)
         self.assertDictEqual(
-            {'message': 'Account was successfully created'}, output)
+            {"message": "Account was successfully created"}, output)
 
     def test_user_already_exists(self):
         ''' Test that an existing username cannot be registered again '''
@@ -91,3 +91,16 @@ class UserTestCase(BaseTestCase):
         self.assertEqual(delete_res.status_code, 200)
         delete_res = json.loads(delete_res.data)
         self.assertEqual(delete_res['message'], 'Successfully logged out')
+
+    def test_reset_password(self):
+        ''' Test reset password '''
+        self.user_registration()
+        loggedin_user = self.user_login()
+        token = json.loads(loggedin_user.data)['access_token']
+        passwords = {"old_password": "password",
+                     "new_password": "new_password"}
+        reset_res = self.client().put('/api/v1/auth/reset_password/',
+                                      headers=dict(
+                                          Authorization="Bearer " + token,
+                                          data=passwords))
+        self.assertEqual(reset_res.status_code, 200)

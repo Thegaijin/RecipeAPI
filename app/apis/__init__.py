@@ -43,6 +43,6 @@ jwt._set_error_handler_callbacks(api)
 
 
 @apiv1_blueprint.app_errorhandler(404)
-def handle_custom_exception(e):
-    '''Return a custom message and 400 status code'''
+def handle_not_found_exception(e):
+    ''' Return a custom message and 404 status code '''
     return make_response(jsonify({'message': 'The URL does not exist'}), 404)

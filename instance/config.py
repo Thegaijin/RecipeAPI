@@ -1,5 +1,5 @@
 # /instance/config.py
-''' This script holds all the environment configurations  '''
+''' This script holds all the environment configurations '''
 
 import os
 
@@ -9,8 +9,8 @@ class Config(object):
     DEBUG = False
     CSRF_ENABLED = True
     SECRET_KEY = "x7êr(9rty%$$#NV^h_=+4"
-    # path to production database
     SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/recipe_db'
+    # RESTPLUS_VALIDATE = True
 
 
 class DevelopmentConfig(Config):
@@ -21,7 +21,6 @@ class DevelopmentConfig(Config):
 class TestingConfig(Config):
     """Configurations for Testing, with a separate test database."""
     TESTING = True
-    # path to test database
     SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/test_db'
     DEBUG = True
     SQLALCHEMY_ECHO = False
