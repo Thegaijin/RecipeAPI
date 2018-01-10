@@ -1,10 +1,7 @@
 # app/apis/helper.py
-''' This script handles search and pagination functionality for recipes '''
 
-# THird party imports
 from flask import jsonify
 
-# Local imports
 from .serializers import RecipeSchema
 
 per_page_min = 5

@@ -1,7 +1,5 @@
 # app/auth/auth.py
-''' This script holds resource functionality for user creation and login '''
 
-# Third party imports
 from datetime import timedelta
 import re
 from flask import request, jsonify
@@ -10,7 +8,6 @@ from flask_jwt_extended import (
 from flask_restplus import fields, Namespace, Resource, reqparse
 
 
-# Local imports
 from app.models.user import User
 from app.models.blacklist import Blacklist
 from ..db import db
@@ -26,12 +23,14 @@ user = api.model('User', {
     'password': fields.String(required=True, description='user\'s password'),
 })
 
-# validate input
 parser = reqparse.RequestParser(bundle_errors=True)
-# specify parameter names and accepted values
 parser.add_argument('username',
                     required=True, help='Try again: {error_msg}')
 parser.add_argument('password', required=True)
+
+auth_parser = reqparse.RequestParser(bundle_errors=True)
+auth_parser.add_argument('old_password', required=True)
+auth_parser.add_argument('new_password', required=True)
 
 
 @api.route('/register/')
@@ -63,13 +62,11 @@ class UserRegistration(Resource):
                 db.session.add(new_user)
                 db.session.commit()
 
-                return {'message': 'Account was successfully created'}, 201
-            return {'message': 'The username already exists'}, 409
-        else:
-            return {'Input validation error': 'username can only comprise '
-                    'of alphanumeric values & an underscore. '
-                    'Password can only comprise of alphanumeric values '
-                    '& an underscore and between 6 to 25 characters long'}
+                return {"message": "Account was successfully created"}, 201
+            return {"message": "The username already exists"}, 409
+        return {"message": "username can only comprise of alphanumeric values "
+                "& an underscore. Password can only comprise of alphanumeric "
+                "values & an underscore and between to 25 characters long"}
 
 
 @api.route('/login/')
@@ -126,3 +123,31 @@ class UserLogout(Resource):
         db.session.commit()
         the_response = {"message": "Successfully logged out"}
         return the_response, 200
+
+
+@api.route('/reset_password/')
+class ResetPassword(Resource):
+    ''' This class logs out a currently logged in user. '''
+
+    @api.expect(auth_parser)
+    @api.response(200, 'Password reset successfully')
+    @jwt_required
+    def put(self):
+
+        user_id = get_jwt_identity()
+        current_user = User.query.filter_by(user_id=user_id).first()
+        args = auth_parser.parse_args()
+        old_password = args.old_password
+        new_password = args.new_password
+
+        match = current_user.password_checker(old_password)
+        if password_validator(new_password):
+            if not match:
+                return {'message': 'The passwords did not match'}
+            current_user.password_hasher(new_password)
+
+            db.session.add(current_user)
+            db.session.commit()
+            return {'message': 'Password reset successfully'}
+        return {'message': 'Password can only comprise of alphanumeric values '
+                '& an underscore and between 6 to 25 characters long'}
