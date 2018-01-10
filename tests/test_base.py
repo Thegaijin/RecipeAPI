@@ -21,20 +21,16 @@ class BaseTestCase(TestCase):
         self.client = self.app.test_client
 
         # The user details data to be used for testing
-        self.user = {'username': 'username', 'password': 'password'}
+        self.user = {"username": "username", "password": "password"}
         # The Category details data to be used for testing
-        self.category = {'category_name': 'category',
-                         'description': 'description',
-                         'created_by': 'created_by'}
-        self.category1 = {'category_name': 'category one',
-                          'description': 'description one',
-                          'created_by': 'created_by'}
-        self.recipe = {'recipe_name': 'recipe',
-                       'description': 'description',
-                       'created_by': 'created_by'}
-        self.recipe1 = {'recipe_name': 'recipe one',
-                        'description': 'description one',
-                        'created_by': 'created_by'}
+        self.category = {"category_name": "category",
+                         "description": "description"}
+        self.category1 = {"category_name": "category one",
+                          "description": "description one"}
+        self.recipe = {"recipe_name": "recipe",
+                       "description": "description"}
+        self.recipe1 = {"recipe_name": "recipe one",
+                        "description": "description one"}
 
         # explicitly create application context
         # cache DB connections to be created on a per-request or usage case
