@@ -1,10 +1,7 @@
 # serializers.py
-''' This script has the model serializers  '''
 
-# # Third-party import
 from flask_marshmallow import Marshmallow
 
-# Local import
 from app.models.category import Category
 from app.models.recipe import Recipe
 from app.models.user import User

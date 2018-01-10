@@ -1,5 +1,4 @@
 # /app/apis/hello.py
-''' This script returns a string '''
 
 # Third-party imoport
 from flask_restplus import Namespace, Resource
