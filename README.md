@@ -4,6 +4,7 @@
 <img class="notice-badge" src="https://img.shields.io/badge/code%20style-pep8-orange.svg" alt="Badge"/>
 </a>
 <a href="https://codeclimate.com/github/Thegaijin/RecipeAPI/maintainability"><img src="https://api.codeclimate.com/v1/badges/c75e4a167e39a25c50aa/maintainability" /></a>
+[![Code Health](https://landscape.io/github/Thegaijin/RecipeAPI/master/landscape.svg?style=flat)](https://landscape.io/github/Thegaijin/RecipeAPI/master)
 
 # RecipeAPI
 
