@@ -29,10 +29,15 @@ jobs:
 
       - run:
           name: install dependencies
-          command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install -r requirements.txt
+          command: 
+          python3 -m venv venv
+          . venv/bin/activate
+          pip install -r requirements.txt
+        
+      - run:
+        echo ${FLASK_CONFIG}
+          environment:
+            FLASK_CONFIG: testing
 
       - save_cache:
           paths:
@@ -44,7 +49,8 @@ jobs:
           name: run tests
           command: |
             . venv/bin/activate
-            pytest --cov-report term --cov=app
+            python manage.py test
+            # pytest --cov-report term --cov=app
 
       - store_artifacts:
           path: test-reports
