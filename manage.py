@@ -15,5 +15,18 @@ manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 
 
+@manager.command
+def test():
+    """Runs the unit tests without test coverage."""
+
+    # load the tests from the tests folder
+    tests = TestLoader().discover('./tests', pattern='test*.py')
+    # run the tests
+    result = TextTestRunner(verbosity=2).run(tests)
+    if result.wasSuccessful():
+        return 0
+    return 1
+
+
 if __name__ == '__main__':
     manager.run()
