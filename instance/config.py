@@ -1,7 +1,4 @@
 # /instance/config.py
-''' This script holds all the environment configurations '''
-
-import os
 
 
 class Config(object):
@@ -10,12 +7,12 @@ class Config(object):
     CSRF_ENABLED = True
     SECRET_KEY = "x7êr(9rty%$$#NV^h_=+4"
     SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/recipe_db'
-    # RESTPLUS_VALIDATE = True
 
 
 class DevelopmentConfig(Config):
     """Configurations for Development."""
     DEBUG = True
+    RESTPLUS_VALIDATE = True
 
 
 class TestingConfig(Config):

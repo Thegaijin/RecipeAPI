@@ -12,22 +12,22 @@ This is an API for a Recipes service using Flask. Users can register an account 
 
 Add link to Heroku here
 
-| EndPoint                                   | Functionality                                    |
-| ------------------------------------------ | ------------------------------------------------ |
-| [ POST /auth/login/ ](#)                   | Logs a user in                                   |
-| [ POST /auth/register/ ](#)                | Register a user                                  |
-| [ DELETE /auth/logout/ ](#)                | Logout a user                                    |
-| [ POST /categories/ ](#)                   | Create a new category                            |
-| [ GET /categories/ ](#)                    | Get all categories created by the logged in user |
-| [ GET /categories/\<id>/ ](#)              | Get a category by it's id                        |
-| [ PUT /categories/\<id>/ ](#)              | Update the category                              |
-| [ DELETE /categories/\<id>/ ](#)           | Delete the category                              |
-| [ POST /recipes/\<id>/ ](#)                | Create a recipe in the specified category        |
-| [ GET /recipes/](#)                        | Get all recipes created by the logged in user    |
-| [ GET /recipes/\<id>/](#)                  | Get all recipes in the specified category id     |
-| [ GET /recipes/\<id>/\<recipe_name>](#)    | Get a recipe in the specified category id        |
-| [ PUT /recipes/\<id>/<recipe_name> ](#)    | Update the recipe in the specified category id   |
-| [ DELETE /recipes/\<id>/<recipe_name> ](#) | Delete the recipe in the specified category id   |
+| EndPoint                                 | Functionality                                    |
+| ---------------------------------------- | ------------------------------------------------ |
+| [ POST /auth/login/ ](#)                 | Logs a user in                                   |
+| [ POST /auth/register/ ](#)              | Register a user                                  |
+| [ DELETE /auth/logout/ ](#)              | Logout a user                                    |
+| [ POST /categories/ ](#)                 | Create a new category                            |
+| [ GET /categories/ ](#)                  | Get all categories created by the logged in user |
+| [ GET /categories/\<id>/ ](#)            | Get a category by it's id                        |
+| [ PUT /categories/\<id>/ ](#)            | Update the category                              |
+| [ DELETE /categories/\<id>/ ](#)         | Delete the category                              |
+| [ POST /recipes/\<id>/ ](#)              | Create a recipe in the specified category        |
+| [ GET /recipes/](#)                      | Get all recipes created by the logged in user    |
+| [ GET /recipes/\<id>/](#)                | Get all recipes in the specified category id     |
+| [ GET /recipes/\<id>/\<recipe_id>](#)    | Get a recipe in the specified category id        |
+| [ PUT /recipes/\<id>/<recipe_id> ](#)    | Update the recipe in the specified category id   |
+| [ DELETE /recipes/\<id>/<recipe_id> ](#) | Delete the recipe in the specified category id   |
 
 ## Setup
 

@@ -1,5 +1,3 @@
-# test_recipes.py
-
 import json
 
 from tests.test_base import BaseTestCase

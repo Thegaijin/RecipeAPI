@@ -1,10 +1,3 @@
-# app/models/category.py
-''' This scripts holds the Category model '''
-
-# Third party import
-from datetime import datetime
-
-# Local import
 from ..db import db
 
 

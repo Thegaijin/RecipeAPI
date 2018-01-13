@@ -1,8 +1,4 @@
-# app/auth/auth.py
-
 from datetime import timedelta
-import re
-from flask import request, jsonify
 from flask_jwt_extended import (
     get_jwt_identity, create_access_token, jwt_required, get_raw_jwt)
 from flask_restplus import fields, Namespace, Resource, reqparse
@@ -11,7 +7,8 @@ from flask_restplus import fields, Namespace, Resource, reqparse
 from app.models.user import User
 from app.models.blacklist import Blacklist
 from ..db import db
-from ..validation_helper import username_validator, password_validator
+from ..validation_helper import(
+    username_validator, password_validator, email_validator)
 
 
 api = Namespace(
@@ -21,12 +18,14 @@ user = api.model('User', {
     'username': fields.String(required=True,
                               description='user\'s name'),
     'password': fields.String(required=True, description='user\'s password'),
+    'email': fields.String(required=True, description='user\'s email')
 })
 
 parser = reqparse.RequestParser(bundle_errors=True)
 parser.add_argument('username',
                     required=True, help='Try again: {error_msg}')
 parser.add_argument('password', required=True)
+parser.add_argument('email', required=True)
 
 auth_parser = reqparse.RequestParser(bundle_errors=True)
 auth_parser.add_argument('old_password', required=True)
@@ -50,23 +49,31 @@ class UserRegistration(Resource):
         args = parser.parse_args()
         username = args.username
         password = args.password
+        email = args.email
 
         validated_username = username_validator(username)
         validated_password = password_validator(password)
-        if validated_username and validated_password:
+        validated_email = email_validator(email)
+        if validated_username is False:
+            return {"message": "username should comprise of alphanumeric "
+                    "values & an underscore."}
 
-            username = username.lower()
-            if User.query.filter_by(username=username).first() is None:
-                new_user = User(username)
-                new_user.password_hasher(password)
-                db.session.add(new_user)
-                db.session.commit()
+        if validated_password is False:
+            return {"message": "Password can only comprise of alphanumeric "
+                    "values & an underscore and not more than 25 characters"}
 
-                return {"message": "Account was successfully created"}, 201
-            return {"message": "The username already exists"}, 409
-        return {"message": "username can only comprise of alphanumeric values "
-                "& an underscore. Password can only comprise of alphanumeric "
-                "values & an underscore and between to 25 characters long"}
+        if validated_email is False:
+            return {"message": "email can only comprise of alphanumeric "
+                    "values & a dot as well other standard email conventions"}
+
+        username = username.lower()
+        if User.query.filter_by(username=username).first() is None:
+            new_user = User(username, email)
+            new_user.password_hasher(password)
+            db.session.add(new_user)
+            db.session.commit()
+            return {"message": "Account was successfully created"}, 201
+        return {"message": "The username already exists"}, 409
 
 
 @api.route('/login/')

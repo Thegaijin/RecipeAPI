@@ -1,5 +1,3 @@
-# validation_helper.py
-
 import re
 
 
@@ -10,7 +8,7 @@ def username_validator(username):
         :param str username: The username input
         :return: the username if it meets the specification otherwise false
     """
-    username_pattern = re.compile(r'^\w+([a-zA-Z0-9]{1,10})$')
+    username_pattern = re.compile(r'^[a-zA-Z_]+([a-zA-Z0-9]{1,10})$')
     if username_pattern.match(username):
         return True
     return False
@@ -25,6 +23,22 @@ def password_validator(password):
     """
     password_pattern = re.compile(r'^\w{6,25}$')
     if password_pattern.match(password):
+        return True
+    return False
+
+
+def email_validator(password):
+    """ The function validates the username input.
+        It checks if the input matches the expected string structure
+
+        :param str username: The username input
+        :return: the username if it meets the specification otherwise false
+    """
+    r"(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)"
+    r"(^[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-zA-Z0-9.]+$)"
+    email_pattern = re.compile(
+        r'(^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z0-9.]+$)')
+    if email_pattern.match(password):
         return True
     return False
 

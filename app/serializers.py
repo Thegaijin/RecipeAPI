@@ -1,5 +1,3 @@
-# serializers.py
-
 from flask_marshmallow import Marshmallow
 
 from app.models.category import Category

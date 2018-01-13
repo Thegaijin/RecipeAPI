@@ -1,11 +1,9 @@
-# app/apis/helper.py
-
 from flask import jsonify
 
 from .serializers import RecipeSchema
 
-per_page_min = 5
-per_page_max = 10
+PER_PAGE_MIN = 5
+PER_PAGE_MAX = 10
 
 
 def manage_get_recipes(the_recipes, args):
@@ -24,10 +22,10 @@ def manage_get_recipes(the_recipes, args):
         q = args.get('q', '')
         page = args.get('page', 1)
         per_page = args.get('per_page', 10)
-        if per_page is None or per_page < per_page_min:
-            per_page = per_page_min
-        if per_page > per_page_max:
-            per_page = per_page_max
+        if per_page is None or per_page < PER_PAGE_MIN:
+            per_page = PER_PAGE_MIN
+        if per_page > PER_PAGE_MAX:
+            per_page = PER_PAGE_MAX
         if q:
             q = q.lower()
             for a_recipe in the_recipes.all():
@@ -50,4 +48,3 @@ def manage_get_recipe(the_recipe):
     recipeschema = RecipeSchema()
     get_response = recipeschema.dump(the_recipe)
     return jsonify(get_response.data)
-    return False
