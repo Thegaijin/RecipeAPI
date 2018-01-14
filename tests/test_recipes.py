@@ -1,5 +1,3 @@
-# test_recipes.py
-
 import json
 
 from tests.test_base import BaseTestCase
@@ -61,7 +59,7 @@ class RecipeTestCase(BaseTestCase):
         self.assertEqual(create_res.status_code, 201)
         create_res = json.loads(create_res.data)
         view_res = self.client().get('/api/v1/recipes/{}/{}/'.format(
-            category_res['category_id'], create_res['recipe_name']),
+            category_res['category_id'], create_res['recipe_id']),
             headers=dict(Authorization="Bearer " + token))
         self.assertEqual(view_res.status_code, 200)
         view_res = json.loads(view_res.data)
@@ -111,7 +109,7 @@ class RecipeTestCase(BaseTestCase):
         new_details = {"recipe_name": "new_name",
                        "description": "new_description"}
         edit_res = self.client().put('/api/v1/recipes/{}/{}/'.format(
-            category_res['category_id'], create_res['recipe_name']),
+            category_res['category_id'], create_res['recipe_id']),
             headers=dict(Authorization="Bearer " + token), data=new_details)
         self.assertEqual(edit_res.status_code, 200)
 
@@ -130,8 +128,9 @@ class RecipeTestCase(BaseTestCase):
                 Authorization="Bearer " + token), data=self.recipe)
         self.assertEqual(create_res.status_code, 201)
         create_res = json.loads(create_res.data)
+        print('delete', create_res)
         delete_res = self.client().delete('/api/v1/recipes/{}/{}/'.format(
-            category_res['category_id'], create_res['recipe_name']),
+            category_res['category_id'], create_res['recipe_id']),
             headers=dict(Authorization="Bearer " + token))
         self.assertEqual(delete_res.status_code, 200)
         delete_res = json.loads(delete_res.data)

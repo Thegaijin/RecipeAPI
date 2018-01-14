@@ -1,7 +1,3 @@
-# test_recipes.py
-''' This Script has the tests for user registration and login functionality '''
-
-# Third party imports
 import json
 from unittest import TestCase
 

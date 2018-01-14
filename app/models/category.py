@@ -1,10 +1,3 @@
-# app/models/category.py
-''' This scripts holds the Category model '''
-
-# Third party import
-from datetime import datetime
-
-# Local import
 from ..db import db
 
 
@@ -13,7 +6,6 @@ class Category(db.Model):
 
     __tablename__ = 'categories'
 
-    # table columns
     category_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     category_name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(256), nullable=False)
@@ -21,7 +13,6 @@ class Category(db.Model):
     date_modified = db.Column(
         db.DateTime, default=db.func.current_timestamp(),
         onupdate=db.func.current_timestamp())
-    # resolved at run time
     created_by = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     recipes = db.relationship(
         'Recipe', backref='category', cascade='all, delete-orphan')

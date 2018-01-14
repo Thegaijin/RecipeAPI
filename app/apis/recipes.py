@@ -1,16 +1,11 @@
-# app/auth/categories.py
-
-
-# Third party imports
 from flask import request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restplus import fields, Namespace, Resource, reqparse
 
-# Local imports
 from app import db
 from app.models.recipe import Recipe
 from ..validation_helper import name_validator
-from ..get_helper import (per_page_max, per_page_min,
+from ..get_helper import (PER_PAGE_MAX, PER_PAGE_MIN,
                           manage_get_recipes, manage_get_recipe)
 
 
@@ -93,14 +88,13 @@ class Recipes(Resource):
     @jwt_required
     def post(self, category_id):
         ''' A method to create a recipe.
-            Checks if a recipe name exists in the given category, if it
-            doesn\'t it creates the new recipe,if it does,it returns a message
+            Checks if a recipe id exists in the given category, if it doesn\'t
+            it creates the new recipe,if it does,it returns a message
 
             :param int category_id: The category id to which the recipe belongs
             :return: A dictionary with a message and status code
         '''
 
-        # get current username
         user_id = get_jwt_identity()
         args = recipe_parser.parse_args()
         recipe_name = args.recipe_name
@@ -110,39 +104,38 @@ class Recipes(Resource):
 
         validated_name = name_validator(recipe_name)
         if validated_name:
-            # change values to lowercase
             recipe_name = recipe_name.lower()
             description = description.lower()
 
-            # check if the category exists
             if Recipe.query.filter_by(created_by=created_by,
                                       category_id=category_id,
                                       recipe_name=recipe_name).first() is not None:
                 return {'message': 'Recipe already exists'}
             a_recipe = Recipe(recipe_name, description,
                               category_id, created_by)
+
             db.session.add(a_recipe)
             db.session.commit()
             response = {
                 'status': 'Success',
                 'message': 'Recipe has been created',
-                'recipe_name': a_recipe.recipe_name
+                'recipe_id': a_recipe.recipe_id
             }
             return response, 201
-        return {'message': 'The recipe name should comprise of alphabetical'
-                ' characters and can be more than one word'}
+        return {'message': 'The recipe name can only comprise of alphabetical'
+                'characters and can be more than one word'}, 400
 
 
-@api.route('/<int:category_id>/<recipe_name>/')
+@api.route('/<int:category_id>/<recipe_id>/')
 class Recipee(Resource):
     """This class handles a single recipe GET, PUT AND DELETE functionality
     """
 
     @api.response(200, 'Category found successfully')
     @jwt_required
-    def get(self, category_id, recipe_name):
-        ''' A method to get a recipe in a category by name.
-            Checks if the given recipe name exists in the given category and
+    def get(self, category_id, recipe_id):
+        ''' A method to get a recipe in a category by id.
+            Checks if the given recipe id exists in the given category and
             returns the recipe details.
 
             :param int category_id: The category id to which the recipe belongs
@@ -151,7 +144,7 @@ class Recipee(Resource):
         '''
 
         the_recipe = Recipe.query.filter_by(
-            category_id=category_id, recipe_name=recipe_name).first()
+            category_id=category_id, recipe_id=recipe_id).first()
         if the_recipe is not None:
             return manage_get_recipe(the_recipe)
         return {'message': 'The recipe does not exist'}, 404
@@ -159,18 +152,18 @@ class Recipee(Resource):
     @api.expect(recipe_parser)
     @api.response(204, 'Success')
     @jwt_required
-    def put(self, category_id, recipe_name):
+    def put(self, category_id, recipe_id):
         ''' A method for editing a recipe.
-            Checks if the given recipe name exists in the given category and
+            Checks if the given recipe id exists in the given category and
             edits it with the new details.
 
-            :param str recipe_name: The new recipe name
+            :param str recipe_id: The new recipe id
             :param str description: The new recipe description
             :return: A dictionary with a message
         '''
 
         the_recipe = Recipe.query.filter_by(category_id=category_id,
-                                            recipe_name=recipe_name).first()
+                                            recipe_id=recipe_id).first()
         if the_recipe is None:
             return {'message': 'The recipe does not exist'}, 404
         args = recipe_parser.parse_args()
@@ -201,18 +194,18 @@ class Recipee(Resource):
 
     @api.response(204, 'Success')
     @jwt_required
-    def delete(self, category_id, recipe_name):
+    def delete(self, category_id, recipe_id):
         ''' A method to delete a recipe
-            Checks if the given recipe name exists in the given category and
+            Checks if the given recipe id exists in the given category and
             deletes it.
 
-            :param str recipe_name: The new recipe name
+            :param str recipe_id: The new recipe id
             :param str description: The new recipe description
             :return: A dictionary with a message
         '''
 
         the_recipe = Recipe.query.filter_by(category_id=category_id,
-                                            recipe_name=recipe_name).first()
+                                            recipe_id=recipe_id).first()
         if the_recipe is None:
             return {'message': 'The recipe does not exist'}
         db.session.delete(the_recipe)
