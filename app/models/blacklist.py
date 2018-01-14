@@ -1,10 +1,5 @@
-# app/models/blacklist.py
-''' This scripts holds the Blacklist model '''
-
-# Third party import
 from datetime import datetime
 
-# Local import
 from ..db import db
 
 

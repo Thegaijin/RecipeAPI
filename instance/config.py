@@ -1,9 +1,3 @@
-# /instance/config.py
-''' This script holds all the environment configurations '''
-
-import os
-
-
 class Config(object):
     """ The configurations all the environments should have."""
     DEBUG = False
@@ -16,6 +10,7 @@ class Config(object):
 class DevelopmentConfig(Config):
     """Configurations for Development."""
     DEBUG = True
+    RESTPLUS_VALIDATE = True
 
 
 class TestingConfig(Config):

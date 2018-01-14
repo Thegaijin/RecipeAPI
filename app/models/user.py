@@ -1,10 +1,5 @@
-# app/models/user.py
-''' This scripts holds the DB table models '''
-
-# Third-party import
 from flask_bcrypt import Bcrypt
 
-# Local import
 from ..db import db
 
 
@@ -17,14 +12,16 @@ class User(db.Model):
     user_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(256), nullable=False)
+    email = db.Column(db.String(256), nullable=False, unique=True)
     categories = db.relationship(
         'Category', backref='user', cascade='all, delete-orphan')
     recipes = db.relationship(
         'Recipe', backref='user', cascade='all, delete-orphan')
 
-    def __init__(self, username):
+    def __init__(self, username, email):
         ''' Initialise the user with a username '''
         self.username = username
+        self.email = email
 
     def password_hasher(self, password):
         ''' hashes the password '''

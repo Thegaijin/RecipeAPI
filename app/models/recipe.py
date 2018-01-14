@@ -1,10 +1,3 @@
-# app/models/recipe.py
-''' This scripts holds the Recipe model '''
-
-# Third-party import
-from datetime import datetime
-
-# Local import
 from ..db import db
 
 
