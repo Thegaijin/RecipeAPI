@@ -28,7 +28,16 @@ login_user = api.model('User', {
 })
 
 parser = reqparse.RequestParser(bundle_errors=True)
+<< << << < HEAD
 parser.add_argument('username', required=True)
+== == == =
+<< << << < HEAD
+parser.add_argument('username',
+                    required=True, help='Try again: {error_msg}')
+== == == =
+parser.add_argument('username', required=True)
+>>>>>> > validate
+>>>>>> > 7db820c8b3cc8a5aabfe2c77a5b34f19d55533b2
 parser.add_argument('password', required=True)
 parser.add_argument('email', required=True)
 
