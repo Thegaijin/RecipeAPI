@@ -5,6 +5,7 @@
 </a>
 <a href="https://codeclimate.com/github/Thegaijin/RecipeAPI/maintainability"><img src="https://api.codeclimate.com/v1/badges/c75e4a167e39a25c50aa/maintainability" /></a>
 [![Code Health](https://landscape.io/github/Thegaijin/RecipeAPI/master/landscape.svg?style=flat)](https://landscape.io/github/Thegaijin/RecipeAPI/master)
+[![CircleCI](https://circleci.com/gh/Thegaijin/RecipeAPI.svg?style=svg)](https://circleci.com/gh/Thegaijin/RecipeAPI)
 
 # RecipeAPI
 
