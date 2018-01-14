@@ -1,5 +1,3 @@
-# serializers.py
-
 from flask_marshmallow import Marshmallow
 
 from app.models.category import Category
@@ -20,6 +18,7 @@ class CategorySchema(ma.ModelSchema):
     """ Category model schema """
     class Meta:
         model = Category
+    recipes = ma.Nested('RecipeSchema', many=True, load=True)
 
 
 class RecipeSchema(ma.ModelSchema):

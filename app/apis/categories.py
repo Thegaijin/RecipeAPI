@@ -1,17 +1,12 @@
-# app/auth/categories.py
-
-# Third party imports
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restplus import fields, Namespace, Resource, reqparse
 
-
-# Local imports
 from app import db
 from app.models.category import Category
 from ..serializers import CategorySchema
 from ..validation_helper import name_validator
-from ..get_helper import per_page_max, per_page_min
+from ..get_helper import PER_PAGE_MAX, PER_PAGE_MIN
 
 
 api = Namespace(
@@ -24,17 +19,13 @@ category = api.model('Category', {
                                  description='category description')
 })
 
-# validate input
 parser = reqparse.RequestParser(bundle_errors=True)
 parser.add_argument('category_name', required=True,
                     help='Try again: {error_msg}')
 parser.add_argument('description', required=True,
                     help='Try again: {error_msg}', default='')
 
-
-# validate input
 q_parser = reqparse.RequestParser(bundle_errors=True)
-# location specifies to look only in the querystring
 q_parser.add_argument('q', required=False,
                       help='search for word', location='args')
 q_parser.add_argument('page', required=False, type=int,
@@ -63,10 +54,10 @@ class Categories(Resource):
         q = args.get('q', '')
         page = args.get('page', 1)
         per_page = args.get('per_page', 10)
-        if per_page < per_page_min:
-            per_page = per_page_min
-        if per_page > per_page_max:
-            per_page = per_page_max
+        if per_page < PER_PAGE_MIN:
+            per_page = PER_PAGE_MIN
+        if per_page > PER_PAGE_MAX:
+            per_page = PER_PAGE_MAX
 
         if q:
             q = q.lower()

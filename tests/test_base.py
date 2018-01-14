@@ -1,5 +1,3 @@
-# base.py
-
 import json
 from unittest import TestCase
 
@@ -14,7 +12,8 @@ class BaseTestCase(TestCase):
         self.app = create_app(config_name="testing")
         self.client = self.app.test_client
 
-        self.user = {"username": "username", "password": "password"}
+        self.user = {"username": "username",
+                     "password": "password", "email": "email@email.com"}
         self.category = {"category_name": "category",
                          "description": "description"}
         self.category1 = {"category_name": "category one",

@@ -1,5 +1,3 @@
-# app/appis/__init__.py
-
 from flask import Blueprint, jsonify, make_response
 from flask_restplus import Api
 

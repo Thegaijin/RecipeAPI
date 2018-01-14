@@ -1,9 +1,5 @@
-# app/__init__.py
-
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
-from flask_restplus import Api
-
 
 from instance.config import app_config
 from .db import db
