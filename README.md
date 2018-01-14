@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/6f13916edb504c14ac71eb37b9a6e861)](https://www.codacy.com/app/Thegaijin/RecipeAPI?utm_source=github.com&utm_medium=referral&utm_content=Thegaijin/RecipeAPI&utm_campaign=badger)
 [![Build Status](https://travis-ci.org/Thegaijin/RecipeAPI.svg?branch=master)](https://travis-ci.org/Thegaijin/RecipeAPI)
 [![Coverage Status](https://coveralls.io/repos/github/Thegaijin/RecipeAPI/badge.svg?branch=validate)](https://coveralls.io/github/Thegaijin/RecipeAPI?branch=validate)
 <a href="https://www.python.org/dev/peps/pep-0008/">
