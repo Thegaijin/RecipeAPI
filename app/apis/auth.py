@@ -14,18 +14,27 @@ from ..validation_helper import(
 api = Namespace(
     'auth', description='Creating and authenticating user credentials')
 
-user = api.model('User', {
+register_user = api.model('User', {
     'username': fields.String(required=True,
                               description='user\'s name'),
     'password': fields.String(required=True, description='user\'s password'),
     'email': fields.String(required=True, description='user\'s email')
 })
 
+login_user = api.model('User', {
+    'username': fields.String(required=True,
+                              description='user\'s name'),
+    'password': fields.String(required=True, description='user\'s password')
+})
+
 parser = reqparse.RequestParser(bundle_errors=True)
-parser.add_argument('username',
-                    required=True, help='Try again: {error_msg}')
+parser.add_argument('username', required=True)
 parser.add_argument('password', required=True)
 parser.add_argument('email', required=True)
+
+login_parser = reqparse.RequestParser(bundle_errors=True)
+login_parser.add_argument('username', required=True)
+login_parser.add_argument('password', required=True)
 
 auth_parser = reqparse.RequestParser(bundle_errors=True)
 auth_parser.add_argument('old_password', required=True)
@@ -36,7 +45,7 @@ auth_parser.add_argument('new_password', required=True)
 class UserRegistration(Resource):
     ''' This class registers a new user. '''
 
-    @api.expect(user)
+    @api.expect(register_user)
     @api.response(201, 'Account was successfully created')
     def post(self):
         ''' This method adds a new user.
@@ -80,7 +89,7 @@ class UserRegistration(Resource):
 class UserLogin(Resource):
     ''' This class logs in an existing user. '''
 
-    @api.expect(user)
+    @api.expect(login_user)
     @api.response(201, 'You have been signed in')
     def post(self):
         ''' This method signs in an existing user
@@ -89,10 +98,11 @@ class UserLogin(Resource):
 
             :return: A dictionary with a message
         '''
-        args = parser.parse_args()
+        print('we are in the login route')
+        args = login_parser.parse_args()
         username = args.username
         password = args.password
-
+        print('the login args', args)
         username = username.lower()
         if User.query.filter_by(username=username).first() is not None:
             the_user = User.query.filter_by(username=username).first()
