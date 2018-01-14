@@ -35,7 +35,7 @@ def email_validator(password):
         :return: the username if it meets the specification otherwise false
     """
     email_pattern = re.compile(
-        r'(^[a-zA-Z0-9.]+@[a-zA-Z0-9]+\.[a-zA-Z0-9.]+$)')
+        r'(^[a-zA-Z0-9_.]+@[a-zA-Z0-9]+\.[a-zA-Z0-9.]+$)')
     if email_pattern.match(password):
         return True
     return False
