@@ -19,17 +19,13 @@ category = api.model('Category', {
                                  description='category description')
 })
 
-# validate input
 parser = reqparse.RequestParser(bundle_errors=True)
 parser.add_argument('category_name', required=True,
                     help='Try again: {error_msg}')
 parser.add_argument('description', required=True,
                     help='Try again: {error_msg}', default='')
 
-
-# validate input
 q_parser = reqparse.RequestParser(bundle_errors=True)
-# location specifies to look only in the querystring
 q_parser.add_argument('q', required=False,
                       help='search for word', location='args')
 q_parser.add_argument('page', required=False, type=int,

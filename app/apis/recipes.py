@@ -122,7 +122,8 @@ class Recipes(Resource):
                 'recipe_id': a_recipe.recipe_id
             }
             return response, 201
-        return {'message': 'The recipe name should comprise of alphabetical'}
+        return {'message': 'The recipe name can only comprise of alphabetical'
+                'characters and can be more than one word'}, 400
 
 
 @api.route('/<int:category_id>/<recipe_id>/')
