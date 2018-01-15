@@ -1,3 +1,6 @@
+''' This script has the configuration settings for the different states '''
+
+
 class Config(object):
     """ The configurations all the environments should have."""
     DEBUG = False

@@ -1,3 +1,5 @@
+''' This script handles how data is formatted and returned on get requests '''
+
 from flask_marshmallow import Marshmallow
 
 from app.models.category import Category

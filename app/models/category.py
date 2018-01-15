@@ -1,3 +1,5 @@
+''' This script holds the category model '''
+
 from ..db import db
 
 

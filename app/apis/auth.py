@@ -1,3 +1,5 @@
+''' This script handles user registration, login, logout and password reset '''
+
 from datetime import timedelta
 from flask_jwt_extended import (
     get_jwt_identity, create_access_token, jwt_required, get_raw_jwt)
@@ -14,38 +16,38 @@ from ..validation_helper import(
 api = Namespace(
     'auth', description='Creating and authenticating user credentials')
 
-register_user = api.model('User', {
+REGISTER_USER = api.model('User', {
     'username': fields.String(required=True,
                               description='user\'s name'),
     'password': fields.String(required=True, description='user\'s password'),
     'email': fields.String(required=True, description='user\'s email')
 })
 
-login_user = api.model('User', {
+LOGIN_USER = api.model('User', {
     'username': fields.String(required=True,
                               description='user\'s name'),
     'password': fields.String(required=True, description='user\'s password')
 })
 
-parser = reqparse.RequestParser(bundle_errors=True)
-parser.add_argument('username', required=True)
-parser.add_argument('password', required=True)
-parser.add_argument('email', required=True)
+PARSER = reqparse.RequestParser(bundle_errors=True)
+PARSER.add_argument('username', required=True)
+PARSER.add_argument('password', required=True)
+PARSER.add_argument('email', required=True)
 
-login_parser = reqparse.RequestParser(bundle_errors=True)
-login_parser.add_argument('username', required=True)
-login_parser.add_argument('password', required=True)
+LOGIN_PARSER = reqparse.RequestParser(bundle_errors=True)
+LOGIN_PARSER.add_argument('username', required=True)
+LOGIN_PARSER.add_argument('password', required=True)
 
-auth_parser = reqparse.RequestParser(bundle_errors=True)
-auth_parser.add_argument('old_password', required=True)
-auth_parser.add_argument('new_password', required=True)
+AUTH_PARSER = reqparse.RequestParser(bundle_errors=True)
+AUTH_PARSER.add_argument('old_password', required=True)
+AUTH_PARSER.add_argument('new_password', required=True)
 
 
 @api.route('/register/')
 class UserRegistration(Resource):
     ''' This class registers a new user. '''
 
-    @api.expect(register_user)
+    @api.expect(REGISTER_USER)
     @api.response(201, 'Account was successfully created')
     def post(self):
         ''' This method adds a new user.
@@ -54,7 +56,7 @@ class UserRegistration(Resource):
             :return: A dictionary with a message
         '''
 
-        args = parser.parse_args()
+        args = PARSER.parse_args()
         username = args.username
         password = args.password
         email = args.email
@@ -88,7 +90,7 @@ class UserRegistration(Resource):
 class UserLogin(Resource):
     ''' This class logs in an existing user. '''
 
-    @api.expect(login_user)
+    @api.expect(LOGIN_USER)
     @api.response(201, 'You have been signed in')
     def post(self):
         ''' This method signs in an existing user
@@ -97,7 +99,7 @@ class UserLogin(Resource):
             :return: A dictionary with a message
         '''
         print('we are in the login route')
-        args = login_parser.parse_args()
+        args = LOGIN_PARSER.parse_args()
         username = args.username
         password = args.password
         print('the login args', args)
@@ -144,14 +146,17 @@ class UserLogout(Resource):
 class ResetPassword(Resource):
     ''' This class logs out a currently logged in user. '''
 
-    @api.expect(auth_parser)
+    @api.expect(AUTH_PARSER)
     @api.response(200, 'Password reset successfully')
     @jwt_required
     def put(self):
+        ''' This method handles password reset.
 
+            :return: A dictionary with a message
+        '''
         user_id = get_jwt_identity()
         current_user = User.query.filter_by(user_id=user_id).first()
-        args = auth_parser.parse_args()
+        args = AUTH_PARSER.parse_args()
         old_password = args.old_password
         new_password = args.new_password
 
