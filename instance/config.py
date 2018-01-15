@@ -1,4 +1,4 @@
-# /instance/config.py
+''' This script has the configuration settings for the different states '''
 
 
 class Config(object):

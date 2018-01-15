@@ -1,3 +1,5 @@
+''' This scripts tests the recipe crud functionality '''
+
 import json
 
 from tests.test_base import BaseTestCase

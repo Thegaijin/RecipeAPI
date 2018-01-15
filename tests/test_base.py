@@ -1,3 +1,5 @@
+''' This script holds the universal configurations of the test cases '''
+
 import json
 from unittest import TestCase
 

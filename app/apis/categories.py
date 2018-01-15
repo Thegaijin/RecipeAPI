@@ -1,3 +1,5 @@
+''' This script handles the categories CRUD '''
+
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restplus import fields, Namespace, Resource, reqparse
@@ -13,24 +15,24 @@ api = Namespace(
     'categories', description='Creating, viewing, editing and deleting \
     categories')
 
-category = api.model('Category', {
+CATEGORY = api.model('Category', {
     'category_name': fields.String(required=True, description='category name'),
     'description': fields.String(required=True,
                                  description='category description')
 })
 
-parser = reqparse.RequestParser(bundle_errors=True)
-parser.add_argument('category_name', required=True,
+PARSER = reqparse.RequestParser(bundle_errors=True)
+PARSER.add_argument('category_name', required=True,
                     help='Try again: {error_msg}')
-parser.add_argument('description', required=True,
+PARSER.add_argument('description', required=True,
                     help='Try again: {error_msg}', default='')
 
-q_parser = reqparse.RequestParser(bundle_errors=True)
-q_parser.add_argument('q', required=False,
+Q_PARSER = reqparse.RequestParser(bundle_errors=True)
+Q_PARSER.add_argument('q', required=False,
                       help='search for word', location='args')
-q_parser.add_argument('page', required=False, type=int,
+Q_PARSER.add_argument('page', required=False, type=int,
                       help='Number of pages', location='args')
-q_parser.add_argument('per_page', required=False, type=int,
+Q_PARSER.add_argument('per_page', required=False, type=int,
                       help='categories per page', default=10, location='args')
 
 
@@ -39,7 +41,7 @@ class Categories(Resource):
     ''' The class handles the Category CRUD functionality '''
 
     @api.response(200, 'Category found successfully')
-    @api.expect(q_parser)
+    @api.expect(Q_PARSER)
     @jwt_required
     def get(self):
         ''' This method returns all the categories
@@ -50,7 +52,7 @@ class Categories(Resource):
 
         # get BaseQuery object to allow for pagination
         the_categories = Category.query.filter_by(created_by=user_id)
-        args = q_parser.parse_args(request)
+        args = Q_PARSER.parse_args(request)
         q = args.get('q', '')
         page = args.get('page', 1)
         per_page = args.get('per_page', 10)
@@ -77,7 +79,7 @@ class Categories(Resource):
         all_categories = categoriesschema.dump(paginated)
         return jsonify(all_categories)
 
-    @api.expect(category)
+    @api.expect(CATEGORY)
     @api.response(201, 'Category created successfully')
     @jwt_required
     def post(self):
@@ -87,7 +89,7 @@ class Categories(Resource):
         '''
         user_id = get_jwt_identity()
 
-        args = parser.parse_args()
+        args = PARSER.parse_args()
         category_name = args.category_name
         description = args.description
         created_by = user_id
@@ -133,7 +135,7 @@ class Categoryy(Resource):
         get_response = categoryschema.dump(the_category)
         return jsonify(get_response.data)
 
-    @api.expect(parser)
+    @api.expect(PARSER)
     @api.response(204, 'Successfully edited')
     @jwt_required
     def put(self, category_id):
@@ -143,7 +145,7 @@ class Categoryy(Resource):
         :param str description: The new category description
         :return: A dictionary with a message
         '''
-        args = parser.parse_args()
+        args = PARSER.parse_args()
         category_name = args.category_name
         description = args.description
 
