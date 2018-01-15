@@ -102,6 +102,7 @@ class UserLogin(Resource):
             and if they do, gives the user access.
             :return: A dictionary with a message
         '''
+        print('we are in the login route')
         args = LOGIN_PARSER.parse_args()
         username = args.username
         password = args.password

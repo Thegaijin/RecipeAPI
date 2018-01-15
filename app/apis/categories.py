@@ -27,12 +27,6 @@ PARSER.add_argument('category_name', required=True,
 PARSER.add_argument('description', required=True,
                     help='Try again: {error_msg}', default='')
 
-EDIT_PARSER = reqparse.RequestParser(bundle_errors=True)
-EDIT_PARSER.add_argument('category_name', required=False,
-                         help='Try again: {error_msg}')
-EDIT_PARSER.add_argument('description', required=False,
-                         help='Try again: {error_msg}', default='')
-
 Q_PARSER = reqparse.RequestParser(bundle_errors=True)
 Q_PARSER.add_argument('q', required=False,
                       help='search for word', location='args')
@@ -147,7 +141,7 @@ class Categoryy(Resource):
         get_response = categoryschema.dump(the_category)
         return jsonify(get_response.data)
 
-    @api.expect(EDIT_PARSER)
+    @api.expect(PARSER)
     @api.response(204, 'Successfully edited')
     @jwt_required
     def put(self, category_id):
@@ -157,8 +151,7 @@ class Categoryy(Resource):
         :param str description: The new category description
         :return: A dictionary with a message
         '''
-        user_id = get_jwt_identity()
-        args = EDIT_PARSER.parse_args()
+        args = PARSER.parse_args()
         category_name = args.category_name
         description = args.description
 
