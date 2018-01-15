@@ -27,6 +27,12 @@ PARSER.add_argument('category_name', required=True,
 PARSER.add_argument('description', required=True,
                     help='Try again: {error_msg}', default='')
 
+EDIT_PARSER = reqparse.RequestParser(bundle_errors=True)
+EDIT_PARSER.add_argument('category_name', required=False,
+                         help='Try again: {error_msg}')
+EDIT_PARSER.add_argument('description', required=False,
+                         help='Try again: {error_msg}', default='')
+
 Q_PARSER = reqparse.RequestParser(bundle_errors=True)
 Q_PARSER.add_argument('q', required=False,
                       help='search for word', location='args')
@@ -141,7 +147,7 @@ class Categoryy(Resource):
         get_response = categoryschema.dump(the_category)
         return jsonify(get_response.data)
 
-    @api.expect(PARSER)
+    @api.expect(EDIT_PARSER)
     @api.response(204, 'Successfully edited')
     @jwt_required
     def put(self, category_id):
@@ -151,21 +157,25 @@ class Categoryy(Resource):
         :param str description: The new category description
         :return: A dictionary with a message
         '''
-        args = PARSER.parse_args()
+        user_id = get_jwt_identity()
+        args = EDIT_PARSER.parse_args()
         category_name = args.category_name
         description = args.description
 
-        category_name = category_name.lower()
-        description = description.lower()
-        the_category = Category.query.filter_by(
-            category_id=category_id).first()
-        if the_category is None:
-            return {'message': f'Category with id {category_id} doesn\'t exist'}
+        the_category = Category.query.filter_by(created_by=user_id,
+                                                category_id=category_id).first()
 
         if not category_name:
             category_name = the_category.category_name
+
         if not description:
             description = the_category.description
+
+        category_name = category_name.lower()
+        description = description.lower()
+
+        if the_category is None:
+            return {'message': f'Category with id {category_id} doesn\'t exist'}
 
         validated_name = name_validator(category_name)
         if validated_name:

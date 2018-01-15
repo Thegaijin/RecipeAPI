@@ -24,6 +24,11 @@ RECIPE_PARSER.add_argument(
     'recipe_name', required=True, help='Try again: {error_msg}')
 RECIPE_PARSER.add_argument('description', required=True, default='')
 
+EDIT_PARSER = reqparse.RequestParser(bundle_errors=True)
+EDIT_PARSER.add_argument(
+    'recipe_name', required=False, help='Try again: {error_msg}')
+EDIT_PARSER.add_argument('description', required=False, default='')
+
 Q_PARSER = reqparse.RequestParser(bundle_errors=True)
 Q_PARSER.add_argument('q', help='search', location='args')
 Q_PARSER.add_argument(
@@ -146,7 +151,7 @@ class Recipee(Resource):
             return manage_get_recipe(the_recipe)
         return {'message': f'You don\'t have a recipe with id {recipe_id}'}, 404
 
-    @api.expect(RECIPE_PARSER)
+    @api.expect(EDIT_PARSER)
     @api.response(204, 'Success')
     @jwt_required
     def put(self, category_id, recipe_id):
@@ -165,17 +170,17 @@ class Recipee(Resource):
 
         if the_recipe is None:
             return {'message': f'No recipe with id {recipe_id}'}, 404
-        args = RECIPE_PARSER.parse_args()
+        args = EDIT_PARSER.parse_args()
         recipe_name = args.recipe_name
         description = args.description
-
-        recipe_name = recipe_name.lower()
-        description = description.lower()
 
         if not recipe_name:
             recipe_name = the_recipe.recipe_name
         if not description:
             description = the_recipe.ingredients
+
+        recipe_name = recipe_name.lower()
+        description = description.lower()
 
         validated_name = name_validator(recipe_name)
         if validated_name:

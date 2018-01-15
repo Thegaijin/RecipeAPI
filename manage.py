@@ -1,4 +1,4 @@
-# manage.py
+''' This script manages migrations and starts the app '''
 
 import os
 from unittest import TestLoader, TextTestRunner
