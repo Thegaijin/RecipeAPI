@@ -1,5 +1,6 @@
+''' This scripts handles setting up the app context for the tests '''
+
 import json
-from unittest import TestCase
 
 from tests.test_base import BaseTestCase
 
@@ -25,7 +26,7 @@ class UserTestCase(BaseTestCase):
         self.assertEqual(res_2.status_code, 409)
         output = json.loads(res_2.data)
         self.assertDictEqual(
-            {'message': "The username already exists"}, output)
+            {'message': f"The username {self.user['username']} already exists"}, output)
 
     def test_user_successful_login(self):
         ''' Test if existing user can successfully login '''
@@ -41,19 +42,17 @@ class UserTestCase(BaseTestCase):
         res = self.client().post('/api/v1/auth/login/', data=self.user)
         self.assertEqual(res.status_code, 401)
         result = json.loads(res.data)
-        self.assertEqual(result['Login error'],
+        self.assertEqual(result['message'],
                          'Username does not exist, signup')
 
     def test_login_fails(self):
         ''' Test if a user can sign in with wrong credentials '''
         res_1 = self.client().post('/api/v1/auth/register/', data=self.user)
         self.assertEqual(res_1.status_code, 201)
-        self.wrong_cred = {'username': 'username',
-                           'password': '12345'}
         res_2 = self.client().post('/api/v1/auth/login/', data=self.wrong_cred)
         self.assertEqual(res_2.status_code, 401)
         result = json.loads(res_2.data)
-        self.assertEqual(result['Login error'],
+        self.assertEqual(result['message'],
                          'Credentials do not match, try again')
 
     def test_valid_logout(self):

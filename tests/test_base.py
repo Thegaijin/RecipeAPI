@@ -24,6 +24,8 @@ class BaseTestCase(TestCase):
                        "description": "description"}
         self.recipe1 = {"recipe_name": "recipe one",
                         "description": "description one"}
+        self.wrong_cred = {'username': 'username',
+                           'password': '12345'}
 
         with self.app.app_context():
             db.create_all()

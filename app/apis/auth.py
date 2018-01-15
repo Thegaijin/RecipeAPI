@@ -65,25 +65,29 @@ class UserRegistration(Resource):
         validated_password = password_validator(password)
         validated_email = email_validator(email)
         if validated_username is False:
-            return {"message": "username should comprise of alphanumeric "
-                    "values & an underscore."}
+            return {"message": f"{username} is not a valid username. It should "
+                    "comprise of alphanumeric values & an underscore."}
 
         if validated_password is False:
             return {"message": "Password can only comprise of alphanumeric "
                     "values & an underscore and not more than 25 characters"}
 
         if validated_email is False:
-            return {"message": "email can only comprise of alphanumeric "
-                    "values & a dot as well other standard email conventions"}
+            return {"message": f"{email} is not a valid email. It should "
+                    "comprise of alphanumeric values & a dot as well other "
+                    "standard email conventions"}
 
         username = username.lower()
-        if User.query.filter_by(username=username).first() is None:
-            new_user = User(username, email)
-            new_user.password_hasher(password)
-            db.session.add(new_user)
-            db.session.commit()
-            return {"message": "Account was successfully created"}, 201
-        return {"message": "The username already exists"}, 409
+        email = email.lower()
+        if User.query.filter_by(username=username).first() is not None:
+            return {"message": f"The username {username} already exists"}, 409
+        if User.query.filter_by(email=email).first() is not None:
+            return {"message": f"The email {email} already exists"}, 409
+        new_user = User(username, email)
+        new_user.password_hasher(password)
+        db.session.add(new_user)
+        db.session.commit()
+        return {"message": "Account was successfully created"}, 201
 
 
 @api.route('/login/')
@@ -98,11 +102,9 @@ class UserLogin(Resource):
             and if they do, gives the user access.
             :return: A dictionary with a message
         '''
-        print('we are in the login route')
         args = LOGIN_PARSER.parse_args()
         username = args.username
         password = args.password
-        print('the login args', args)
         username = username.lower()
         if User.query.filter_by(username=username).first() is not None:
             the_user = User.query.filter_by(username=username).first()
@@ -119,8 +121,8 @@ class UserLogin(Resource):
                     'access_token': access_token
                 }
                 return the_response, 200
-            return {'Login error': 'Credentials do not match, try again'}, 401
-        return {'Login error': 'Username does not exist, signup'}, 401
+            return {'message': 'Credentials do not match, try again'}, 401
+        return {'message': 'Username does not exist, signup'}, 401
 
 
 @api.route('/logout/')

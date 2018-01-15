@@ -1,3 +1,5 @@
+''' This scripts tests the category crud functionality '''
+
 import json
 
 from tests.test_base import BaseTestCase
@@ -101,6 +103,7 @@ class CategoryTestCase(BaseTestCase):
         self.assertEqual(edit_res.status_code, 200)
 
     def test_delete_category(self):
+        ''' Test that API can delete a category '''
         self.user_registration()
         loggedin_user = self.user_login()
         token = json.loads(loggedin_user.data)['access_token']

@@ -50,6 +50,8 @@ def name_validator(name):
     """
     name_pattern = re.compile(r'[a-zA-Z\s]+')
     result = name_pattern.match(name)
+    if result is None:
+        return False
     result = result.group()
     if len(result) is len(name):
         return True

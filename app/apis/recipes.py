@@ -1,3 +1,5 @@
+''' This script handles the recipes CRUD '''
+
 from flask import request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restplus import fields, Namespace, Resource, reqparse
@@ -5,8 +7,7 @@ from flask_restplus import fields, Namespace, Resource, reqparse
 from app import db
 from app.models.recipe import Recipe
 from ..validation_helper import name_validator
-from ..get_helper import (PER_PAGE_MAX, PER_PAGE_MIN,
-                          manage_get_recipes, manage_get_recipe)
+from ..get_helper import manage_get_recipes, manage_get_recipe
 
 
 api = Namespace(
@@ -18,16 +19,16 @@ recipe = api.model('Recipe', {
                                  description='Recipe description'),
 })
 
-recipe_parser = reqparse.RequestParser(bundle_errors=True)
-recipe_parser.add_argument(
+RECIPE_PARSER = reqparse.RequestParser(bundle_errors=True)
+RECIPE_PARSER.add_argument(
     'recipe_name', required=True, help='Try again: {error_msg}')
-recipe_parser.add_argument('description', required=True, default='')
+RECIPE_PARSER.add_argument('description', required=True, default='')
 
-q_parser = reqparse.RequestParser(bundle_errors=True)
-q_parser.add_argument('q', help='search', location='args')
-q_parser.add_argument(
+Q_PARSER = reqparse.RequestParser(bundle_errors=True)
+Q_PARSER.add_argument('q', help='search', location='args')
+Q_PARSER.add_argument(
     'page', type=int, help='Try again: {error_msg}', location='args')
-q_parser.add_argument('per_page', type=int,
+Q_PARSER.add_argument('per_page', type=int,
                       help='Try again: {error_msg}', location='args')
 
 
@@ -36,7 +37,7 @@ class Recipess(Resource):
     ''' The class handles the view functionality for all recipes '''
 
     @api.response(200, 'Success')
-    @api.expect(q_parser)
+    @api.expect(Q_PARSER)
     @jwt_required
     def get(self):
         ''' A method to get all the recipes
@@ -45,16 +46,10 @@ class Recipess(Resource):
 
             :return: A recipe that matches the search or a list of recipe\'s
         '''
-        try:
-            user_id = get_jwt_identity()
-            the_recipes = Recipe.query.filter_by(created_by=user_id)
-            args = q_parser.parse_args(request)
-            return manage_get_recipes(the_recipes, args)
-        except Exception as e:
-            get_response = {
-                'View recipes exception': str(e)
-            }
-            return get_response
+        user_id = get_jwt_identity()
+        the_recipes = Recipe.query.filter_by(created_by=user_id)
+        args = Q_PARSER.parse_args(request)
+        return manage_get_recipes(the_recipes, args)
 
 
 @api.route('/<int:category_id>/')
@@ -62,7 +57,7 @@ class Recipes(Resource):
     ''' The class handles the Recipes CRUD functionality '''
 
     @api.response(200, 'Success')
-    @api.expect(q_parser)
+    @api.expect(Q_PARSER)
     @jwt_required
     def get(self, category_id):
         ''' A method to get recipes in a category.
@@ -77,9 +72,9 @@ class Recipes(Resource):
         user_id = get_jwt_identity()
         the_recipes = Recipe.query.filter_by(
             created_by=user_id, category_id=category_id)
-        args = q_parser.parse_args(request)
-        if the_recipes is None:
-            return {'message': 'There are no recipes in the category'}, 404
+        args = Q_PARSER.parse_args(request)
+        if not the_recipes.all():
+            return {'message': f'No recipes in category {category_id}'}, 404
         return manage_get_recipes(the_recipes, args)
 
     # specifies the expected input fields
@@ -96,7 +91,7 @@ class Recipes(Resource):
         '''
 
         user_id = get_jwt_identity()
-        args = recipe_parser.parse_args()
+        args = RECIPE_PARSER.parse_args()
         recipe_name = args.recipe_name
         description = args.description
         category_id = category_id
@@ -122,8 +117,9 @@ class Recipes(Resource):
                 'recipe_id': a_recipe.recipe_id
             }
             return response, 201
-        return {'message': 'The recipe name can only comprise of alphabetical'
-                'characters and can be more than one word'}, 400
+        return {'message': f'{recipe_name} is not a valid name. Recipe names '
+                'can only comprise of alphabetical characters and can be more '
+                'than one word'}, 400
 
 
 @api.route('/<int:category_id>/<recipe_id>/')
@@ -142,14 +138,15 @@ class Recipee(Resource):
             :param str recipe_name: The name of the recipe to search for
             :return: The details of the recipe
         '''
-
-        the_recipe = Recipe.query.filter_by(
-            category_id=category_id, recipe_id=recipe_id).first()
+        user_id = get_jwt_identity()
+        the_recipe = Recipe.query.filter_by(created_by=user_id,
+                                            category_id=category_id,
+                                            recipe_id=recipe_id).first()
         if the_recipe is not None:
             return manage_get_recipe(the_recipe)
-        return {'message': 'The recipe does not exist'}, 404
+        return {'message': f'You don\'t have a recipe with id {recipe_id}'}, 404
 
-    @api.expect(recipe_parser)
+    @api.expect(RECIPE_PARSER)
     @api.response(204, 'Success')
     @jwt_required
     def put(self, category_id, recipe_id):
@@ -161,12 +158,14 @@ class Recipee(Resource):
             :param str description: The new recipe description
             :return: A dictionary with a message
         '''
-
-        the_recipe = Recipe.query.filter_by(category_id=category_id,
+        user_id = get_jwt_identity()
+        the_recipe = Recipe.query.filter_by(created_by=user_id,
+                                            category_id=category_id,
                                             recipe_id=recipe_id).first()
+
         if the_recipe is None:
-            return {'message': 'The recipe does not exist'}, 404
-        args = recipe_parser.parse_args()
+            return {'message': f'No recipe with id {recipe_id}'}, 404
+        args = RECIPE_PARSER.parse_args()
         recipe_name = args.recipe_name
         description = args.description
 
@@ -203,11 +202,12 @@ class Recipee(Resource):
             :param str description: The new recipe description
             :return: A dictionary with a message
         '''
-
-        the_recipe = Recipe.query.filter_by(category_id=category_id,
+        user_id = get_jwt_identity()
+        the_recipe = Recipe.query.filter_by(created_by=user_id,
+                                            category_id=category_id,
                                             recipe_id=recipe_id).first()
         if the_recipe is None:
-            return {'message': 'The recipe does not exist'}
+            return {'message': f'recipe id {recipe_id} does not exist'}
         db.session.delete(the_recipe)
         db.session.commit()
         return {'message': 'Recipe was deleted'}
