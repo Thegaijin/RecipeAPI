@@ -1,9 +1,14 @@
+''' This script has the app factory of the application which loads the
+    extensions and reusable packages as well as the configuration settings.
+'''
+
 from flask import Flask, jsonify
 from flask_jwt_extended import JWTManager
 
 from instance.config import app_config
-from .db import db
 from app.models.blacklist import Blacklist
+from .db import db
+
 
 jwt = JWTManager()
 

@@ -1,3 +1,5 @@
+''' This script handles pagination of recipe get request data '''
+
 from flask import jsonify
 
 from .serializers import RecipeSchema
