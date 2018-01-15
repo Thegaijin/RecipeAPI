@@ -57,4 +57,5 @@ def check_if_token_in_blacklist(decrypted_token):
 
 @jwt.revoked_token_loader
 def my_revoked_token_callback():
+    ''' Checks if a user attempts to log in with revoked token '''
     return jsonify({'message': 'You must be logged in to access this page'})

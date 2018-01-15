@@ -3,7 +3,7 @@
 from flask import jsonify
 
 from .serializers import RecipeSchema
-
+THE_PAGE = 1
 PER_PAGE_MIN = 5
 PER_PAGE_MAX = 10
 
@@ -20,30 +20,30 @@ def manage_get_recipes(the_recipes, args):
         :return:
     """
 
-    if the_recipes:
-        q = args.get('q', '')
-        page = args.get('page', 1)
-        per_page = args.get('per_page', 10)
-        if per_page is None or per_page < PER_PAGE_MIN:
-            per_page = PER_PAGE_MIN
-        if per_page > PER_PAGE_MAX:
-            per_page = PER_PAGE_MAX
-        if q:
-            q = q.lower()
-            for a_recipe in the_recipes.all():
-                if q in a_recipe.recipe_name:
-                    recipeschema = RecipeSchema()
-                    the_recipe = recipeschema.dump(a_recipe)
-                    return jsonify(the_recipe.data)
-        pag_recipes = the_recipes.paginate(
-            page, per_page, error_out=False)
-        paginated = []
-        for a_recipe in pag_recipes.items:
-            paginated.append(a_recipe)
-        recipesschema = RecipeSchema(many=True)
-        all_recipes = recipesschema.dump(paginated)
-        return jsonify(all_recipes)
-    return {'message': 'There are no recipes'}
+    q = args.get('q', '')
+    page = args.get('page', THE_PAGE)
+    per_page = args.get('per_page', PER_PAGE_MAX)
+    if per_page is None or per_page < PER_PAGE_MIN:
+        per_page = PER_PAGE_MIN
+    if per_page > PER_PAGE_MAX:
+        per_page = PER_PAGE_MAX
+    if q:
+        q = q.lower()
+        for a_recipe in the_recipes.all():
+            if q in a_recipe.recipe_name:
+                recipeschema = RecipeSchema()
+                the_recipe = recipeschema.dump(a_recipe)
+                return jsonify(the_recipe.data)
+    pag_recipes = the_recipes.paginate(
+        page, per_page, error_out=False)
+    if not pag_recipes.items:
+        return {'message': f'There are no recipes on page {page}'}
+    paginated = []
+    for a_recipe in pag_recipes.items:
+        paginated.append(a_recipe)
+    recipesschema = RecipeSchema(many=True)
+    all_recipes = recipesschema.dump(paginated)
+    return jsonify(all_recipes)
 
 
 def manage_get_recipe(the_recipe):

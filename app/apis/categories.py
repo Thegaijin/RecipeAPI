@@ -65,13 +65,17 @@ class Categories(Resource):
             q = q.lower()
             the_categories = Category.query.filter(
                 Category.category_name.like("%" + q + "%"))
+
             for a_category in the_categories.all():
                 if q in a_category.category_name.lower():
                     categoryschema = CategorySchema()
                     the_category = categoryschema.dump(a_category)
                     return jsonify(the_category.data)
+
         pag_categories = the_categories.paginate(
             page, per_page, error_out=False)
+        if not pag_categories.items:
+            return {'message': f'There are no categories on page {page}'}
         paginated = []
         for a_category in pag_categories.items:
             paginated.append(a_category)
@@ -113,8 +117,9 @@ class Categories(Resource):
                 'category_id': a_category.category_id
             }
             return the_response, 201
-        return {'message': 'The category name should comprise of alphabetical '
-                'characters and can be more than one word'}, 400
+        return {'message': f'{category_name} is not a valid name. Category '
+                'names can only comprise of alphabetical characters & can be '
+                'more than one word'}, 400
 
 
 @api.route('/<int:category_id>/')
@@ -126,11 +131,12 @@ class Categoryy(Resource):
     @jwt_required
     def get(self, category_id):
         ''' This method returns a category '''
-        the_category = Category.query.filter_by(
-            category_id=category_id).first()
+        user_id = get_jwt_identity()
+        the_category = Category.query.filter_by(created_by=user_id,
+                                                category_id=category_id).first()
 
         if the_category is None:
-            return {'message': 'The category doesn\'t exist'}, 404
+            return {'message': f'You don\'t have a category with id {category_id}'}, 404
         categoryschema = CategorySchema()
         get_response = categoryschema.dump(the_category)
         return jsonify(get_response.data)
@@ -154,7 +160,7 @@ class Categoryy(Resource):
         the_category = Category.query.filter_by(
             category_id=category_id).first()
         if the_category is None:
-            return {'message': 'The category does not exist'}
+            return {'message': f'Category with id {category_id} doesn\'t exist'}
 
         if not category_name:
             category_name = the_category.category_name
@@ -172,8 +178,9 @@ class Categoryy(Resource):
                 'message': 'Category details successfully edited'
             }
             return response, 200
-        return {'Input validation Error': 'The category name should comprise '
-                'of alphabetical characters and can be more than one word'}
+        return {'message': f'{category_name} is not a valid name. Category '
+                'names can only comprise of alphabetical characters & can be '
+                'more than one word'}
 
     @api.response(204, 'Category was deleted')
     @jwt_required
@@ -191,4 +198,4 @@ class Categoryy(Resource):
             db.session.delete(the_category)
             db.session.commit()
             return {'message': 'Category was deleted'}, 200
-        return {'message': 'The category does not exist'}
+        return {'message': f'Category with id {category_id} does not exist'}
