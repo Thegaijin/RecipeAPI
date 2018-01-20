@@ -22,7 +22,6 @@ class UserTestCase(BaseTestCase):
         res_1 = self.client().post('/api/v1/auth/register/', data=self.user)
         self.assertEqual(res_1.status_code, 201)
         res_2 = self.client().post('/api/v1/auth/register/', data=self.user)
-        # get the results returned in json format
         self.assertEqual(res_2.status_code, 409)
         output = json.loads(res_2.data)
         self.assertDictEqual(

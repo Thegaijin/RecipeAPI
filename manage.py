@@ -2,6 +2,7 @@
 
 import os
 from unittest import TestLoader, TextTestRunner
+from flask import redirect
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
 
@@ -26,6 +27,12 @@ def test():
     if result.wasSuccessful():
         return 0
     return 1
+
+
+@app.route('/')
+def main():
+    ''' Load the documentation on heroku '''
+    return redirect('/api/v1/')
 
 
 if __name__ == '__main__':
