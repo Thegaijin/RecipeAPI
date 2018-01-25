@@ -7,6 +7,13 @@ from .categories import api as ns_categories
 from .recipes import api as ns_recipes
 from .hello import api as ns_hello
 
+authorization = {
+    'apiKey': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'Authorization'
+    }
+}
 
 apiv1_blueprint = Blueprint('api_v1', __name__)
 apiv2_blueprint = Blueprint('api_v2', __name__)
@@ -14,7 +21,8 @@ apiv2_blueprint = Blueprint('api_v2', __name__)
 api = Api(apiv1_blueprint,
           title='Recipes API',
           version='1.0',
-          description='An API to create, read, update and delete recipes')
+          description='An API to create, read, update and delete recipes',
+          authorizations=authorization)
 
 api_2 = Api(apiv2_blueprint,
             title='My app',
