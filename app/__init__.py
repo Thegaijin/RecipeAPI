@@ -8,8 +8,9 @@ from flask_jwt_extended import JWTManager
 from instance.config import app_config
 from app.models.blacklist import Blacklist
 from .db import db
+from flask_cors import CORS
 
-
+cors = CORS()
 jwt = JWTManager()
 
 
@@ -29,6 +30,7 @@ def create_app(config_name):
     app.config['JWT_BLACKLIST_ENABLED'] = True
     app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access']
     db.init_app(app)
+    cors.init_app(app)
     jwt.init_app(app)
 
     from app.apis import apiv1_blueprint as api_v1
