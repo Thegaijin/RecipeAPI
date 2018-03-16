@@ -80,6 +80,11 @@ class Categories(Resource):
 
         pag_categories = the_categories.paginate(
             page, per_page, error_out=False)
+
+        has_next = pag_categories.has_next
+        has_prev = pag_categories.has_prev
+        pages = pag_categories.pages
+
         if not pag_categories.items:
             return {'message': f'There are no categories on page {page}'}
         paginated = []
@@ -87,7 +92,13 @@ class Categories(Resource):
             paginated.append(a_category)
         categoriesschema = CategorySchema(many=True)
         all_categories = categoriesschema.dump(paginated)
-        return jsonify(all_categories)
+
+        response = {"categories": all_categories.data,
+                    "hasNext": has_next,
+                    "hasPrev": has_prev,
+                    "pages": pages
+                    }
+        return response
 
     @api.expect(CATEGORY)
     @api.response(201, 'Category created successfully')

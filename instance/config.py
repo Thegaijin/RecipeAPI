@@ -6,8 +6,13 @@ class Config(object):
     DEBUG = False
     CSRF_ENABLED = True
     SECRET_KEY = "x7êr(9rty%$$#NV^h_=+4"
-    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/recipe_db'
+    #  SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/recipe_db'
     # RESTPLUS_VALIDATE = True
+
+    if os.environ.get('DATABASE_URL') is None:
+        SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/recipe_db'
+    else:
+        SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 
 
 class DevelopmentConfig(Config):

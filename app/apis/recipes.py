@@ -167,14 +167,13 @@ class Recipee(Resource):
         the_recipe = Recipe.query.filter_by(created_by=user_id,
                                             category_id=category_id,
                                             recipe_id=recipe_id).first()
-        print('***The the recipe from DB', the_recipe.recipe_id, the_recipe.recipe_name, the_recipe.ingredients)
+        
         if the_recipe is None:
             return {'message': f'No recipe with id {recipe_id}'}, 404
         args = EDIT_PARSER.parse_args()
         recipe_name = args.recipe_name
         ingredients = args.ingredients
-        print("&&&&&&&&&& args ***", args)
-        print("&&&&&&&&&& ***", args, recipe_name, ingredients)
+        
         if not recipe_name:
             recipe_name = the_recipe.recipe_name
         if not ingredients:
@@ -187,14 +186,14 @@ class Recipee(Resource):
         if validated_name:
             the_recipe.recipe_name = recipe_name
             the_recipe.ingredients = ingredients
-            print("After validation", the_recipe)
+            
             db.session.add(the_recipe)
             db.session.commit()
             response = {
                 'status': 'Success',
                 'message': 'Recipe details successfully edited'
             }
-            print("$$$$$%%%%%%%%%######", response)
+            
             return response, 200
         return {'message': 'The recipe name should comprise alphabetical'
                 ' characters and can be more than one word'}
