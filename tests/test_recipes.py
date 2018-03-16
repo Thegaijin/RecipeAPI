@@ -109,7 +109,7 @@ class RecipeTestCase(BaseTestCase):
         self.assertEqual(create_res.status_code, 201)
         create_res = json.loads(create_res.data)
         new_details = {"recipe_name": "new_name",
-                       "description": "new_description"}
+                       "ingredients": "new_ingredients"}
         edit_res = self.client().put('/api/v1/recipes/{}/{}/'.format(
             category_res['category_id'], create_res['recipe_id']),
             headers=dict(Authorization="Bearer " + token), data=new_details)

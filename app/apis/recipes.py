@@ -15,19 +15,19 @@ api = Namespace(
 
 recipe = api.model('Recipe', {
     'recipe_name': fields.String(required=True, description='Recipe name'),
-    'description': fields.String(required=True,
-                                 description='Recipe description'),
+    'ingredients': fields.String(required=True,
+                                 description='Recipe ingredients'),
 })
 
 RECIPE_PARSER = reqparse.RequestParser(bundle_errors=True)
 RECIPE_PARSER.add_argument(
     'recipe_name', required=True, help='Try again: {error_msg}')
-RECIPE_PARSER.add_argument('description', required=True, default='')
+RECIPE_PARSER.add_argument('ingredients', required=True, default='')
 
 EDIT_PARSER = reqparse.RequestParser(bundle_errors=True)
 EDIT_PARSER.add_argument(
     'recipe_name', required=False, help='Try again: {error_msg}')
-EDIT_PARSER.add_argument('description', required=False, default='')
+EDIT_PARSER.add_argument('ingredients', required=False, default='')
 
 Q_PARSER = reqparse.RequestParser(bundle_errors=True)
 Q_PARSER.add_argument('q', help='search', location='args')
@@ -98,20 +98,20 @@ class Recipes(Resource):
         user_id = get_jwt_identity()
         args = RECIPE_PARSER.parse_args()
         recipe_name = args.recipe_name
-        description = args.description
+        ingredients = args.ingredients
         category_id = category_id
         created_by = user_id
 
         validated_name = name_validator(recipe_name)
         if validated_name:
             recipe_name = recipe_name.lower()
-            description = description.lower()
+            ingredients = ingredients.lower()
 
             if Recipe.query.filter_by(created_by=created_by,
                                       category_id=category_id,
                                       recipe_name=recipe_name).first() is not None:
                 return {'message': 'Recipe already exists'}
-            a_recipe = Recipe(recipe_name, description,
+            a_recipe = Recipe(recipe_name, ingredients,
                               category_id, created_by)
 
             db.session.add(a_recipe)
@@ -160,38 +160,41 @@ class Recipee(Resource):
             edits it with the new details.
 
             :param str recipe_id: The new recipe id
-            :param str description: The new recipe description
+            :param str ingredients: The new recipe ingredients
             :return: A dictionary with a message
         '''
         user_id = get_jwt_identity()
         the_recipe = Recipe.query.filter_by(created_by=user_id,
                                             category_id=category_id,
                                             recipe_id=recipe_id).first()
-
+        print('***The the recipe from DB', the_recipe.recipe_id, the_recipe.recipe_name, the_recipe.ingredients)
         if the_recipe is None:
             return {'message': f'No recipe with id {recipe_id}'}, 404
         args = EDIT_PARSER.parse_args()
         recipe_name = args.recipe_name
-        description = args.description
-
+        ingredients = args.ingredients
+        print("&&&&&&&&&& args ***", args)
+        print("&&&&&&&&&& ***", args, recipe_name, ingredients)
         if not recipe_name:
             recipe_name = the_recipe.recipe_name
-        if not description:
-            description = the_recipe.ingredients
+        if not ingredients:
+            ingredients = the_recipe.ingredients
 
         recipe_name = recipe_name.lower()
-        description = description.lower()
+        ingredients = ingredients.lower()
 
         validated_name = name_validator(recipe_name)
         if validated_name:
             the_recipe.recipe_name = recipe_name
-            the_recipe.ingredients = description
+            the_recipe.ingredients = ingredients
+            print("After validation", the_recipe)
             db.session.add(the_recipe)
             db.session.commit()
             response = {
                 'status': 'Success',
                 'message': 'Recipe details successfully edited'
             }
+            print("$$$$$%%%%%%%%%######", response)
             return response, 200
         return {'message': 'The recipe name should comprise alphabetical'
                 ' characters and can be more than one word'}
@@ -204,7 +207,7 @@ class Recipee(Resource):
             deletes it.
 
             :param str recipe_id: The new recipe id
-            :param str description: The new recipe description
+            :param str ingredients: The new recipe ingredients
             :return: A dictionary with a message
         '''
         user_id = get_jwt_identity()

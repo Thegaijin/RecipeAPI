@@ -21,9 +21,9 @@ class BaseTestCase(TestCase):
         self.category1 = {"category_name": "category one",
                           "description": "description one"}
         self.recipe = {"recipe_name": "recipe",
-                       "description": "description"}
+                       "ingredients": "description"}
         self.recipe1 = {"recipe_name": "recipe one",
-                        "description": "description one"}
+                        "ingredients": "description one"}
         self.wrong_cred = {'username': 'username',
                            'password': '12345'}
 
