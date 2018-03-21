@@ -1,14 +1,18 @@
+# recipes.py
+
 ''' This script handles the recipes CRUD '''
 
 from flask import request
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restplus import fields, Namespace, Resource, reqparse
+from sqlalchemy import func
 
 from app import db
 from app.models.recipe import Recipe
 from ..validation_helper import name_validator
-from ..get_helper import manage_get_recipes, manage_get_recipe
-
+from ..get_helper import (
+    manage_get_recipes, manage_get_recipe, PER_PAGE_MAX, PER_PAGE_MIN)
+from ..serializers import RecipeSchema
 
 api = Namespace(
     'recipes', description='Creating, viewing, editing and deleting recipes')
@@ -36,6 +40,8 @@ Q_PARSER.add_argument(
 Q_PARSER.add_argument('per_page', type=int,
                       help='Try again: {error_msg}', location='args')
 
+# Not consumed
+
 
 @api.route('/')
 class Recipess(Resource):
@@ -53,8 +59,26 @@ class Recipess(Resource):
         '''
         user_id = get_jwt_identity()
         the_recipes = Recipe.query.filter_by(created_by=user_id)
+
         args = Q_PARSER.parse_args(request)
+        q = args.get('q', ' ')
+        #  page = args.get('page', THE_PAGE)
+        per_page = args.get('per_page', PER_PAGE_MAX)
+        if per_page is None or per_page < PER_PAGE_MIN:
+            per_page = PER_PAGE_MIN
+        if per_page > PER_PAGE_MAX:
+            per_page = PER_PAGE_MAX
+
+        if q:
+            q = q.lower()
+            the_recipes = Recipe.query.filter(
+                (Recipe.created_by == user_id),
+                ((Recipe.recipe_name).ilike("%" + q + "%"))
+            )
+
         return manage_get_recipes(the_recipes, args)
+
+# Consumed for view and search
 
 
 @api.route('/<int:category_id>/')
@@ -76,10 +100,30 @@ class Recipes(Resource):
 
         user_id = get_jwt_identity()
         the_recipes = Recipe.query.filter_by(
-            created_by=user_id, category_id=category_id)
+            created_by=user_id, category_id=category_id).order_by("recipe_id desc")
+        print("the_recipes", the_recipes)
+
         args = Q_PARSER.parse_args(request)
+        q = args.get('q', ' ')
+
         if not the_recipes.all():
             return {'message': f'No recipes in category {category_id}'}, 404
+
+        if q:
+            q = q.lower()
+            the_recipes = Recipe.query.filter(
+                (Recipe.created_by == user_id),
+                (func.lower(Recipe.recipe_name).like("%" + q + "%"))
+            )
+            recipesschema = RecipeSchema(many=True)
+            search_recipes = recipesschema.dump(the_recipes)
+
+            response = {
+                "recipes": search_recipes.data,
+                "message": "These are the recipes",
+            }
+            print("the search recipe response", search_recipes.data)
+            return response
         return manage_get_recipes(the_recipes, args)
 
     # specifies the expected input fields
@@ -90,7 +134,6 @@ class Recipes(Resource):
         ''' A method to create a recipe.
             Checks if a recipe id exists in the given category, if it doesn\'t
             it creates the new recipe,if it does,it returns a message
-
             :param int category_id: The category id to which the recipe belongs
             :return: A dictionary with a message and status code
         '''
@@ -104,8 +147,8 @@ class Recipes(Resource):
 
         validated_name = name_validator(recipe_name)
         if validated_name:
-            recipe_name = recipe_name.lower()
-            ingredients = ingredients.lower()
+            recipe_name = recipe_name
+            ingredients = ingredients
 
             if Recipe.query.filter_by(created_by=created_by,
                                       category_id=category_id,
@@ -167,13 +210,13 @@ class Recipee(Resource):
         the_recipe = Recipe.query.filter_by(created_by=user_id,
                                             category_id=category_id,
                                             recipe_id=recipe_id).first()
-        
+
         if the_recipe is None:
             return {'message': f'No recipe with id {recipe_id}'}, 404
         args = EDIT_PARSER.parse_args()
         recipe_name = args.recipe_name
         ingredients = args.ingredients
-        
+
         if not recipe_name:
             recipe_name = the_recipe.recipe_name
         if not ingredients:
@@ -186,14 +229,14 @@ class Recipee(Resource):
         if validated_name:
             the_recipe.recipe_name = recipe_name
             the_recipe.ingredients = ingredients
-            
+
             db.session.add(the_recipe)
             db.session.commit()
             response = {
                 'status': 'Success',
                 'message': 'Recipe details successfully edited'
             }
-            
+
             return response, 200
         return {'message': 'The recipe name should comprise alphabetical'
                 ' characters and can be more than one word'}

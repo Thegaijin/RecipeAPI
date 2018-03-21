@@ -1,3 +1,4 @@
+# get_helper.py
 ''' This script handles pagination of recipe get request data '''
 
 from flask import jsonify
@@ -27,15 +28,21 @@ def manage_get_recipes(the_recipes, args):
         per_page = PER_PAGE_MIN
     if per_page > PER_PAGE_MAX:
         per_page = PER_PAGE_MAX
-    if q:
-        q = q.lower()
-        for a_recipe in the_recipes.all():
+
+    for a_recipe in the_recipes.all():
+        if q:
+            q = q.lower()
             if q in a_recipe.recipe_name:
                 recipeschema = RecipeSchema()
                 the_recipe = recipeschema.dump(a_recipe)
                 return jsonify(the_recipe.data)
+
     pag_recipes = the_recipes.paginate(
         page, per_page, error_out=False)
+
+    pages = pag_recipes.pages
+    page = pag_recipes.page
+    categoryId = 0
     if not pag_recipes.items:
         return {'message': f'There are no recipes on page {page}'}
     paginated = []
@@ -43,7 +50,15 @@ def manage_get_recipes(the_recipes, args):
         paginated.append(a_recipe)
     recipesschema = RecipeSchema(many=True)
     all_recipes = recipesschema.dump(paginated)
-    return jsonify(all_recipes)
+
+    response = {"recipes": all_recipes.data,
+                "message": "These are the recipes",
+                "recipePages": pages,
+                "recipePage": page,
+                "categoryId": categoryId,
+                }
+    print("the recipe response", response)
+    return response
 
 
 def manage_get_recipe(the_recipe):
