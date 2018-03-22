@@ -82,7 +82,7 @@ class Categories(Resource):
                       the_categories.data)
 
                 response = {"categories": the_categories.data,
-                            "message": "These the category search results"
+                            "message": "These are the category search results"
                             }
                 return response
         pag_categories = the_categories.paginate(
@@ -136,7 +136,7 @@ class Categories(Resource):
             db.session.commit()
             the_response = {
                 'status': 'Success',
-                'message': 'Category was created',
+                'message': f'{category_name} category was created',
                 'category_id': a_category.category_id
             }
             return the_response, 201

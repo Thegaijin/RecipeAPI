@@ -120,7 +120,7 @@ class Recipes(Resource):
 
             response = {
                 "recipes": search_recipes.data,
-                "message": "These are the recipes",
+                "message": "These are your recipes",
             }
             print("the search recipe response", search_recipes.data)
             return response
@@ -161,7 +161,7 @@ class Recipes(Resource):
             db.session.commit()
             response = {
                 'status': 'Success',
-                'message': 'Recipe has been created',
+                'message': f'{recipe_name} recipe has been created',
                 'recipe_id': a_recipe.recipe_id
             }
             return response, 201
@@ -239,7 +239,7 @@ class Recipee(Resource):
 
             return response, 200
         return {'message': 'The recipe name should comprise alphabetical'
-                ' characters and can be more than one word'}
+                ' characters and can be more than one word'}, 401
 
     @api.response(204, 'Success')
     @jwt_required
@@ -260,4 +260,4 @@ class Recipee(Resource):
             return {'message': f'recipe id {recipe_id} does not exist'}
         db.session.delete(the_recipe)
         db.session.commit()
-        return {'message': 'Recipe was deleted'}
+        return {'message': 'Recipe was deleted'}, 200
