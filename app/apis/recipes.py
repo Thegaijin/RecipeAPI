@@ -101,7 +101,7 @@ class Recipes(Resource):
         user_id = get_jwt_identity()
         the_recipes = Recipe.query.filter_by(
             created_by=user_id, category_id=category_id).order_by("recipe_id desc")
-        print("the_recipes", the_recipes)
+        # print("the_recipes", the_recipes)
 
         args = Q_PARSER.parse_args(request)
         q = args.get('q', ' ')
@@ -122,7 +122,6 @@ class Recipes(Resource):
                 "recipes": search_recipes.data,
                 "message": "These are your recipes",
             }
-            print("the search recipe response", search_recipes.data)
             return response
         return manage_get_recipes(the_recipes, args)
 
@@ -236,7 +235,7 @@ class Recipee(Resource):
                 'status': 'Success',
                 'message': 'Recipe details successfully edited'
             }
-
+            print(response, 'editing recipes')
             return response, 200
         return {'message': 'The recipe name should comprise alphabetical'
                 ' characters and can be more than one word'}, 401

@@ -74,12 +74,12 @@ class Categories(Resource):
             the_categories = Category.query.filter(
                 (Category.created_by == user_id),
                 (func.lower(Category.category_name).ilike("%" + q + "%")))
-            print("qqqqqqqqqqqqqqqqqqqq", the_categories.all())
+            # print("qqqqqqqqqqqqqqqqqqqq", the_categories.all())
             if the_categories.all():
                 categorieschema = CategorySchema(many=True)
                 the_categories = categorieschema.dump(the_categories)
-                print("<<<<<<<<<<<<<<<<>>>>>>>>>>>>>",
-                      the_categories.data)
+                # print("<<<<<<<<<<<<<<<<>>>>>>>>>>>>>",
+                #       the_categories.data)
 
                 response = {"categories": the_categories.data,
                             "message": "These are the category search results"
@@ -98,7 +98,7 @@ class Categories(Resource):
             paginated.append(a_category)
         categoriesschema = CategorySchema(many=True)
         all_categories = categoriesschema.dump(paginated)
-        print("<><><><><><><><><><><><><><><>", all_categories.data)
+        # print("<><><><><><><><><><><><><><><>", all_categories.data)
         response = {"categories": all_categories.data,
                     "message": "These are your categories",
                     "categoryPages": pages,

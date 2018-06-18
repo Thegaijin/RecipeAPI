@@ -57,7 +57,7 @@ def manage_get_recipes(the_recipes, args):
                 "recipePage": page,
                 "categoryId": categoryId,
                 }
-    print("the recipe response", response)
+    # print("the recipe response", response)
     return response
 
 

@@ -5,7 +5,7 @@ import os
 class Config(object):
     """ The configurations all the environments should have."""
     DEBUG = False
-    CSRF_ENABLED = True
+    # CSRF_ENABLED = True
     # SECRET_KEY = "x7êr(9rty%$$#NV^h_=+4"
     SECRET_KEY = os.environ['SECRET_KEY']
     #  SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/recipe_db'
@@ -21,6 +21,7 @@ class DevelopmentConfig(Config):
     """Configurations for Development."""
     DEBUG = True
     RESTPLUS_VALIDATE = True
+    RESTPLUS_MASK_SWAGGER = False
 
 
 class TestingConfig(Config):

@@ -11,6 +11,9 @@ from app.db import db
 
 
 app = create_app(config_name=os.getenv('FLASK_CONFIG'))
+# print("This is the app", app)
+# print("This is the app type", type(app))
+# print("This is the app config", app.config)
 migrate = Migrate(app, db)
 manager = Manager(app)
 manager.add_command('db', MigrateCommand)
