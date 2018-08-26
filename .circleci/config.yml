@@ -45,8 +45,7 @@ jobs:
       - run:
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
-            docker-compose build
-            docker-compose ps
+            docker build -t $DOCKER_USER/recipeAPI
             docker ps -a
             docker images
-            docker-compose push circleci/$DOCKER_USER/project_web
+            docker push $DOCKER_USER/recipeAPI
