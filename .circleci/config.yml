@@ -45,6 +45,6 @@ jobs:
       - run:
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
-            docker-compose build -d
+            docker-compose build
             docker-compose ps
             # docker-compose push $DOCKER_USER/project_web
