@@ -47,4 +47,6 @@ jobs:
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker-compose build
             docker-compose ps
+            docker ps -a
+            docker images
             # docker-compose push $DOCKER_USER/project_web
