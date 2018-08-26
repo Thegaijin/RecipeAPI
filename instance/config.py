@@ -12,7 +12,7 @@ class Config(object):
     # RESTPLUS_VALIDATE = True
 
     if os.environ.get('DATABASE_URL') is None:
-        SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/recipe_db'
+        SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/${POSTGRES_DB}'
     else:
         SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 
