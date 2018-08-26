@@ -1,24 +1,29 @@
-FROM python:3
+FROM ubuntu:latest
 MAINTAINER Thegaijin "devoprentice@gmail.com"
 
+# Update image
+RUN apt-get update -y && apt-get install -y python3.6 python3-pip python3.6-gdbm nginx
+
+RUN rm -rf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+
+COPY default /etc/nginx/sites-available/
+
+RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+
 # Create a directory where our app will be placed
-RUN mkdir -p /usr/src/app
+RUN mkdir -p /app
 
 # Change directory so that our commands run inside this new directory
-WORKDIR /usr/src/app
+WORKDIR /app
 
 # Get all the code needed to run the app
-COPY . /usr/src/app
+COPY . /app
 
-# Update image
-RUN apt-get update -y
+# Install dependencies from requirements file
+RUN pip3 install --no-cache-dir -r requirements.txt
 
-# install necessary packages
-RUN apt-get install -y python3-pip python3-dev build-essential
+# open up port 5000
+EXPOSE 80
 
-COPY . /RECIPEAPI
-WORKDIR /RECIPEAPI
-RUN pip3 install -r requirements.txt
-EXPOSE 5000
-
-CMD ["python" "manage.py" "runserver"]
+# restart nginx
+CMD /app/start_nginx.sh && /usr/bin/python3 manage.py runserver
