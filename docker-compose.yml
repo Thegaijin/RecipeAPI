@@ -3,7 +3,8 @@ services:
   web:
     restart: always
     build: .
-    container_name: recipeAPI
+    container_name: recipeapi
+    image: thegaijin/recipeapi
     ports:
       - '80:80'
     environment:
