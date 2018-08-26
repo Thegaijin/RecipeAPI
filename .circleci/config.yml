@@ -45,7 +45,7 @@ jobs:
       - run:
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
-            docker build -t $DOCKER_USER/recipeapi
+            docker build -t $DOCKER_USER/recipeapi .
             docker ps -a
             docker images
             docker push $DOCKER_USER/recipeapi
