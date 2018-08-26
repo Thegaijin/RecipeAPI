@@ -32,18 +32,24 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt
+            pip install awscli
       - run:
           command: |
             . venv/bin/activate
+            pip3 install awscli
             pytest
       - store_artifacts:
           path: test-reports/
           destination: tr1
       - store_test_results:
           path: test-reports/
-      - setup_remote_docker
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker-compose up
             docker-compose push
+      - run:
+          name: Install aws cli
+          command: sudo apt-get -y -qq install awscli
