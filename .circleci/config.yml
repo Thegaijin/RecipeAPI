@@ -43,15 +43,9 @@ jobs:
           path: test-reports/
       - setup_remote_docker
       - run:
-          name: Install Docker Compose
-          command: >
-            set -x curl -L
-            https://github.com/docker/compose/releases/download/1.19.0/docker-compose-`uname
-            -s`-`uname -m` > /usr/local/bin/docker-compose
-
-            chmod +x /usr/local/bin/docker-compose
-      - run:
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
-            docker-compose build
-            docker-compose push
+            docker build -t $DOCKER_USER/recipeapi .
+            docker ps -a
+            docker images
+            docker push $DOCKER_USER/recipeapi
