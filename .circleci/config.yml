@@ -42,6 +42,6 @@ jobs:
       - store_test_results:
           path: test-reports/
       - setup_remote_docker
-      - run: docker login $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
       - run: docker-compose build
       - run: docker-compose push $DOCKER_USER/recipeAPI
