@@ -42,6 +42,9 @@ jobs:
       - store_test_results:
           path: test-reports/
       - setup_remote_docker
-      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
-      - run: docker-compose build
-      - run: docker-compose push $DOCKER_USER/project_web
+      - run:
+          command: |
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker-compose build -d
+            docker-compose ps
+            # docker-compose push $DOCKER_USER/project_web
