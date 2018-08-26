@@ -4,7 +4,6 @@ services:
     restart: always
     build: .
     container_name: recipeAPI
-    image: thegaijin/recipeAPI
     ports:
       - '80:80'
     environment:
