@@ -11,6 +11,7 @@ jobs:
           POSTGRES_USER: circleci
           POSTGRES_DB: test_db
           POSTGRES_PASSWORD: ''
+    working_directory: ~/app
     steps:
       - checkout
       - run: mkdir test-reports
