@@ -11,13 +11,13 @@ COPY default /etc/nginx/sites-available/
 RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 
 # Create a directory where our app will be placed
-RUN mkdir -p /project
+RUN mkdir -p /app
 
 # Change directory so that our commands run inside this new directory
-WORKDIR /project
+WORKDIR /app
 
 # Get all the code needed to run the app
-COPY . /project
+COPY . /app
 
 # Install dependencies from requirements file
 RUN pip3 install --no-cache-dir -r requirements.txt
