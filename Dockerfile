@@ -26,4 +26,4 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 EXPOSE 80
 
 # restart nginx
-CMD pwd && /app/start_nginx.sh && /usr/bin/python3 manage.py runserver
+CMD ls -la && pwd && /app/start_nginx.sh && /usr/bin/python3 manage.py runserver
