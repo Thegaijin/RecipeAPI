@@ -17,6 +17,7 @@ jobs:
     <<: *defaults
     steps:
       - checkout
+          path: ~/app
       - run: mkdir test-reports
       - run:
           name: Download Selenium
