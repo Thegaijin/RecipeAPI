@@ -38,6 +38,7 @@ jobs:
             . venv/bin/activate
             pip3 install awscli
             pytest
+            ls -la
       - store_artifacts:
           path: test-reports/
           destination: tr1
