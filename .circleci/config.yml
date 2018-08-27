@@ -9,7 +9,7 @@ default: &defaults
         POSTGRES_USER: circleci
         POSTGRES_DB: test_db
         POSTGRES_PASSWORD: ''
-  working_directory: ~/app
+  working_directory: ~/project
 
 version: 2
 jobs:
@@ -18,7 +18,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: ~/app
+          at: ~/project
       - run: mkdir test-reports
       - run:
           name: Download Selenium
@@ -56,7 +56,7 @@ jobs:
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             ls -la
             pwd
-            docker-compose up
+            docker-compose up -d
             docker-compose push
       - run:
           name: Install aws cli
