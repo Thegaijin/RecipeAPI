@@ -1,5 +1,5 @@
-default:
-  docker: &ref_0
+default: &defaults
+  docker:
     - image: 'circleci/python:3.6.2-stretch-browsers'
       environment:
         FLASK_CONFIG: testing
@@ -10,11 +10,11 @@ default:
         POSTGRES_DB: test_db
         POSTGRES_PASSWORD: ''
   working_directory: ~/app
+
 version: 2
 jobs:
   build:
-    docker: *ref_0
-    working_directory: ~/app
+    <<: *defaults
     steps:
       - checkout
       - run: mkdir test-reports
