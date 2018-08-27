@@ -1,16 +1,19 @@
+default:
+  docker: &ref_0
+    - image: 'circleci/python:3.6.2-stretch-browsers'
+      environment:
+        FLASK_CONFIG: testing
+        TEST_DATABASE_URL: 'postgresql://ubuntu@localhost/circle_test?sslmode=disable'
+    - image: 'circleci/postgres:9.6.5-alpine-ram'
+      environment:
+        POSTGRES_USER: circleci
+        POSTGRES_DB: test_db
+        POSTGRES_PASSWORD: ''
+  working_directory: ~/app
 version: 2
 jobs:
   build:
-    docker:
-      - image: 'circleci/python:3.6.2-stretch-browsers'
-        environment:
-          FLASK_CONFIG: testing
-          TEST_DATABASE_URL: 'postgresql://ubuntu@localhost/circle_test?sslmode=disable'
-      - image: 'circleci/postgres:9.6.5-alpine-ram'
-        environment:
-          POSTGRES_USER: circleci
-          POSTGRES_DB: test_db
-          POSTGRES_PASSWORD: ''
+    docker: *ref_0
     working_directory: ~/app
     steps:
       - checkout
