@@ -37,18 +37,18 @@ if [[ ${THE_CLUSTER} == ${CLUSTER_NAME} ]]; then
 if
 
 
-if [ $THE_CLUSTER == false ]; then
-	echo "Creating cluster..."
-	kops create cluster --dns-zone thegaijin.xyz --zones us-east-1a --master-size t2.micro --node-size t2.micro --name $CLUSTER_NAME --ssh-public-key /home/ubuntu/.ssh/id_rsa.pub --yes
-	echo "************************ validate cluster **************************"
-	while true; do
-	kops validate cluster --name $CLUSTER_NAME | grep 'is ready' &> /dev/null
-	if [ $? == 0 ]; then
-		break
-	fi
-	  sleep 30
-done
-fi
+# if [ $THE_CLUSTER == false ]; then
+# 	echo "Creating cluster..."
+# 	kops create cluster --dns-zone thegaijin.xyz --zones us-east-1a --master-size t2.micro --node-size t2.micro --name $CLUSTER_NAME --ssh-public-key /home/ubuntu/.ssh/id_rsa.pub --yes
+# 	echo "************************ validate cluster **************************"
+# 	while true; do
+# 	kops validate cluster --name $CLUSTER_NAME | grep 'is ready' &> /dev/null
+# 	if [ $? == 0 ]; then
+# 		break
+# 	fi
+# 	  sleep 30
+# done
+# fi
 
 echo "<<<<<<<<<<<<< get the cluster >>>>>>>>>>>>>"
 kops get cluster
