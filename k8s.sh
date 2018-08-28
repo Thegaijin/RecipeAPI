@@ -21,7 +21,7 @@ if [ ${found_bucket} == false ]; then
 fi
 
 echo "Generate public key from pem file"
-echo ${PEM_FILE} > key-pair.json
+echo ${PEM_FILE} > ~/project/key-pair.json
 ls -la
 pwd
 chmod 400 ~/project/key-pair.pem
