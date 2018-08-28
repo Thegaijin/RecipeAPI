@@ -20,12 +20,12 @@ if [ ${found_bucket} == false ]; then
 	export KOPS_STATE_STORE=s3://${BUCKET_NAME}
 fi
 
-echo "Generate public key from pem file"
-echo ${PEM_FILE} > ~/project/key-pair.pem
-ls -la
-pwd
-chmod 400 ~/project/key-pair.pem
-ssh-keygen -y -f ~/project/key-pair.pem > ~/project/id_rsa.pub
+# echo "Generate public key from pem file"
+# echo ${PEM_FILE} > ~/project/key-pair.pem
+# ls -la
+# pwd
+# chmod 400 ~/project/key-pair.pem
+# ssh-keygen -y -f ~/project/key-pair.pem > ~/project/id_rsa.pub
 
 CLUSTERS="$(kops get clusters)"
 FOUND_CLUSTER=false
