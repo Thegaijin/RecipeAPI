@@ -24,8 +24,8 @@ echo "Generate public key from pem file"
 echo ${PEM_FILE} > key-pair.json
 ls -la
 pwd
-chmod 400 key-pair.pem
-ssh-keygen -y -f key-pair.pem > id_rsa.pub
+chmod 400 /project/key-pair.pem
+ssh-keygen -y -f /project/key-pair.pem > /project/id_rsa.pub
 
 CLUSTERS="$(kops get clusters)"
 FOUND_CLUSTER=false

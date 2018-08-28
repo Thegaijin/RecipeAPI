@@ -65,6 +65,7 @@ jobs:
             docker-compose up -d
             docker-compose push
             echo ${BUCKET_NAME}
+            echo ${PATH}
       # - run:
       #     name: Install aws cli
       #     command: sudo apt-get -y -qq install awscli
