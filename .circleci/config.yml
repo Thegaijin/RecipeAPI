@@ -15,8 +15,6 @@ version: 2
 jobs:
   build:
     <<: *defaults
-    docker:
-      - image: 'thegaijin/cc-python-k8ps:v1'
     steps:
       - checkout
       - attach_workspace:
@@ -44,13 +42,15 @@ jobs:
       - run:
           command: |
             . venv/bin/activate
-            pip3 install awscli
             pytest
       - store_artifacts:
           path: test-reports/
           destination: tr1
       - store_test_results:
           path: test-reports/
+  deploy:
+    <<: *defaults
+    steps:
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
