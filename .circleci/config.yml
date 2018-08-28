@@ -38,7 +38,6 @@ jobs:
             python3 -m venv venv
             . venv/bin/activate
             pip install -r requirements.txt
-            pip install awscli
       - run:
           command: |
             . venv/bin/activate
@@ -64,6 +63,9 @@ jobs:
             pwd
             docker-compose up -d
             docker-compose push
+            echo $BUCKET_NAME
+            echo ${BUCKET_NAME}
+            export KOPS_STATE_STORE=s3://$BUCKET_NAME
       # - run:
       #     name: Install aws cli
       #     command: sudo apt-get -y -qq install awscli
