@@ -21,8 +21,10 @@ if [ ${found_bucket} == false ]; then
 fi
 
 echo "Generate public key from pem file"
-chmod 400 /home/ubuntu/jenk8ns-key-pair.pem
-ssh-keygen -y -f /home/ubuntu/jenk8ns-key-pair.pem > /home/ubuntu/.ssh/id_rsa.pub
+echo ${PEM_FILE} > key-pair.json
+ls -la
+chmod 400 key-pair.pem
+ssh-keygen -y -f key-pair.pem > id_rsa.pub
 
 CLUSTERS="$(kops get clusters)"
 FOUND_CLUSTER=false
