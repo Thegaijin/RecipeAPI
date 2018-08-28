@@ -2,7 +2,7 @@ echo "Get s3 bucket..."
 # Check available buckets
 buckets="$(aws s3api list-buckets | jq -r '.Buckets')"
 found_bucket=false
-
+echo "This is a bucket: ${BUCKET_NAME}"
 # check if bucket already exists
 for name in $( echo ${buckets} | jq -c '.[]'); do
 	bucket_names=$(echo ${name} | jq -r '.Name')
