@@ -50,6 +50,9 @@ jobs:
   deploy:
     docker:
       - image: 'thegaijin/cc-python-k8ps:v2'
+        environment:
+          FLASK_CONFIG: ${FLASK_CONFIG}
+          SECRET_KEY: ${SECRET_KEY}
     <<: *defaults
     steps:
       - checkout
@@ -60,27 +63,8 @@ jobs:
       - run:
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
-            ls -la
-            pwd
             docker-compose up -d
             docker-compose push
-            echo ${BUCKET_NAME}
-            echo ${PATH}
-      # - run:
-      #     name: Install aws cli
-      #     command: sudo apt-get -y -qq install awscli
-      # - run:
-      #     name: Install kubectl
-      #     command: |
-      #       curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.8.7/bin/linux/amd64/kubectl
-      #       chmod +x ./kubectl
-      #       sudo mv ./kubectl /usr/local/bin/kubectl
-      # - run:
-      #     name: Install kops
-      #     command: |
-      #       wget https://github.com/kubernetes/kops/releases/download/1.8.0/kops-linux-amd64
-      #       chmod +x kops-linux-amd64
-      #       mv kops-linux-amd64 /usr/local/bin/kops
       - run:
           name: List clusters
           command: |
