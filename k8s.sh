@@ -34,9 +34,9 @@ CLUSTER_NAMES="$(kops get clusters --state=s3://${BUCKET_NAME})"
 for name in ${CLUSTER_NAMES}; do
   if [ ${name} == ${CLUSTER_NAME} ]; then
     echo "this is the name ${name}"
-    kubectl apply -f -R ~/project/k8s/
+    kubectl apply -f ~/project/k8s/recipeapi_deployment.yml
   else
-    echo "There is no cluster. to deploy to.."
+    echo "There is no cluster to deploy to.."
   fi
 done
 
