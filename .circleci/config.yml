@@ -80,6 +80,8 @@ jobs:
           name: List clusters
           command: |
             kops list clusters
+    working_directory: ~/project
+
 workflows:
   version: 2
   build-and-deploy:
