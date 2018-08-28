@@ -17,9 +17,9 @@ done
 
 if [ ${found_bucket} == false ]; then
 	echo "Create the bucket..."
-	export BUCKET_NAME=$BUCKET_NAME
-	aws s3api create-bucket --bucket $BUCKET_NAME
-	export KOPS_STATE_STORE=s3://$BUCKET_NAME
+	export BUCKET_NAME=${BUCKET_NAME}
+	aws s3api create-bucket --bucket ${BUCKET_NAME}
+	export KOPS_STATE_STORE=s3://${BUCKET_NAME}
 fi
 
 echo "Generate public key from pem file"

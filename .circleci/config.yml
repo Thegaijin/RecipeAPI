@@ -50,6 +50,7 @@ jobs:
   deploy:
     docker:
       - image: 'thegaijin/cc-python-k8ps:v1'
+    <<: *defaults
     steps:
       - checkout
       - attach_workspace:
@@ -64,7 +65,6 @@ jobs:
             docker-compose up -d
             docker-compose push
             echo ${BUCKET_NAME}
-            export KOPS_STATE_STORE=s3://${BUCKET_NAME}
       # - run:
       #     name: Install aws cli
       #     command: sudo apt-get -y -qq install awscli
