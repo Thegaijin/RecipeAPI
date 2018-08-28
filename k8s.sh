@@ -4,6 +4,7 @@ buckets="$(aws s3api list-buckets | jq -r '.Buckets')"
 found_bucket=false
 echo "This is a bucket: ${BUCKET_NAME}"
 # check if bucket already exists
+echo "Checking for bucket"
 for name in $( echo ${buckets} | jq -c '.[]'); do
 	bucket_names=$(echo ${name} | jq -r '.Name')
 	the_bucket=$(echo ${bucket_names} | grep ${BUCKET_NAME})
@@ -13,6 +14,7 @@ for name in $( echo ${buckets} | jq -c '.[]'); do
 	fi
 done
 
+echo "creating bucket"
 if [ ${found_bucket} == false ]; then
 	echo "Create the bucket..."
 	export BUCKET_NAME=${BUCKET_NAME}
@@ -27,7 +29,8 @@ fi
 # chmod 400 ~/project/key-pair.pem
 # ssh-keygen -y -f ~/project/key-pair.pem > ~/project/id_rsa.pub
 
-CLUSTERS="$(kops get clusters)"
+echo "checking for cluster"
+CLUSTERS="$(kops get cluster)"
 FOUND_CLUSTER=false
 THE_CLUSTER=$(echo ${CLUSTER_NAMES} | grep ${CLUSTER_NAME})
 if [[ ${THE_CLUSTER} == ${CLUSTER_NAME} ]]; then
