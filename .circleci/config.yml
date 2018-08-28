@@ -27,6 +27,9 @@ jobs:
             http://selenium-release.storage.googleapis.com/3.5/selenium-server-standalone-3.5.3.jar
             echo $BUCKET_NAME
             echo ${BUCKET_NAME}
+            export KOPS_STATE_STORE=s3://$BUCKET_NAME
+            echo $KOPS_STATE_STORE
+            echo ${KOPS_STATE_STORE}
       - run:
           name: Start Selenium
           command: >
