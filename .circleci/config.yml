@@ -85,8 +85,6 @@ jobs:
           name: List clusters
           command: |
             pwd
-
-            touch /home/circleci/project/key-pair.pem
             ls -la
             bash k8s.sh
     working_directory: ~/project

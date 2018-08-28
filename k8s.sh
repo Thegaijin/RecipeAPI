@@ -30,19 +30,28 @@ fi
 # ssh-keygen -y -f ~/project/key-pair.pem > ~/project/id_rsa.pub
 
 echo "checking for clusters"
-CLUSTERS="$(kops get clusters --state=s3://${BUCKET_NAME})"
-echo "These are the $CLUSTERS"
-FOUND_CLUSTER=false
-THE_CLUSTER=$(echo ${CLUSTER_NAMES} | grep ${CLUSTER_NAME})
-if [[ ${THE_CLUSTER} == ${CLUSTER_NAME} ]]; then
-	FOUND_CLUSTER=true
-	break
-fi
+CLUSTER_NAMES="$(kops get clusters --state=s3://${BUCKET_NAME})"
+for name in $CLUSTER_NAMES; do
+  if [name == $CLUSTER_NAME ]; then
+    kubectl apply -f -R ~/project/k8s/
+  else
+    echo "There is no cluster. to deploy to.."
+  fi
+done
 
 
-if [ $THE_CLUSTER == false ]; then
-echo "There is no cluster..."
-fi
+# echo "These are the $CLUSTERS"
+# FOUND_CLUSTER=false
+# THE_CLUSTER=$(echo ${CLUSTERS} | grep ${CLUSTER_NAME})
+# if [[ ${THE_CLUSTER} == ${CLUSTER_NAME} ]]; then
+# 	FOUND_CLUSTER=true
+# 	break
+# fi
+
+
+# if [ $THE_CLUSTER == false ]; then
+# echo "There is no cluster..."
+# fi
 
 
 # if [ $THE_CLUSTER == false ]; then
@@ -59,9 +68,9 @@ fi
 # fi
 
 echo "<<<<<<<<<<<<< get the cluster >>>>>>>>>>>>>"
-kops get clusters
-kubectl cluster-info
+# kops get clusters
+# kubectl cluster-info
 # kubectl apply namespace ingress
 
 echo "Add Dashboard"
-kubectl create -f https://raw.githubusercontent.com/kubernetes/kops/master/addons/kubernetes-dashboard/v1.4.0.yaml
+# kubectl create -f https://raw.githubusercontent.com/kubernetes/kops/master/addons/kubernetes-dashboard/v1.4.0.yaml
