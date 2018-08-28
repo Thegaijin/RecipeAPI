@@ -52,6 +52,9 @@ jobs:
     docker:
       - image: 'thegaijin/cc-python-k8ps:v1'
     steps:
+      - checkout
+      - attach_workspace:
+          at: ~/project
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
