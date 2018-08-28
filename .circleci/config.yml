@@ -63,7 +63,6 @@ jobs:
             pwd
             docker-compose up -d
             docker-compose push
-
             echo ${BUCKET_NAME}
             export KOPS_STATE_STORE=s3://${BUCKET_NAME}
       # - run:
@@ -84,7 +83,7 @@ jobs:
       - run:
           name: List clusters
           command: |
-            kops get clusters
+            . k8s.sh
     working_directory: ~/project
 
 workflows:
