@@ -10,6 +10,7 @@ from app import create_app
 from app.db import db
 
 
+FLASK_CONFIG = development
 app = create_app(config_name=os.getenv('FLASK_CONFIG'))
 # print("This is the app", app)
 # print("This is the app type", type(app))
