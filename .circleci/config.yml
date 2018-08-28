@@ -25,6 +25,8 @@ jobs:
           command: >
             curl -O
             http://selenium-release.storage.googleapis.com/3.5/selenium-server-standalone-3.5.3.jar
+            echo $BUCKET_NAME
+            echo ${BUCKET_NAME}
       - run:
           name: Start Selenium
           command: >
