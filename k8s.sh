@@ -1,5 +1,3 @@
-. /home/ubuntu/.env
-
 echo "Get s3 bucket..."
 # Check available buckets
 buckets="$(aws s3api list-buckets | jq -r '.Buckets')"
