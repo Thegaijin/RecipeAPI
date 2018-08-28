@@ -23,6 +23,7 @@ fi
 echo "Generate public key from pem file"
 echo ${PEM_FILE} > key-pair.json
 ls -la
+pwd
 chmod 400 key-pair.pem
 ssh-keygen -y -f key-pair.pem > id_rsa.pub
 
