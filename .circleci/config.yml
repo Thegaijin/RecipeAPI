@@ -79,3 +79,14 @@ jobs:
           name: List clusters
           command: |
             kops list clusters
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: api_defence
