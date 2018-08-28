@@ -8,7 +8,7 @@ services:
     ports:
       - '80:80'
     environment:
-      - FLASK_CONFIG: ${FLASK_CONFIG}
-      - SECRET_KEY: ${SECRET_KEY}
+      - FLASK_CONFIG: '${FLASK_CONFIG}'
+      - SECRET_KEY: '${SECRET_KEY}'
     volumes:
       - '.:/app'
