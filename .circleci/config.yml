@@ -86,7 +86,7 @@ jobs:
           command: |
             pwd
             ls -la
-            kops export kubecfg ${CLUSTER_NAME}
+            kops export kubecfg ${CLUSTER_NAME} --state=s3://${BUCKET_NAME}
             bash k8s.sh
     working_directory: ~/project
 
