@@ -36,6 +36,10 @@ if [[ ${THE_CLUSTER} == ${CLUSTER_NAME} ]]; then
 	fi
 if
 
+if [ $THE_CLUSTER == false ]; then
+echo "There is no cluster..."
+fi
+
 
 # if [ $THE_CLUSTER == false ]; then
 # 	echo "Creating cluster..."
