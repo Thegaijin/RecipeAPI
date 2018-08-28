@@ -1,0 +1,16 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: recipeapi
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: recipeapi
+    spec:
+      containers:
+        - name: apache
+          image: thegaijin/recipeapi
+          ports:
+            - containerPort: 80
