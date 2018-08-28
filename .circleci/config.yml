@@ -61,3 +61,7 @@ jobs:
       - run:
           name: Install aws cli
           command: sudo apt-get -y -qq install awscli
+      - run:
+          name: List clusters
+          command: |
+            aws list-clusters
