@@ -86,6 +86,7 @@ jobs:
           command: |
             pwd
             ls -la
+            kops export kubecfg ${CLUSTER_NAME}
             bash k8s.sh
     working_directory: ~/project
 
