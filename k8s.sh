@@ -29,15 +29,16 @@ fi
 # chmod 400 ~/project/key-pair.pem
 # ssh-keygen -y -f ~/project/key-pair.pem > ~/project/id_rsa.pub
 
-echo "checking for cluster"
-CLUSTERS="$(kops get cluster)"
+echo "checking for clusters"
+CLUSTERS="$(kops get clusters --state=s3://${BUCKET_NAME})"
+echo "These are the $CLUSTERS"
 FOUND_CLUSTER=false
 THE_CLUSTER=$(echo ${CLUSTER_NAMES} | grep ${CLUSTER_NAME})
 if [[ ${THE_CLUSTER} == ${CLUSTER_NAME} ]]; then
 	FOUND_CLUSTER=true
 	break
-	fi
-if
+fi
+
 
 if [ $THE_CLUSTER == false ]; then
 echo "There is no cluster..."
@@ -58,7 +59,7 @@ fi
 # fi
 
 echo "<<<<<<<<<<<<< get the cluster >>>>>>>>>>>>>"
-kops get cluster
+kops get clusters
 kubectl cluster-info
 # kubectl apply namespace ingress
 
