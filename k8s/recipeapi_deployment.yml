@@ -12,11 +12,6 @@ spec:
       containers:
         - name: apache
           image: thegaijin/recipeapi
-          env:
-            - name: FLASK_CONFIG
-              value: ${FLASK_CONFIG}
-            - name: SECRET_KEY
-              value: ${SECRET_KEY}
           ports:
             - containerPort: 80
 
