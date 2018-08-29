@@ -63,18 +63,12 @@ jobs:
       - run:
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
-            echo ${FLASK_CONFIG}
-            echo ${SECRET_KEY}
             docker-compose up -d
             docker-compose push
       - run:
           name: List clusters
           command: |
-            pwd
-            ls -la
             kops export kubecfg ${CLUSTER_NAME} --state=s3://${BUCKET_NAME}
-            echo ${FLASK_CONFIG}
-            echo ${SECRET_KEY}
             bash k8s.sh
     working_directory: ~/project
 
