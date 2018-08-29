@@ -33,7 +33,7 @@ First we install the [aws cli](https://aws.amazon.com/cli/) tool. Assumptions ha
 - To create the cluster, we need to install [kops](https://github.com/kubernetes/kops), a tool for managing clusters. run `brew install kops` to install kops.
 - Create the cluster by running the command below.
 
-      	`kops create cluster --node-count 2 --zones us-east-1a --master-zones us-east-1a --node-size t2.micro --master-size t2.micro <name of cluster> --yes`
+  kops create cluster --node-count 2 --zones us-east-1a --master-zones us-east-1a --node-size t2.micro --master-size t2.micro <name of cluster> --yes
 
 - Once the cluster has been created, validate that it is up and running.
   Run `kops validate cluster <name of cluster>`
@@ -44,7 +44,7 @@ In the CI/CD pipeline, once the tests have passed, we build the docker image and
 
 ### The script
 
-Inside the script we verify that the S3 bucket exists, if it doesn't it is created. Then we append the details of the kubernetes deployment and service to an empty yaml file in the k8s directory. After that we check for the cluster by the name we created earlier. If the cluster is present, we run the command which uses the configurations in the yaml file to setup the pods and service for our application. The `pods` are created using the Docker application image created in pushed a few steps ago in the pipeline.
+In the [script](https://github.com/Thegaijin/RecipeAPI/blob/api_defence/k8s.sh) we verify that the S3 bucket exists, if it doesn't it is created. Then we append the details of the kubernetes deployment and service to an empty yaml file in the k8s directory. After that we check for the cluster by the name we created earlier. If the cluster is present, we then pick the cluster config file from the S3 bucket and set it in the working context and then run the command which uses the configurations in the yaml file to setup the pods and service for our application. The `pods` are created using the Docker application image created in pushed a few steps ago in the pipeline.
 
 To access the app, you need be able to access the created resources. For that we install [kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
 
