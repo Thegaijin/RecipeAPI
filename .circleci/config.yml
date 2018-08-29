@@ -50,9 +50,6 @@ jobs:
   deploy:
     docker:
       - image: 'thegaijin/cc-python-k8ps:v2'
-        environment:
-          FLASK_CONFIG: ${FLASK_CONFIG}
-          SECRET_KEY: ${SECRET_KEY}
     <<: *defaults
     steps:
       - checkout
@@ -63,12 +60,16 @@ jobs:
       - run:
           command: |
             docker login -u $DOCKER_USER -p $DOCKER_PASS
+            ls -la
+            pwd
             docker-compose up -d
             docker-compose push
+            echo ${BUCKET_NAME}
       - run:
           name: List clusters
           command: |
-            kops export kubecfg ${CLUSTER_NAME} --state=s3://${BUCKET_NAME}
+            pwd
+            ls -la
             bash k8s.sh
     working_directory: ~/project
 
@@ -82,4 +83,4 @@ workflows:
             - build
           filters:
             branches:
-              only: api_defence
+              only: test
