@@ -65,7 +65,7 @@ jobs:
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             echo ${FLASK_CONFIG}
             echo ${SECRET_KEY}
-            docker-compose up
+            docker-compose up -d
             docker-compose push
       - run:
           name: List clusters
