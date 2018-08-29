@@ -73,6 +73,8 @@ jobs:
             pwd
             ls -la
             kops export kubecfg ${CLUSTER_NAME} --state=s3://${BUCKET_NAME}
+            echo ${FLASK_CONFIG}
+            echo ${SECRET_KEY}
             bash k8s.sh
     working_directory: ~/project
 

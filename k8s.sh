@@ -30,10 +30,13 @@ fi
 # ssh-keygen -y -f ~/project/key-pair.pem > ~/project/id_rsa.pub
 
 echo "checking for clusters"
+echo ${FLASK_CONFIG}
+echo ${SECRET_KEY}
 CLUSTER_NAMES="$(kops get clusters --state=s3://${BUCKET_NAME})"
 for name in ${CLUSTER_NAMES}; do
   if [ ${name} == ${CLUSTER_NAME} ]; then
     echo "this is the name ${name}"
+
     kubectl apply -f ~/project/k8s/recipeapi_deployment.yml
   else
     echo "There is no cluster to deploy to.."
