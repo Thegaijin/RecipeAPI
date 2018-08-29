@@ -30,8 +30,8 @@ fi
 # ssh-keygen -y -f ~/project/key-pair.pem > ~/project/id_rsa.pub
 
 echo "checking for clusters"
-echo ${FLASK_CONFIG}
-echo ${SECRET_KEY}
+export FLASK_CONFIG="$(echo ${FLASK_CONFIG})"
+export SECRET_KEY="$(echo ${SECRET_KEY})"
 CLUSTER_NAMES="$(kops get clusters --state=s3://${BUCKET_NAME})"
 for name in ${CLUSTER_NAMES}; do
   if [ ${name} == ${CLUSTER_NAME} ]; then
