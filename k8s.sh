@@ -37,8 +37,7 @@ echo "This is the flask config $FLASK_CONFIG"
 echo "This is the secret key $SECRET_KEY"
 
 
-echo "Creating login microservice service file"
-touch ~/project/k8s/recipeapi_deployment.yml
+echo "Creating the deployment yml file"
 sudo cat <<EOF > ~/project/k8s/recipeapi_deployment.yml
 apiVersion: extensions/v1beta1
 kind: Deployment
