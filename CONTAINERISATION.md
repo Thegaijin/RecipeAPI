@@ -4,7 +4,7 @@ The first step was to create a custom CI image installing all the deployment rel
 
     docker build -t <your_dockerhub_username>/<image_name> .
 
-To check the integrity of the image created you can run the command below. It should return `OK` if it is, otherwise, `Corrupted`. If it returns the later, try to recreate the image and check it again.
+To check the integrity of the image created you can run the command below. It should return `OK` if it is, otherwise, `Corrupted`. If it returns the latter, try to recreate the image and check it again.
 
     docker save <your_dockerhub_username>/<image_name> > /dev/null && echo 'OK' || echo 'Corrupted'
 
@@ -54,4 +54,4 @@ To access the app, you need be able to access the created resources. For that we
 
 <img width="1680" alt="screen shot 2018-08-29 at 17 17 39" src="https://user-images.githubusercontent.com/5388763/44795518-901b3d00-abb3-11e8-8e53-fe2f9822d3e2.png">
 
-The loadbalancer DNS link can be mapped to a subdomain if you have a domain setup.
+The loadbalancer DNS link can be mapped to a subdomain if you have a domain setup. I have mapped mine to http://api.thegaijin.xyz. Should you find this link down, I have probably torn down the infrastructure.
