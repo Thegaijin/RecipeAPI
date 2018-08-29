@@ -32,6 +32,53 @@ fi
 echo "checking for clusters"
 export FLASK_CONFIG="$(echo ${FLASK_CONFIG})"
 export SECRET_KEY="$(echo ${SECRET_KEY})"
+
+echo "This is the flask config $FLASK_CONFIG"
+echo "This is the secret key $SECRET_KEY"
+
+
+echo "Creating login microservice service file"
+touch ~/project/k8s/recipeapi_deployment.yml
+sudo cat <<EOF > ~/project/k8s/recipeapi_deployment.yml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: recipeapi
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: recipeapi
+    spec:
+      containers:
+        - name: apache
+          image: thegaijin/recipeapi
+          env:
+            - name: FLASK_CONFIG
+              value: ${FLASK_CONFIG}
+            - name: SECRET_KEY
+              value: ${SECRET_KEY}
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: recipeapi
+  labels:
+    app: recipeapi
+spec:
+  type: LoadBalancer
+  externalTrafficPolicy: Cluster
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 31818
+  selector:
+    app: recipeapi
+EOF
+
 CLUSTER_NAMES="$(kops get clusters --state=s3://${BUCKET_NAME})"
 for name in ${CLUSTER_NAMES}; do
   if [ ${name} == ${CLUSTER_NAME} ]; then
