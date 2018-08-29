@@ -92,5 +92,3 @@ To use the application, ensure that you have python 3.6+, clone the repository t
 export FLASK_CONFIG=development
 python manage.py runserver
 ```
-
-testsssxx
