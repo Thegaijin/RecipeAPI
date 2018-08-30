@@ -40,7 +40,7 @@ spec:
         app: recipeapi
     spec:
       containers:
-        - name: apache
+        - name: recipeapi
           image: thegaijin/recipeapi
           env:
             - name: FLASK_CONFIG
@@ -67,7 +67,6 @@ spec:
     app: recipeapi
 EOF
 
-cat ~/project/k8s/recipeapi_deployment.yml
 CLUSTER_NAMES="$(kops get clusters --state=s3://${BUCKET_NAME})"
 for name in ${CLUSTER_NAMES}; do
   if [ ${name} == ${CLUSTER_NAME} ]; then
