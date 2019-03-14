@@ -23,9 +23,10 @@ cmd_install_packages: &cmd_install_packages
       pip install -r requirements.txt
 
 cmd_save_cache: &cmd_save_cache
-  key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
-  paths:
-    - ".venv"
+  save_cache:
+    key: api-dependencies-{{ checksum "Pipfile.lock" }}
+    paths:
+      - $(python3 -m venv venv)
 
 cmd_restore_cache: &cmd_restore_cache
   restore_cache:
