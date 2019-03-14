@@ -26,8 +26,6 @@ cmd_save_cache: &cmd_save_cache
   key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
   paths:
     - ".venv"
-    - "/usr/local/bin"
-    - "/usr/local/lib/python3.6/site-packages"
 
 cmd_restore_cache: &cmd_restore_cache
   restore_cache:
@@ -40,10 +38,8 @@ jobs:
     steps:
       - checkout
       - *cmd_attach_workspace
-      - run: sudo chown -R circleci:circleci /usr/local/bin
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
       - *cmd_install_packages
-      # - *cmd_save_cache
+      - *cmd_save_cache
 
   test:
     <<: *defaults
@@ -52,17 +48,6 @@ jobs:
       - *cmd_attach_workspace
       - *cmd_install_packages
       - run: mkdir test-reports
-      - run:
-          name: Download Selenium
-          command: >
-            curl -O
-            http://selenium-release.storage.googleapis.com/3.5/selenium-server-standalone-3.5.3.jar
-      - run:
-          name: Start Selenium
-          command: >
-            java -jar selenium-server-standalone-3.5.3.jar -log
-            test-reports/selenium.log
-          background: true
       - run:
           command: |
             . venv/bin/activate
