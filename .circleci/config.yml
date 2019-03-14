@@ -1,14 +1,14 @@
 default: &defaults
   docker:
-    - image: 'thegaijin/cc-python-k8ps:v2'
+    - image: "thegaijin/cc-python-k8ps:v2"
       environment:
         FLASK_CONFIG: testing
-        TEST_DATABASE_URL: 'postgresql://ubuntu@localhost/circle_test?sslmode=disable'
-    - image: 'circleci/postgres:9.6.5-alpine-ram'
+        TEST_DATABASE_URL: "postgresql://ubuntu@localhost/circle_test?sslmode=disable"
+    - image: "circleci/postgres:9.6.5-alpine-ram"
       environment:
         POSTGRES_USER: circleci
         POSTGRES_DB: test_db
-        POSTGRES_PASSWORD: ''
+        POSTGRES_PASSWORD: ""
   working_directory: ~/project
 
 version: 2
@@ -33,6 +33,12 @@ jobs:
           background: true
       - restore_cache:
           key: 'deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}'
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/project
       - run:
           command: |
             python3 -m venv venv
@@ -49,7 +55,7 @@ jobs:
           path: test-reports/
   deploy:
     docker:
-      - image: 'thegaijin/cc-python-k8ps:v2'
+      - image: "thegaijin/cc-python-k8ps:v2"
         environment:
           FLASK_CONFIG: ${FLASK_CONFIG}
           SECRET_KEY: ${SECRET_KEY}
