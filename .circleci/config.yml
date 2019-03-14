@@ -11,14 +11,43 @@ default: &defaults
         POSTGRES_PASSWORD: ""
   working_directory: ~/project
 
+cmd_attach_workspace: &cmd_attach_workspace
+  attach_workspace:
+    at: ~/project
+
+cmd_install_packages: &cmd_install_packages
+  run:
+    command: |
+      python3 -m venv venv
+      . venv/bin/activate
+      pip install -r requirements.txt
+
+cmd_save_cache: &cmd_save_cache
+  key: deps9-{{ .Branch }}-{{ checksum "Pipfile.lock" }}
+  paths:
+    - ".venv"
+    - "/usr/local/bin"
+    - "/usr/local/lib/python3.6/site-packages"
+
+cmd_restore_cache: &cmd_restore_cache
+  restore_cache:
+    keys: 'deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}'
+
 version: 2
 jobs:
   build:
     <<: *defaults
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/project
+      - *cmd_attach_workspace
+      - *cmd_save_cache
+
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - *cmd_attach_workspace
+      - *cmd_install_packages
       - run: mkdir test-reports
       - run:
           name: Download Selenium
@@ -31,19 +60,6 @@ jobs:
             java -jar selenium-server-standalone-3.5.3.jar -log
             test-reports/selenium.log
           background: true
-      - restore_cache:
-          key: 'deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}'
-  test:
-    <<: *defaults
-    steps:
-      - checkout
-      - attach_workspace:
-          at: ~/project
-      - run:
-          command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install -r requirements.txt
       - run:
           command: |
             . venv/bin/activate
@@ -62,8 +78,9 @@ jobs:
     <<: *defaults
     steps:
       - checkout
-      - attach_workspace:
-          at: ~/project
+      - *cmd_attach_workspace
+      - *cmd_install_packages
+      - *cmd_restore_cache
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
@@ -92,4 +109,7 @@ workflows:
             - test
           filters:
             branches:
-              only: api_defence
+              only:
+                - api_defence
+                - develop
+                - master
