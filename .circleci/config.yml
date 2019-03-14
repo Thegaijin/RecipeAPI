@@ -83,9 +83,13 @@ workflows:
   build-and-deploy:
     jobs:
       - build
+      - test:
+          requires:
+            - build
       - deploy:
           requires:
             - build
+            - test
           filters:
             branches:
               only: api_defence
