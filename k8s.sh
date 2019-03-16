@@ -25,6 +25,7 @@ fi
 echo "checking for clusters"
 export FLASK_CONFIG="$(echo ${FLASK_CONFIG})"
 export SECRET_KEY="$(echo ${SECRET_KEY})"
+export DATABASE_URL="$(echo ${DATABASE_URL})"
 
 echo "Creating the deployment yml file"
 sudo cat <<EOF > ~/project/k8s/recipeapi_deployment.yml
@@ -47,6 +48,8 @@ spec:
               value: ${FLASK_CONFIG}
             - name: SECRET_KEY
               value: ${SECRET_KEY}
+            - name: DATABASE_URL
+              value: ${DATABASE_URL}
           ports:
             - containerPort: 80
 ---
