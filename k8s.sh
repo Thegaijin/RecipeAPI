@@ -22,7 +22,7 @@ if [ ${found_bucket} == false ]; then
 	export KOPS_STATE_STORE=s3://${BUCKET_NAME}
 fi
 
-echo "checking for clusters"
+echo "setting env vars"
 export FLASK_CONFIG="$(echo ${FLASK_CONFIG})"
 export SECRET_KEY="$(echo ${SECRET_KEY})"
 export DATABASE_URL="$(echo ${DATABASE_URL})"
@@ -42,7 +42,7 @@ spec:
     spec:
       containers:
         - name: recipeapi
-          image: thegaijin/recipeapi
+          image: thegaijin/recipeapi:{{ IMG_TAG }}
           env:
             - name: FLASK_CONFIG
               value: ${FLASK_CONFIG}
@@ -68,12 +68,40 @@ spec:
       nodePort: 31818
   selector:
     app: recipeapi
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: recipeapi-migrations-job
+  namespace: default
+spec:
+  ttlSecondsAfterFinished: 100
+  template:
+    metadata:
+      name: recipeapi-migrations
+    spec:
+      containers:
+        - name: recipeapi-migrations
+          image: thegaijin/recipeapi:{{ IMG_TAG }}
+          command:
+            - python
+            - manage.py
+            - db
+            - upgrade
+          env:
+          - name: FLASK_CONFIG
+            value: ${FLASK_CONFIG}
+          - name: DATABASE_URL
+            value: "{{ DATABASE_URL }}"
+      restartPolicy: Never
 EOF
 
 CLUSTER_NAMES="$(kops get clusters --state=s3://${BUCKET_NAME})"
 for name in ${CLUSTER_NAMES}; do
   if [ ${name} == ${CLUSTER_NAME} ]; then
     echo "this is the name ${name} of the cluster"
+    echo $IMG_TAG
+    # kops export kubecfg ${CLUSTER_NAME} --state=s3://${BUCKET_NAME}
     kubectl apply -f ~/project/k8s/recipeapi_deployment.yml
   else
     echo "There is no cluster to deploy to.."

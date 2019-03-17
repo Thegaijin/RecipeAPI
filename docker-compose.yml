@@ -1,14 +1,14 @@
-version: '3'
+version: "3"
 services:
   web:
     restart: always
     build: .
     container_name: recipeapi
-    image: thegaijin/recipeapi
+    image: thegaijin/recipeapi:{{ IMG_TAG }}
     ports:
-      - '80:80'
+      - "80:80"
     environment:
-      FLASK_CONFIG: '${FLASK_CONFIG}'
-      SECRET_KEY: '${SECRET_KEY}'
+      FLASK_CONFIG: "${FLASK_CONFIG}"
+      SECRET_KEY: "${SECRET_KEY}"
     volumes:
-      - '.:/app'
+      - ".:/app"

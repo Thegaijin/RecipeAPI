@@ -74,6 +74,8 @@ jobs:
           docker_layer_caching: true
       - run:
           command: |
+            export IMG_TAG=$(echo $CIRCLE_SHA1 | cut -c -7)
+            echo $IMG_TAG
             docker login -u $DOCKER_USER -p $DOCKER_PASS
             docker-compose up -d
             docker-compose push
