@@ -42,7 +42,7 @@ spec:
     spec:
       containers:
         - name: recipeapi
-          image: thegaijin/recipeapi:{{ IMG_TAG }}
+          image: thegaijin/recipeapi:$IMG_TAG
           env:
             - name: FLASK_CONFIG
               value: ${FLASK_CONFIG}
@@ -82,7 +82,7 @@ spec:
     spec:
       containers:
         - name: recipeapi-migrations
-          image: thegaijin/recipeapi:{{ IMG_TAG }}
+          image: thegaijin/recipeapi:$IMG_TAG
           command:
             - python
             - manage.py
