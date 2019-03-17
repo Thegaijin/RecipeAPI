@@ -4,7 +4,7 @@ services:
     restart: always
     build: .
     container_name: recipeapi
-    image: thegaijin/recipeapi:{{ IMG_TAG }}
+    image: thegaijin/recipeapi:$IMG_TAG
     ports:
       - "80:80"
     environment:
