@@ -119,6 +119,6 @@ workflows:
           filters:
             branches:
               only:
-                - api_defence
+                - deployment
                 - develop
                 - master
