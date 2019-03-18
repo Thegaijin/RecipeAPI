@@ -13,7 +13,6 @@ activateServiceAccount() {
   gcloud --quiet config set project ${GCP_PROJECT_ID}
   gcloud --quiet config set compute/zone ${COMPUTE_ZONE}
   gcloud --quiet container clusters get-credentials ${CLUSTER_NAME}
-  fi
   gcloud config list
 }
 
