@@ -1,0 +1,6 @@
+tests/
+shared/
+k8s/
+Procfile
+travis.yml
+.circleci/

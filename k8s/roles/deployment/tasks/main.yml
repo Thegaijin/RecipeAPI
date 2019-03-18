@@ -1,0 +1,27 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: recipeapi
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: recipeapi
+    spec:
+      containers:
+        - name: recipeapi
+          image: thegaijin/recipeapi:$IMG_TAG
+          env:
+            - name: FLASK_CONFIG
+              value: ${FLASK_CONFIG}
+            - name: SECRET_KEY
+              value: ${SECRET_KEY}
+            - name: DATABASE_URL
+              value: ${DATABASE_URL}
+          command:
+            - python3
+            - manage.py
+            - runserver
+          ports:
+            - containerPort: 80

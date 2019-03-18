@@ -32,6 +32,26 @@ cmd_restore_cache: &cmd_restore_cache
   restore_cache:
     key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
 
+cmd_login_gcp: &cmd_login_gcp
+  run:
+    name: login into GCP
+    command: |
+      echo "Service account"
+      echo ${SERVICE_ACCOUNT}
+      echo "GCP Project ID"
+      echo $GCP_PROJECT_ID
+      chmod +x .circleci/gcp_login.sh
+      .circleci/gcp_login.sh main
+
+cmd_build_and_push_docker: &cmd_build_and_push_docker
+  run:
+    name: build image
+    command: |
+      export IMG_TAG=$(echo $CIRCLE_SHA1 | cut -c -7)
+      echo $IMG_TAG
+      docker login -u _json_key -p "$(echo $SERVICE_ACCOUNT)" https://gcr.io
+      docker-compose up -d
+      docker push gcr.io/${GCP_PROJECT_ID}/recipeapi:$IMG_TAG
 version: 2
 jobs:
   build:
@@ -61,32 +81,27 @@ jobs:
   deploy:
     docker:
       - image: "thegaijin/cc-python-k8ps:v2"
+        auth:
+          username: _json_key
+          password: $SERVICE_ACCOUNT
         environment:
           FLASK_CONFIG: ${FLASK_CONFIG}
           SECRET_KEY: ${SECRET_KEY}
+          GOOGLE_APPLICATION_CREDENTIALS: /root/project/shared/account.json
     <<: *defaults
     steps:
       - checkout
-      - *cmd_attach_workspace
-      - *cmd_install_packages
-      - *cmd_restore_cache
       - setup_remote_docker:
           docker_layer_caching: true
+      - *cmd_attach_workspace
+      - *cmd_login_gcp
+      - *cmd_build_and_push_docker
       - run:
-          command: |
-            export IMG_TAG=$(echo $CIRCLE_SHA1 | cut -c -7)
-            echo $IMG_TAG
-            docker login -u $DOCKER_USER -p $DOCKER_PASS
-            docker-compose up -d
-            docker-compose push
-      - run:
-          name: List clusters
+          name: deploy app
           command: |
             echo ${CLUSTER_NAME}
-            echo ${BUCKET_NAME}
-            echo ${GOPATH}
-            kops export kubecfg ${CLUSTER_NAME} --state=s3://${BUCKET_NAME}
-            bash k8s.sh
+            cd k8s
+            ansible-playbook playbook.yml --extra-vars "@vars.yml" -vvv
     working_directory: ~/project
 
 workflows:

@@ -1,0 +1,4 @@
+PROJECT_NAME: "{{ lookup('env', 'PROJECT_NAME') }}"
+IMG_TAG: "{{ lookup('env', 'IMG_TAG') }}"
+GCP_PROJECT_ID: "{{ lookup('env', 'GCP_PROJECT_ID') }}"
+DATABASE_URL: "{{ lookup('env', 'DATABASE_URL') }}"
