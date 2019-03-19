@@ -2,8 +2,8 @@ FROM ubuntu:16.04
 
 RUN apt-get update
 RUN apt-get update && apt-get install -y wget apt-transport-https curl software-properties-common
-RUN apt-get install -y build-essential libpq-dev libssl-dev libffi-dev zlib1g-dev python3-pip python3-dev && apt-get update
-RUN add-apt-repository ppa:jonathonf/python-3.6 && apt-get update && apt-get install -y python3.6 python3-venv
+RUN apt-get install -y build-essential libpq-dev libssl-dev libffi-dev zlib1g-dev python3-venv python3-pip python3-dev && apt-get update
+RUN add-apt-repository ppa:jonathonf/python-3.6 && apt-get update && apt-get install -y python3.6
 RUN apt-get update
 # RUN sudo wget -q https://storage.googleapis.com/kubernetes-release/release/v1.8.7/bin/linux/amd64/kubectl && sudo chmod +x kubectl && sudo mv kubectl /usr/bin
 # RUN sudo wget -q https://github.com/kubernetes/kops/releases/download/1.8.0/kops-linux-amd64 && sudo chmod +x kops-linux-amd64 && sudo mv kops-linux-amd64 /usr/bin/kops
