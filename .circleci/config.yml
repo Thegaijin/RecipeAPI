@@ -119,6 +119,7 @@ jobs:
           name: delete kubernetes job
           command: |
             sleep 1m
+            ls -la
             export JOB_NAME=recipeapi-migrations-job
             echo ${JOB_NAME}
             export ACTIVE=$(kubectl get job -o 'jsonpath={.status.active}' ${JOB_NAME} --namespace default
