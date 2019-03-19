@@ -11,7 +11,7 @@ spec:
     spec:
       containers:
         - name: recipeapi-migrations
-          image: "gcr.io/{{ GCP_PROJECT_ID }}/recipeapi: {{ IMG_TAG }}"
+          image: "gcr.io/{{ GCP_PROJECT_ID }}/recipeapi:{{ IMG_TAG }}"
           command:
             - python
             - manage.py
