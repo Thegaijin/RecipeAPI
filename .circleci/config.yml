@@ -60,7 +60,7 @@ jobs:
       - checkout
       - *cmd_attach_workspace
       - *cmd_install_packages
-      - *cmd_save_cache
+      # - *cmd_save_cache
 
   test:
     <<: *defaults
