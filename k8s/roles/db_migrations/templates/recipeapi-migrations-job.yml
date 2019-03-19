@@ -4,19 +4,15 @@ metadata:
   name: recipeapi-migrations-job
   namespace: default
 spec:
-  ttlSecondsAfterFinished: 100
   template:
     metadata:
-      name: recipeapi-migrations
+      name: recipeapi-migrations-job
     spec:
       containers:
         - name: recipeapi-migrations
           image: gcr.io/{{ GCP_PROJECT_ID }}/recipeapi:{{ IMG_TAG }}
-          command:
-            - python
-            - manage.py
-            - db
-            - upgrade
+          command: ["/bin/sh","-c"]
+          args: ["python3 manage.py db init; python3 manage.py db migrate && python3 manage.py db upgrade"]
           env:
             - name: FLASK_CONFIG
               value: "{{ FLASK_CONFIG }}"
