@@ -142,7 +142,7 @@ workflows:
           requires:
             - build
             - test
-      - delete_migrations_job:
+      - delete_migration_job:
           requires:
             - build
             - test
