@@ -1,4 +1,5 @@
-- name: Run migrations
+---
+- name: Create recipe deployment file
   k8s:
     state: present
     definition: "{{ lookup('template', 'templates/recipeapi-deployment.yml') }}"
