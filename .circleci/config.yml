@@ -49,6 +49,7 @@ cmd_build_and_push_docker: &cmd_build_and_push_docker
     command: |
       export IMG_TAG=$(echo $CIRCLE_SHA1 | cut -c -7)
       echo $IMG_TAG
+      docker --version
       docker login -u _json_key -p "$(echo $SERVICE_ACCOUNT)" https://gcr.io
       docker-compose up -d
       docker push gcr.io/${GCP_PROJECT_ID}/recipeapi:$IMG_TAG
