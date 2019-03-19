@@ -81,9 +81,6 @@ jobs:
   deploy:
     docker:
       - image: "thegaijin/cc-python-k8ps:v3"
-        auth:
-          username: _json_key
-          password: $SERVICE_ACCOUNT
         environment:
           FLASK_CONFIG: ${FLASK_CONFIG}
           SECRET_KEY: ${SECRET_KEY}
