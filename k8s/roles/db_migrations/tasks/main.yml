@@ -1,3 +1,4 @@
+---
 - name: Run migrations
   k8s:
     state: present
