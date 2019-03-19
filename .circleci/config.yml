@@ -103,6 +103,33 @@ jobs:
             ansible-playbook playbook.yml --extra-vars "@vars.yml" -vvv
     working_directory: ~/project
 
+  delete_migration_job:
+    docker:
+      - image: "thegaijin/cc-python-k8ps:v3"
+        environment:
+          FLASK_CONFIG: ${FLASK_CONFIG}
+          SECRET_KEY: ${SECRET_KEY}
+          GOOGLE_APPLICATION_CREDENTIALS: /root/project/shared/account.json
+
+    steps:
+      - setup_remote_docker
+      - *cmd_attach_workspace
+      - *cmd_login_gcp
+      - run:
+          name: delete kubernetes job
+          command: |
+            sleep 1m
+            export JOB_NAME=recipeapi-migrations-job
+            echo ${JOB_NAME}
+            export ACTIVE=$(kubectl get job -o 'jsonpath={.status.active}' ${JOB_NAME} --namespace default
+            export SUCCEEDED=$(kubectl get job -o 'jsonpath={.status.succeeded}' ${JOB_NAME} --namespace default
+            echo ${ACTIVE}
+            echo ${SUCCEEDED}
+            if ([ "${ACTIVE}" == "null" ] || [[ -z "${ACTIVE}" ]] ) && [ "${SUCCEEDED}" == "1" ]; then
+              echo "Blocking job ${JOB_NAME} succesfully completed, deleting"
+              kubectl delete job ${JOB_NAME} --namespace=default
+            fi
+
 workflows:
   version: 2
   build-and-deploy:
@@ -115,6 +142,11 @@ workflows:
           requires:
             - build
             - test
+      - delete_migrations_job:
+          requires:
+            - build
+            - test
+            - deploy
           filters:
             branches:
               only:
