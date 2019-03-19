@@ -1,0 +1,25 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: recipeapi-migrations-job
+  namespace: default
+spec:
+  ttlSecondsAfterFinished: 100
+  template:
+    metadata:
+      name: recipeapi-migrations
+    spec:
+      containers:
+        - name: recipeapi-migrations
+          image: "gcr.io/{{ GCP_PROJECT_ID }}/recipeapi: {{ IMG_TAG }}"
+          command:
+            - python
+            - manage.py
+            - db
+            - upgrade
+          env:
+            - name: FLASK_CONFIG
+              value: "{{ FLASK_CONFIG }}"
+            - name: DATABASE_URL
+              value: "{{ DATABASE_URL }}"
+      restartPolicy: Never
