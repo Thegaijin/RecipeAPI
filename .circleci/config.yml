@@ -97,6 +97,8 @@ jobs:
           name: deploy app
           command: |
             echo ${CLUSTER_NAME}
+            export IMG_TAG=$(echo $CIRCLE_SHA1 | cut -c -7)
+            echo $IMG_TAG
             cd k8s
             ansible-playbook playbook.yml --extra-vars "@vars.yml" -vvv
     working_directory: ~/project
