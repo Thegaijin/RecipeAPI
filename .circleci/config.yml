@@ -80,7 +80,7 @@ jobs:
           path: test-reports/
   deploy:
     docker:
-      - image: "thegaijin/cc-python-k8ps:v2"
+      - image: "thegaijin/cc-python-k8ps:v3"
         auth:
           username: _json_key
           password: $SERVICE_ACCOUNT
