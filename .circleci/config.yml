@@ -60,7 +60,7 @@ jobs:
       - checkout
       - *cmd_attach_workspace
       - *cmd_install_packages
-      # - *cmd_save_cache
+      - *cmd_save_cache
 
   test:
     <<: *defaults
@@ -88,7 +88,6 @@ jobs:
           FLASK_CONFIG: ${FLASK_CONFIG}
           SECRET_KEY: ${SECRET_KEY}
           GOOGLE_APPLICATION_CREDENTIALS: /root/project/shared/account.json
-    <<: *defaults
     steps:
       - checkout
       - setup_remote_docker:
