@@ -12,7 +12,7 @@ spec:
     spec:
       containers:
       - command:
-        - python
+        - python3
         - manage.py
         - runserver
         env:
