@@ -132,6 +132,7 @@ jobs:
               echo "Blocking job ${JOB_NAME} succesfully completed, deleting"
               kubectl delete job ${JOB_NAME} --namespace=default
             fi
+    working_directory: ~/project
 
 workflows:
   version: 2
