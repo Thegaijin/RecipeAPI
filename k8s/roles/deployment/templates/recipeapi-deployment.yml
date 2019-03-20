@@ -11,19 +11,19 @@ spec:
         app: recipeapi
     spec:
       containers:
-        command:
-          - python3
-          - manage.py
-          - runserver
-        env:
-          - name: FLASK_CONFIG
-            value: "{{ FLASK_CONFIG }}"
-          - name: SECRET_KEY
-            value: "{{ SECRET_KEY }}"
-          - name: DATABASE_URL
-            value: "{{ DATABASE_URL }}"
-        image: gcr.io/{{ GCP_PROJECT_ID }}/recipeapi:{{ IMG_TAG }}
-        name: recipeapi
-        imagePullPolicy: Always
-        ports:
-          - containerPort: 80
+        - name: recipeapi
+          image: gcr.io/{{ GCP_PROJECT_ID }}/recipeapi:{{ IMG_TAG }}
+          imagePullPolicy: Always
+          command:
+            - python3
+            - manage.py
+            - runserver
+          env:
+            - name: FLASK_CONFIG
+              value: "{{ FLASK_CONFIG }}"
+            - name: SECRET_KEY
+              value: "{{ SECRET_KEY }}"
+            - name: DATABASE_URL
+              value: "{{ DATABASE_URL }}"
+          ports:
+            - containerPort: 80
