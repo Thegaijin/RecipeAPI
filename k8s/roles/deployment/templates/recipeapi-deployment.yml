@@ -26,4 +26,4 @@ spec:
             - name: DATABASE_URL
               value: "{{ DATABASE_URL }}"
           ports:
-            - containerPort: 80
+            - containerPort: 5000
