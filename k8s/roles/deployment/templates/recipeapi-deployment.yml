@@ -22,7 +22,7 @@ spec:
             value: "{{ SECRET_KEY }}"
           - name: DATABASE_URL
             value: "{{ DATABASE_URL }}"
-        image: thegaijin/recipeapi:{{ IMG_TAG }}
+        image: gcr.io/${GCP_PROJECT_ID}/recipeapi:{{ IMG_TAG }}
         name: recipeapi
         imagePullPolicy: Always
         ports:
