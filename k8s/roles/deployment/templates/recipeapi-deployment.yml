@@ -11,10 +11,10 @@ spec:
         app: recipeapi
     spec:
       containers:
-      - name: recipeapi
-        image: gcr.io/{{ GCP_PROJECT_ID }}/recipeapi:{{ IMG_TAG }}
-        command: ["/bin/sh","-c"]
-        args: ["bash start_nginx.sh && python3 manage.py runserver"]
+      - command:
+        - python3
+        - manage.py
+        - runserver
         env:
           - name: FLASK_CONFIG
             value: "{{ FLASK_CONFIG }}"
@@ -22,6 +22,8 @@ spec:
             value: "{{ SECRET_KEY }}"
           - name: DATABASE_URL
             value: "{{ DATABASE_URL }}"
+        image: gcr.io/{{ GCP_PROJECT_ID }}/recipeapi:{{ IMG_TAG }}
+        name: recipeapi
         imagePullPolicy: Always
         ports:
           - containerPort: 80

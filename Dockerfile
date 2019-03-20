@@ -2,13 +2,15 @@ FROM ubuntu:latest
 MAINTAINER Thegaijin "devoprentice@gmail.com"
 
 # Update image
-RUN apt-get update -y && apt-get install -y python3.6 python3-pip python3.6-gdbm nginx
+RUN apt-get update -y && apt-get install -y python3.6 python3-pip python3.6-gdbm
 
-RUN rm -rf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+# nginx
 
-COPY default /etc/nginx/sites-available/
+# RUN rm -rf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
-RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
+# COPY default /etc/nginx/sites-available/
+
+# RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/
 
 # Create a directory where our app will be placed
 RUN mkdir -p /project
@@ -26,4 +28,4 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 EXPOSE 80
 
 # restart nginx
-CMD start_nginx.sh
+# CMD start_nginx.sh
