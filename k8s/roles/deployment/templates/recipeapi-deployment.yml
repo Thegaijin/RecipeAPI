@@ -4,25 +4,26 @@ metadata:
   name: recipeapi
   namespace: default
 spec:
-  replicas: 1
+  replicas: 2
   template:
     metadata:
       labels:
         app: recipeapi
     spec:
       containers:
-        - name: recipeapi
-          image: thegaijin/recipeapi:{{ IMG_TAG }}
-          env:
-            - name: FLASK_CONFIG
-              value: "{{ FLASK_CONFIG }}"
-            - name: SECRET_KEY
-              value: "{{ SECRET_KEY }}"
-            - name: DATABASE_URL
-              value: "{{ DATABASE_URL }}"
-          command:
-            - python
-            - manage.py
-            - runserver
-          ports:
-            - containerPort: 80
+      - command:
+        - python
+        - manage.py
+        - runserver
+        env:
+          - name: FLASK_CONFIG
+            value: "{{ FLASK_CONFIG }}"
+          - name: SECRET_KEY
+            value: "{{ SECRET_KEY }}"
+          - name: DATABASE_URL
+            value: "{{ DATABASE_URL }}"
+        image: thegaijin/recipeapi:{{ IMG_TAG }}
+        name: recipeapi
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 80
