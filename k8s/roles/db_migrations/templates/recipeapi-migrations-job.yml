@@ -16,6 +16,8 @@ spec:
           env:
             - name: FLASK_CONFIG
               value: "{{ FLASK_CONFIG }}"
+            - name: SECRET_KEY
+              value: "{{ SECRET_KEY }}"
             - name: DATABASE_URL
               value: "{{ DATABASE_URL }}"
       restartPolicy: Never
