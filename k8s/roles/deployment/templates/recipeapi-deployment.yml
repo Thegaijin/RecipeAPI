@@ -21,7 +21,7 @@ spec:
             - name: DATABASE_URL
               value: "{{ DATABASE_URL }}"
           command:
-            - python3
+            - python
             - manage.py
             - runserver
           ports:

@@ -2,6 +2,6 @@
   vars:
     ansible_python_interpreter: "/usr/bin/python3"
   roles:
-    - db_migrations
+    # - db_migrations
     - deployment
     - service
