@@ -115,6 +115,7 @@ jobs:
           GOOGLE_APPLICATION_CREDENTIALS: /root/project/shared/account.json
 
     steps:
+      - checkout
       - setup_remote_docker
       - *cmd_attach_workspace
       - *cmd_login_gcp
