@@ -42,6 +42,7 @@ cmd_login_gcp: &cmd_login_gcp
       echo $GCP_PROJECT_ID
       echo $CLUSTER_NAME
       ls -la
+      pwd
       chmod +x .circleci/gcp_login.sh
       .circleci/gcp_login.sh main
 
