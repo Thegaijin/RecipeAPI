@@ -7,11 +7,10 @@ metadata:
   labels:
     app: recipeapi
 spec:
+  selector:
+    app: recipeapi
   type: LoadBalancer
-  externalTrafficPolicy: Cluster
   ports:
     - port: 80
       targetPort: 5000
-      nodePort: 31818
-  selector:
-    app: recipeapi
+...
