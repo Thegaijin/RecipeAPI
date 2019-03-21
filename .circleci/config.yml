@@ -84,7 +84,6 @@ jobs:
           command: |
             echo ${CLUSTER_NAME}
             echo ${BUCKET_NAME}
-            echo ${GOPATH}
             kops export kubecfg ${CLUSTER_NAME} --state=s3://${BUCKET_NAME}
             bash k8s.sh
     working_directory: ~/project
