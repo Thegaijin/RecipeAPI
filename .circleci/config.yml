@@ -1,41 +1,108 @@
+default: &defaults
+  docker:
+    - image: "thegaijin/cc-python-k8ps:v2"
+      environment:
+        FLASK_CONFIG: testing
+        TEST_DATABASE_URL: "postgresql://ubuntu@localhost/circle_test?sslmode=disable"
+    - image: "circleci/postgres:9.6.5-alpine-ram"
+      environment:
+        POSTGRES_USER: circleci
+        POSTGRES_DB: test_db
+        POSTGRES_PASSWORD: ""
+  working_directory: ~/project
+
+cmd_attach_workspace: &cmd_attach_workspace
+  attach_workspace:
+    at: ~/project
+
+cmd_install_packages: &cmd_install_packages
+  run:
+    command: |
+      python3 -m venv venv
+      . venv/bin/activate
+      pip install -r requirements.txt
+
+cmd_save_cache: &cmd_save_cache
+  save_cache:
+    key: api-dependencies-{{ checksum "Pipfile.lock" }}
+    paths:
+      - $(python3 -m venv venv)
+
+cmd_restore_cache: &cmd_restore_cache
+  restore_cache:
+    key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
+
 version: 2
 jobs:
   build:
-    docker:
-      - image: circleci/python:3.6.2-stretch-browsers
-        environment:
-          FLASK_CONFIG: testing
-          TEST_DATABASE_URL: postgresql://ubuntu@localhost/circle_test?sslmode=disable
-      - image: circleci/postgres:9.6.5-alpine-ram
-        environment:
-          POSTGRES_USER: circleci
-          POSTGRES_DB: test_db
-          POSTGRES_PASSWORD: ""
+    <<: *defaults
     steps:
       - checkout
+      - *cmd_attach_workspace
+      - *cmd_install_packages
+      - *cmd_save_cache
+
+  test:
+    <<: *defaults
+    steps:
+      - checkout
+      - *cmd_attach_workspace
+      - *cmd_install_packages
       - run: mkdir test-reports
       - run:
-          name: Download Selenium
-          command: |
-            curl -O http://selenium-release.storage.googleapis.com/3.5/selenium-server-standalone-3.5.3.jar
-      - run:
-          name: Start Selenium
-          command: |
-            java -jar selenium-server-standalone-3.5.3.jar -log test-reports/selenium.log
-          background: true
-      - restore_cache:
-          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
-      - run:
-          command: |
-            python3 -m venv venv
-            . venv/bin/activate
-            pip install -r requirements.txt
-      - run:
           command: |
             . venv/bin/activate
-            python manage.py test
+            pytest
       - store_artifacts:
           path: test-reports/
           destination: tr1
       - store_test_results:
           path: test-reports/
+  deploy:
+    docker:
+      - image: "thegaijin/cc-python-k8ps:v2"
+        environment:
+          FLASK_CONFIG: ${FLASK_CONFIG}
+          SECRET_KEY: ${SECRET_KEY}
+    <<: *defaults
+    steps:
+      - checkout
+      - *cmd_attach_workspace
+      - *cmd_install_packages
+      - *cmd_restore_cache
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          command: |
+            export IMG_TAG=$(echo $CIRCLE_SHA1 | cut -c -7)
+            echo $IMG_TAG
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker-compose up -d
+            docker-compose push
+      - run:
+          name: Set context and deploy the app
+          command: |
+            echo ${CLUSTER_NAME}
+            echo ${BUCKET_NAME}
+            kops export kubecfg ${CLUSTER_NAME} --state=s3://${BUCKET_NAME}
+            bash k8s.sh
+    working_directory: ~/project
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+      # - deploy:
+      #     requires:
+      #       - build
+      #       - test
+      #     filters:
+      #       branches:
+      #         only:
+      #           - api_defence
+      #           - develop
+      #           - master

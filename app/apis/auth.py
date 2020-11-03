@@ -16,14 +16,14 @@ from ..validation_helper import(
 api = Namespace(
     'auth', description='Creating and authenticating user credentials')
 
-REGISTER_USER = api.model('User', {
+REGISTER_USER = api.model('RegisterUser', {
     'username': fields.String(required=True,
                               description='user\'s name'),
     'password': fields.String(required=True, description='user\'s password'),
     'email': fields.String(required=True, description='user\'s email')
 })
 
-LOGIN_USER = api.model('User', {
+LOGIN_USER = api.model('LoginUser', {
     'username': fields.String(required=True,
                               description='user\'s name'),
     'password': fields.String(required=True, description='user\'s password')

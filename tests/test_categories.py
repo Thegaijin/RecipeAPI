@@ -20,8 +20,9 @@ class CategoryTestCase(BaseTestCase):
 
         self.assertEqual(create_res.status_code, 201)
         create_res = json.loads(create_res.data)
-
-        self.assertEqual(create_res['message'], 'Category was created')
+        the_category = self.category['category_name']
+        self.assertEqual(
+            create_res['message'], f'{the_category} category was created')
 
     def test_category_already_exists(self):
         ''' Test that the API can not create a Category that already exists '''

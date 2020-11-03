@@ -103,3 +103,4 @@ migrations/
 .vscode/settings.json
 .DS_Store
 migrations/versions/8d2c453752ff_.py
+throwaway/

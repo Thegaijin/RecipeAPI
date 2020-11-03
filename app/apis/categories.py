@@ -3,6 +3,7 @@
 from flask import request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from flask_restplus import fields, Namespace, Resource, reqparse
+from sqlalchemy import func
 
 from app import db
 from app.models.category import Category
@@ -57,7 +58,8 @@ class Categories(Resource):
         user_id = get_jwt_identity()
 
         # get BaseQuery object to allow for pagination
-        the_categories = Category.query.filter_by(created_by=user_id)
+        the_categories = Category.query.filter_by(
+            created_by=user_id).order_by("category_id desc")
         args = Q_PARSER.parse_args(request)
         q = args.get('q', '')
         page = args.get('page', 1)
@@ -70,16 +72,25 @@ class Categories(Resource):
         if q:
             q = q.lower()
             the_categories = Category.query.filter(
-                Category.category_name.like("%" + q + "%"))
+                (Category.created_by == user_id),
+                (func.lower(Category.category_name).ilike("%" + q + "%")))
+            # print("qqqqqqqqqqqqqqqqqqqq", the_categories.all())
+            if the_categories.all():
+                categorieschema = CategorySchema(many=True)
+                the_categories = categorieschema.dump(the_categories)
+                # print("<<<<<<<<<<<<<<<<>>>>>>>>>>>>>",
+                #       the_categories.data)
 
-            for a_category in the_categories.all():
-                if q in a_category.category_name.lower():
-                    categoryschema = CategorySchema()
-                    the_category = categoryschema.dump(a_category)
-                    return jsonify(the_category.data)
-
+                response = {"categories": the_categories.data,
+                            "message": "These are the category search results"
+                            }
+                return response
         pag_categories = the_categories.paginate(
             page, per_page, error_out=False)
+
+        pages = pag_categories.pages
+        page = pag_categories.page
+
         if not pag_categories.items:
             return {'message': f'There are no categories on page {page}'}
         paginated = []
@@ -87,7 +98,13 @@ class Categories(Resource):
             paginated.append(a_category)
         categoriesschema = CategorySchema(many=True)
         all_categories = categoriesschema.dump(paginated)
-        return jsonify(all_categories)
+        # print("<><><><><><><><><><><><><><><>", all_categories.data)
+        response = {"categories": all_categories.data,
+                    "message": "These are your categories",
+                    "categoryPages": pages,
+                    "categoryPage": page
+                    }
+        return response
 
     @api.expect(CATEGORY)
     @api.response(201, 'Category created successfully')
@@ -106,8 +123,8 @@ class Categories(Resource):
 
         validated_name = name_validator(category_name)
         if validated_name:
-            category_name = category_name.lower()
-            description = description.lower()
+            category_name = category_name
+            description = description
 
             if Category.query.filter_by(
                     created_by=created_by,
@@ -119,7 +136,7 @@ class Categories(Resource):
             db.session.commit()
             the_response = {
                 'status': 'Success',
-                'message': 'Category was created',
+                'message': f'{category_name} category was created',
                 'category_id': a_category.category_id
             }
             return the_response, 201
