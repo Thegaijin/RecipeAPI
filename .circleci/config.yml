@@ -96,13 +96,13 @@ workflows:
       - test:
           requires:
             - build
-      - deploy:
-          requires:
-            - build
-            - test
-          filters:
-            branches:
-              only:
-                - api_defence
-                - develop
-                - master
+      # - deploy:
+      #     requires:
+      #       - build
+      #       - test
+      #     filters:
+      #       branches:
+      #         only:
+      #           - api_defence
+      #           - develop
+      #           - master
